@@ -2,6 +2,7 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
+from discord.ui import View, Button
 import json
 import os
 import asyncio
@@ -54,62 +55,200 @@ async def on_ready():
 async def on_member_join(member):
     guild_id = str(member.guild.id)
     guild_config = all_languages["guilds"].get(guild_id)
-
     if not guild_config:
-        print(f"No config for guild {guild_id}")
         return
 
-    channel_id = guild_config.get("welcome_channel_id")
-    if not channel_id:
-        print(f"No welcome_channel_id set for guild {guild_id}")
+    welcome_channel_id = guild_config.get("welcome_channel_id")
+    if not welcome_channel_id:
         return
 
-    channel = bot.get_channel(channel_id)
-    if not channel:
-        print(f"❌ Welcome channel with ID {channel_id} not found.")
-        return
-
+    channel = bot.get_channel(welcome_channel_id)
     lang_map = guild_config.get("languages", {})
+
     if not lang_map:
-        await channel.send(f"🍃 {member.mention}, no languages are set up yet.")
+        await channel.send(f"🌱 {member.mention}, no languages are set up yet.")
         return
 
-    emoji_list = [data["emoji"] for data in lang_map.values()]
-    msg_lines = [f"🧚 Welcome, {member.mention}! Please choose your language by reacting:"]
-    for code, data in lang_map.items():
-        msg_lines.append(f"{data['emoji']} {data['name']}")
-    msg = await channel.send("\n".join(msg_lines))
+    await send_language_selector(member, channel, lang_map, guild_config)
 
-    for emoji in emoji_list:
-        await msg.add_reaction(emoji)
+# ========== FLOW HELPERS ==========
 
-    def check(reaction, user):
-        return user == member and str(reaction.emoji) in emoji_list and reaction.message.id == msg.id
+async def send_language_selector(member, channel, lang_map, guild_config):
+    class LanguageView(View):
+        def __init__(self):
+            super().__init__(timeout=60)
+            for code, data in lang_map.items():
+                self.add_item(Button(label=data['name'], emoji=data['emoji'], custom_id=code))
 
-    try:
-        reaction, _ = await bot.wait_for("reaction_add", timeout=60.0, check=check)
-        selected_lang = None
-        for code, data in lang_map.items():
-            if data["emoji"] == str(reaction.emoji):
-                selected_lang = code
-                break
+        async def interaction_check(self, interaction):
+            return interaction.user.id == member.id
 
-        if selected_lang:
-            welcome_text = lang_map[selected_lang]["welcome"].replace("{user}", member.mention)
-            await channel.send(welcome_text)
+    async def button_callback(inter):
+        selected_code = inter.data['custom_id']
+        if selected_code not in lang_map:
+            return
 
-            if "users" not in all_languages["guilds"][guild_id]:
-                all_languages["guilds"][guild_id]["users"] = {}
+        guild_id = str(member.guild.id)
+        if "users" not in guild_config:
+            guild_config["users"] = {}
+        guild_config["users"][str(member.id)] = selected_code
+        save_languages()
 
-            all_languages["guilds"][guild_id]["users"][str(member.id)] = selected_lang
-            save_languages()
+        await inter.response.edit_message(
+            embed=discord.Embed(
+                title="🌸 Thank you!",
+                description="You've chosen your whispering tongue. The grove awaits...",
+                color=discord.Color.purple()
+            ),
+            view=None
+        )
+
+        await asyncio.sleep(2)
+
+        rules_text = guild_config.get("rules")
+        if rules_text:
+            await send_rules_embed(member, channel, selected_code, lang_map, guild_config)
         else:
-            await channel.send(f"🍂 {member.mention}, a fairy misheard your whisper. Please try again.")
+            await send_role_selector(member, channel, guild_config)
+            await send_final_welcome(member, channel, selected_code, lang_map)
 
-    except asyncio.TimeoutError:
-        await channel.send(f"🕊️ {member.mention}, no language was chosen in time. The breeze will wait for you.")
+    view = LanguageView()
+    for item in view.children:
+        if isinstance(item, Button):
+            item.callback = button_callback
+
+    embed = discord.Embed(
+        title="🧚 Choose Your Whispering Tongue",
+        description=f"{member.mention}, welcome to the grove.\nPlease choose your language to begin your journey.",
+        color=discord.Color.blurple()
+    )
+
+    await channel.send(embed=embed, view=view)
+
+async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
+    class AcceptRulesView(View):
+        def __init__(self):
+            super().__init__(timeout=90)
+            self.add_item(Button(label="I Accept the Rules", style=discord.ButtonStyle.success, custom_id="accept_rules"))
+
+        async def interaction_check(self, interaction):
+            return interaction.user.id == member.id
+
+    async def accept_callback(interaction):
+        await interaction.response.edit_message(
+            embed=discord.Embed(
+                title="🌿 The grove welcomes you.",
+                description="Thank you for accepting the rules.",
+                color=discord.Color.green()
+            ),
+            view=None
+        )
+
+        await asyncio.sleep(2)
+        await send_role_selector(member, channel, guild_config)
+        await send_final_welcome(member, channel, lang_code, lang_map)
+
+    view = AcceptRulesView()
+    for item in view.children:
+        if isinstance(item, Button):
+            item.callback = accept_callback
+
+    embed = discord.Embed(
+        title="📜 Grove Guidelines",
+        description=guild_config["rules"],
+        color=discord.Color.teal()
+    )
+
+    await channel.send(content=member.mention, embed=embed, view=view)
+
+async def send_role_selector(member, channel, guild_config):
+    role_options = guild_config.get("role_options", {})
+    if not role_options:
+        return
+
+    class RoleSelectView(View):
+        def __init__(self):
+            super().__init__(timeout=60)
+            for role_id, data in role_options.items():
+                self.add_item(Button(label=data['label'], emoji=data['emoji'], custom_id=role_id))
+
+        async def interaction_check(self, interaction: discord.Interaction):
+            return interaction.user.id == member.id
+
+    async def role_button_callback(interaction: discord.Interaction):
+        role_id = interaction.data['custom_id']
+        role = member.guild.get_role(int(role_id))
+        if role:
+            try:
+                await member.add_roles(role)
+                await interaction.response.send_message(f"✨ You’ve been gifted the **{role.name}** role!", ephemeral=True)
+            except Exception as e:
+                await interaction.response.send_message("❗ I couldn’t assign that role. Please contact a mod.", ephemeral=True)
+                print("Role assign error:", e)
+
+    view = RoleSelectView()
+    for item in view.children:
+        if isinstance(item, Button):
+            item.callback = role_button_callback
+
+    embed = discord.Embed(
+        title="🌼 Choose Your Role",
+        description="Select a role to express who you are in the grove.",
+        color=discord.Color.gold()
+    )
+
+    await channel.send(content=member.mention, embed=embed, view=view)
+
+async def send_final_welcome(member, channel, lang_code, lang_map):
+    welcome_msg = lang_map[lang_code]["welcome"].replace("{user}", member.mention)
+    embed = discord.Embed(
+        title="💫 Welcome!",
+        description=welcome_msg,
+        color=discord.Color.green()
+    )
+    await channel.send(embed=embed)
 
 # ========== SLASH COMMAND ==========
+
+@tree.command(name="help", description="See the magical commands Whisperling knows.")
+async def help(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="📖 Whisperling's Grimoire",
+        description="A gentle guide to all the enchantments I can perform.",
+        color=discord.Color.lilac()
+    )
+
+    embed.add_field(
+        name="🌸 For All Wanderers",
+        value=(
+            "`/chooselanguage` – Choose your language again\n"
+            "`/translate` – Translate a replied message to your chosen language"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="🛠️ For Grove Keepers (Admins)",
+        value=(
+            "`!preloadlanguages` – Load EN/DE/FR/ES\n"
+            "`!addlanguage` – Add a new language\n"
+            "`!setwelcome` – Set custom welcome text\n"
+            "`!setwelcomechannel` – Choose the channel for new arrivals\n"
+            "`/setrules` – Define rules for new members\n"
+            "`/addroleoption` – Add a role to the selection list\n"
+            "`/removeroleoption` – Remove a role\n"
+            "`/listroleoptions` – Show available roles\n"
+            "`!listlanguages` – Show current languages\n"
+            "`!removelanguage` – Remove a language\n"
+            "`!langcodes` – Show supported translation codes"
+        ),
+        inline=False
+    )
+
+    embed.set_footer(text="Whisperling is here to help your grove bloom 🌷")
+
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
 @tree.command(name="translate", description="Whisper a translation of a message into your language.")
 @app_commands.checks.has_permissions(send_messages=True)
 async def translate(interaction: discord.Interaction):
@@ -142,24 +281,76 @@ async def translate(interaction: discord.Interaction):
         print("Translation error:", e)
         await interaction.response.send_message("❗ The winds failed to carry the words. Please try again.", ephemeral=True)
 
-@tree.command(name="setlanguage", description="Choose your preferred language for translations.")
-@app_commands.describe(code="The language code you'd like to use.")
-async def setlanguage(interaction: discord.Interaction, code: str):
+@tree.command(name="chooselanguage", description="Choose your preferred language for Whisperling to use.")
+async def chooselanguage(interaction: discord.Interaction):
     guild_id = str(interaction.guild_id)
     user_id = str(interaction.user.id)
     guild_config = all_languages["guilds"].get(guild_id)
 
-    if not guild_config or "languages" not in guild_config or code not in guild_config["languages"]:
-        return await interaction.response.send_message("❗ That language isn't available in this server.", ephemeral=True)
+    if not guild_config:
+        return await interaction.response.send_message("❗ This server isn't set up for Whisperling yet.", ephemeral=True)
 
-    if "users" not in guild_config:
-        guild_config["users"] = {}
+    welcome_channel_id = guild_config.get("welcome_channel_id")
+    if not welcome_channel_id:
+        return await interaction.response.send_message("❗ No welcome channel has been set for this server.", ephemeral=True)
 
-    guild_config["users"][user_id] = code
-    save_languages()
+    if interaction.channel.id != welcome_channel_id:
+        return await interaction.response.send_message(
+            f"🌸 Please use this command in the <#{welcome_channel_id}> channel where fairy winds can guide it.",
+            ephemeral=True
+        )
 
-    lang_name = guild_config["languages"][code]["name"]
-    await interaction.response.send_message(f"✨ Your whispers will now be translated into **{lang_name}**.", ephemeral=True)
+    lang_map = guild_config.get("languages", {})
+    if not lang_map:
+        return await interaction.response.send_message("❗ No languages are configured yet.", ephemeral=True)
+
+    class LanguageView(View):
+        def __init__(self):
+            super().__init__(timeout=60)
+            for code, data in lang_map.items():
+                self.add_item(Button(label=data['name'], emoji=data['emoji'], custom_id=code))
+
+        async def interaction_check(self, button_interaction: discord.Interaction) -> bool:
+            return button_interaction.user.id == interaction.user.id
+
+        async def on_timeout(self):
+            try:
+                await message.edit(content="⏳ Time ran out for language selection.", embed=None, view=None)
+            except:
+                pass
+
+        async def on_error(self, interaction: discord.Interaction, error: Exception, item):
+            print(f"❗ Whisperling button error: {error}")
+
+    async def button_callback(inter: discord.Interaction):
+        selected_code = inter.data['custom_id']
+        if selected_code == "cancel":
+            await inter.response.edit_message(content="❌ Cancelled.", embed=None, view=None)
+            return
+
+        if "users" not in guild_config:
+            guild_config["users"] = {}
+
+        guild_config["users"][user_id] = selected_code
+        save_languages()
+        lang_name = lang_map[selected_code]["name"]
+        await inter.response.edit_message(
+            content=f"✨ Your whisper has been tuned to **{lang_name}**.", embed=None, view=None
+        )
+
+    view = LanguageView()
+    for item in view.children:
+        if isinstance(item, Button):
+            item.callback = button_callback
+
+    embed = discord.Embed(
+        title="🧚 Choose Your Whispering Tongue",
+        description="Click one of the buttons below to select your language.\nLet the winds of translation guide you.",
+        color=discord.Color.purple()
+    )
+
+    message = await interaction.channel.send(embed=embed, view=view)
+    await interaction.response.send_message("✨ Please choose your language above.", ephemeral=True)
 
 # ========== ADMIN COMMANDS ==========
 
@@ -231,6 +422,78 @@ async def setwelcome(ctx, code: str, *, message: str):
     save_languages()
     await ctx.send(f"✅ Updated welcome message for `{code}`.")
 
+@tree.command(name="setrules", description="Set the rules that Whisperling should show new members after they choose a language.")
+@app_commands.checks.has_permissions(administrator=True)
+@app_commands.describe(rules="The rules or welcome guidelines you'd like to show.")
+async def setrules(interaction: discord.Interaction, rules: str):
+    guild_id = str(interaction.guild_id)
+
+    if guild_id not in all_languages["guilds"]:
+        all_languages["guilds"][guild_id] = {}
+
+    all_languages["guilds"][guild_id]["rules"] = rules
+    save_languages()
+
+    await interaction.response.send_message("📜 The rules have been etched into the grove’s stones.", ephemeral=True)
+
+@tree.command(name="addroleoption", description="Add a role that members can select after joining.")
+@app_commands.checks.has_permissions(administrator=True)
+@app_commands.describe(role="The role to offer", emoji="An emoji to display", label="Display name for the role")
+async def addroleoption(interaction: discord.Interaction, role: discord.Role, emoji: str, label: str):
+    guild_id = str(interaction.guild_id)
+
+    if guild_id not in all_languages["guilds"]:
+        all_languages["guilds"][guild_id] = {}
+
+    if "role_options" not in all_languages["guilds"][guild_id]:
+        all_languages["guilds"][guild_id]["role_options"] = {}
+
+    all_languages["guilds"][guild_id]["role_options"][str(role.id)] = {
+        "emoji": emoji,
+        "label": label
+    }
+
+    save_languages()
+    await interaction.response.send_message(f"🌿 Role `{label}` with emoji {emoji} has been added as a selectable option.", ephemeral=True)
+
+
+@tree.command(name="removeroleoption", description="Remove a role option from the selection list.")
+@app_commands.checks.has_permissions(administrator=True)
+@app_commands.describe(role="The role to remove")
+async def removeroleoption(interaction: discord.Interaction, role: discord.Role):
+    guild_id = str(interaction.guild_id)
+
+    role_options = all_languages["guilds"].get(guild_id, {}).get("role_options", {})
+
+    if str(role.id) not in role_options:
+        return await interaction.response.send_message("❗ That role is not in the current selection list.", ephemeral=True)
+
+    del all_languages["guilds"][guild_id]["role_options"][str(role.id)]
+    save_languages()
+    await interaction.response.send_message(f"🗑️ Role `{role.name}` has been removed from the selection list.", ephemeral=True)
+
+
+@tree.command(name="listroleoptions", description="List all currently selectable roles for new members.")
+@app_commands.checks.has_permissions(administrator=True)
+async def listroleoptions(interaction: discord.Interaction):
+    guild_id = str(interaction.guild_id)
+
+    role_options = all_languages["guilds"].get(guild_id, {}).get("role_options", {})
+    if not role_options:
+        return await interaction.response.send_message("📭 No roles are currently configured for selection.", ephemeral=True)
+
+    embed = discord.Embed(
+        title="🌸 Selectable Roles",
+        description="These are the roles members can choose after joining:",
+        color=discord.Color.blurple()
+    )
+
+    for role_id, data in role_options.items():
+        role = interaction.guild.get_role(int(role_id))
+        if role:
+            embed.add_field(name=f"{data['emoji']} {data['label']}", value=f"<@&{role.id}>", inline=False)
+
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @bot.command(aliases=["sprachliste", "listelangues", "listaridiomas"])
 @commands.has_permissions(administrator=True)
