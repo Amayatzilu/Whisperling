@@ -134,10 +134,10 @@ async def translate(interaction: discord.Interaction):
     try:
         result = translator.translate(content, dest=user_lang)
         await interaction.response.send_message(
-            f"✨ Whispered into `{user_lang}`:
-> {result.text}",
-            ephemeral=True
-        )
+    f"""✨ Whispered into `{user_lang}`:
+> {result.text}""",
+    ephemeral=True
+)
     except Exception as e:
         print("Translation error:", e)
         await interaction.response.send_message("❗ The winds failed to carry the words. Please try again.", ephemeral=True)
