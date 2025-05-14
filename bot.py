@@ -142,6 +142,25 @@ async def translate(interaction: discord.Interaction):
         print("Translation error:", e)
         await interaction.response.send_message("❗ The winds failed to carry the words. Please try again.", ephemeral=True)
 
+@tree.command(name="setlanguage", description="Choose your preferred language for translations.")
+@app_commands.describe(code="The language code you'd like to use.")
+async def setlanguage(interaction: discord.Interaction, code: str):
+    guild_id = str(interaction.guild_id)
+    user_id = str(interaction.user.id)
+    guild_config = all_languages["guilds"].get(guild_id)
+
+    if not guild_config or "languages" not in guild_config or code not in guild_config["languages"]:
+        return await interaction.response.send_message("❗ That language isn't available in this server.", ephemeral=True)
+
+    if "users" not in guild_config:
+        guild_config["users"] = {}
+
+    guild_config["users"][user_id] = code
+    save_languages()
+
+    lang_name = guild_config["languages"][code]["name"]
+    await interaction.response.send_message(f"✨ Your whispers will now be translated into **{lang_name}**.", ephemeral=True)
+
 # ========== ADMIN COMMANDS ==========
 
 @bot.command(aliases=["sprachenvorladen", "prélangues", "precargaridiomas"])
