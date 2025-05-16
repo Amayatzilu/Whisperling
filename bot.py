@@ -58,7 +58,7 @@ async def on_ready():
 async def glitch_reversion_loop():
     await bot.wait_until_ready()
     while not bot.is_closed():
-        now = datetime.utcnow()
+        datetime.now(datetime.UTC)
 
         for guild_id, timestamp in list(glitch_timestamps_by_guild.items()):
             mode = guild_modes[guild_id]
@@ -143,7 +143,7 @@ MODE_DESCRIPTIONS = {
 
 # Per-guild mode tracking
 guild_modes = defaultdict(lambda: "dayform")
-last_interaction_by_guild = defaultdict(lambda: datetime.utcnow())
+last_interaction_by_guild = defaultdict(lambda: datetime.now(datetime.UTC))
 previous_standard_mode_by_guild = defaultdict(lambda: "dayform")
 glitch_timestamps_by_guild = defaultdict(lambda: None)
 
@@ -516,11 +516,11 @@ def style_text(guild_id, text):
     return MODE_TONE.get(mode, lambda t: t)(text)
 
 def is_summer_solstice():
-    today = datetime.utcnow()
+    today = datetime.now(datetime.UTC)
     return today.month == 6 and 20 <= today.day <= 22
 
 def is_winter_solstice():
-    today = datetime.utcnow()
+    today = datetime.now(datetime.UTC)
     return today.month == 12 and 20 <= today.day <= 22
 
 # ================= EXPANDED /setmode COMMAND =================
@@ -535,7 +535,7 @@ async def setmode(interaction: discord.Interaction, mode: str):
         chosen = random.choice(STANDARD_MODES)
         previous_standard_mode_by_guild[guild_id] = guild_modes[guild_id]
         guild_modes[guild_id] = chosen
-        last_interaction_by_guild[guild_id] = datetime.utcnow()
+        last_interaction_by_guild[guild_id] = datetime.now(datetime.UTC)
         await update_avatar_for_mode(chosen)
 
         description = MODE_DESCRIPTIONS.get(chosen, "A new form awakens...")
@@ -562,7 +562,7 @@ async def setmode(interaction: discord.Interaction, mode: str):
 
     previous_standard_mode_by_guild[guild_id] = guild_modes[guild_id]
     guild_modes[guild_id] = mode
-    last_interaction_by_guild[guild_id] = datetime.utcnow()
+    last_interaction_by_guild[guild_id] = datetime.now(datetime.UTC)
     await update_avatar_for_mode(mode)
 
     description = MODE_DESCRIPTIONS.get(mode, "A new form awakens...")
@@ -573,7 +573,7 @@ async def setmode(interaction: discord.Interaction, mode: str):
 
 # ================= RANDOM GLITCH MODE TRIGGER =================
 def maybe_trigger_glitch(guild_id):
-    now = datetime.utcnow()
+    now = datetime.now(datetime.UTC)
     last_seen = last_interaction_by_guild[str(guild_id)]
     silent_days = (now - last_seen).days
 
@@ -593,7 +593,7 @@ async def whisper(interaction: discord.Interaction):
     guild_id = str(interaction.guild_id)
     guild_modes[guild_id] = "flutterkin"
     await update_avatar_for_mode("flutterkin")
-    last_interaction_by_guild[guild_id] = datetime.utcnow()
+    last_interaction_by_guild[guild_id] = datetime.now(datetime.UTC)
     await interaction.response.send_message(
         style_text(guild_id, "A gentle shimmer surrounds you... The flutterkin hears your wish."),
         ephemeral=True
@@ -609,7 +609,7 @@ async def send_language_selector(member, channel, lang_map, guild_config):
     if mode in STANDARD_MODES and random.random() < 0.04:
         previous_standard_mode_by_guild[guild_id] = mode
         guild_modes[guild_id] = "flutterkin"
-        glitch_timestamps_by_guild[guild_id] = datetime.utcnow()
+        glitch_timestamps_by_guild[guild_id] = datetime.now(datetime.UTC)
         mode = "flutterkin"
 
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
@@ -792,11 +792,11 @@ async def help(interaction: discord.Interaction):
     if maybe_glitch and current_mode in STANDARD_MODES:
         previous_standard_mode_by_guild[guild_id] = current_mode
         guild_modes[guild_id] = maybe_glitch
-        glitch_timestamps_by_guild[guild_id] = datetime.utcnow()
+        glitch_timestamps_by_guild[guild_id] = datetime.now(datetime.UTC)
         await update_avatar_for_mode(maybe_glitch)
 
     # 🌿 Update last interaction
-    last_interaction_by_guild[guild_id] = datetime.utcnow()
+    last_interaction_by_guild[guild_id] = datetime.now(datetime.UTC)
 
     # 🎨 Determine color from mode
     mode = guild_modes.get(guild_id, "dayform")
@@ -869,11 +869,11 @@ async def translate(interaction: discord.Interaction):
     if maybe_glitch and current_mode in STANDARD_MODES:
         previous_standard_mode_by_guild[guild_id] = current_mode
         guild_modes[guild_id] = maybe_glitch
-        glitch_timestamps_by_guild[guild_id] = datetime.utcnow()
+        glitch_timestamps_by_guild[guild_id] = datetime.now(datetime.UTC)
         await update_avatar_for_mode(maybe_glitch)
 
     # 🌿 Update last interaction time
-    last_interaction_by_guild[guild_id] = datetime.utcnow()
+    last_interaction_by_guild[guild_id] = datetime.now(datetime.UTC)
 
     try:
         result = translator.translate(content, dest=user_lang)
@@ -903,11 +903,11 @@ async def chooselanguage(interaction: discord.Interaction):
     if maybe_glitch and current_mode in STANDARD_MODES:
         previous_standard_mode_by_guild[guild_id] = current_mode
         guild_modes[guild_id] = maybe_glitch
-        glitch_timestamps_by_guild[guild_id] = datetime.utcnow()
+        glitch_timestamps_by_guild[guild_id] = datetime.now(datetime.UTC)
         await update_avatar_for_mode(maybe_glitch)
 
     # 🌿 Update last interaction timestamp
-    last_interaction_by_guild[guild_id] = datetime.utcnow()
+    last_interaction_by_guild[guild_id] = datetime.now(datetime.UTC)
 
     if not guild_config:
         return await interaction.response.send_message("❗ This server isn't set up for Whisperling yet.", ephemeral=True)
