@@ -571,6 +571,23 @@ async def setmode(interaction: discord.Interaction, mode: str):
         ephemeral=True
     )
 
+@tree.command(name="moodcheck", description="Check Whisperling's current mood (form).")
+async def moodcheck(interaction: discord.Interaction):
+    guild_id = str(interaction.guild_id)
+    mode = guild_modes.get(guild_id, "dayform")
+    color = MODE_COLORS.get(mode, discord.Color.green())
+    description = MODE_DESCRIPTIONS.get(mode, "A gentle presence stirs in the grove...")
+    footer = MODE_FOOTERS.get(mode, "")
+
+    embed = discord.Embed(
+        title=f"🌿 Whisperling’s Current Mood: **{mode}**",
+        description=description,
+        color=color
+    )
+    embed.set_footer(text=footer)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
 # ================= RANDOM GLITCH MODE TRIGGER =================
 def maybe_trigger_glitch(guild_id):
     now = datetime.now(timezone.utc)
