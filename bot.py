@@ -223,6 +223,8 @@ MODE_FOOTERS = {
     "crepusca": "🌒 Dreams shimmer at the edge of waking."
 }
 
+MODE_TEXTS = {}
+
 MODE_TEXTS["dayform"] = {
     # 🌞 Language selection
     "language_intro_title": "🌞 Choose Your Whispering Tongue",
