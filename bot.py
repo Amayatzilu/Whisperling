@@ -521,6 +521,87 @@ def maybe_trigger_glitch(guild_id):
 
 # ================= ADMIN CONTROLS =================
 
+@tree.command(name="adminhelp", description="📘 A magical guide to setting up Whisperling (Admin only)")
+@app_commands.checks.has_permissions(administrator=True)
+async def adminhelp(interaction: discord.Interaction):
+    guild_id = str(interaction.guild_id)
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+    footer = MODE_FOOTERS.get(mode, "Whisperling is ready to help your grove bloom 🌷")
+
+    embed = discord.Embed(
+        title="📘 Admin Setup Guide – Whisperling's Grove",
+        description=(
+            "Let me gently guide you through setting up the magical welcome journey:\n"
+            "**(Aliases)**: `adminhilfe` 🇩🇪 | `aideadmin` 🇫🇷 | `ayudaadmin` 🇪🇸"
+        ),
+        color=embed_color
+    )
+
+    embed.add_field(
+        name="1️⃣ Set the Welcome Channel",
+        value="`!setwelcomechannel #channel` – Where new members are greeted.",
+        inline=False
+    )
+
+    embed.add_field(
+        name="2️⃣ Add Languages",
+        value=(
+            "`!preloadlanguages` – Adds English, German, Spanish, and French\n"
+            "`!addlanguage <code> <emoji> <name>` – Add manually\n"
+            "Example: `!addlanguage it 🇮🇹 Italiano`"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="3️⃣ Custom Welcome Messages",
+        value=(
+            "`!setwelcome <code> <message>` – Per-language message\n"
+            "Use `{user}` for the joining member’s name.\n"
+            "Example: `!setwelcome fr Bienvenue, {user} !`"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="4️⃣ Server Rules",
+        value="`!setrules <text>` – Show rules after language selection.",
+        inline=False
+    )
+
+    embed.add_field(
+        name="5️⃣ Role Setup",
+        value=(
+            "`!addroleoption @role <emoji> <label>` – Add a role\n"
+            "`!removeroleoption @role` – Remove a role\n"
+            "`!listroleoptions` – View added roles"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="🌐 Language Management",
+        value=(
+            "`!listlanguages` – View active\n"
+            "`!removelanguage <code>` – Remove one\n"
+            "`!langcodes` – View translation codes"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="🌸 Whisperling Mood",
+        value=(
+            "`!setmode <form>` – Change appearance\n"
+            "`!moodcheck` – View current form"
+        ),
+        inline=False
+    )
+
+    embed.set_footer(text=footer)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
 @bot.command(aliases=["formwechsel", "modedeforme", "cambiodemodo"])
 @commands.has_permissions(administrator=True)
 async def setmode(ctx, mode: str):
@@ -563,7 +644,7 @@ async def setmode(ctx, mode: str):
         f"🧚 Whisperling now shifts into **{mode}**\n{description}"
     )
 
-@bot.command("stimmungsprüfung", "humeure", "estadodeanimo")
+@bot.command(aliases=["stimmungsprüfung", "humeure", "estadodeanimo"])
 async def moodcheck(ctx):
     guild_id = str(ctx.guild.id)
     mode = guild_modes.get(guild_id, "dayform")
@@ -810,9 +891,7 @@ async def listroleoptions(ctx):
 
     await ctx.send(embed=embed)
 
-@bot.command(
-    aliases=["sprachliste", "listelangues", "listaridiomas"]
-)
+@bot.command(aliases=["sprachliste", "listelangues", "listaridiomas"])
 @commands.has_permissions(administrator=True)
 async def listlanguages(ctx):
     guild_id = str(ctx.guild.id)
