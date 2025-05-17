@@ -203,9 +203,9 @@ MODE_FOOTERS = {
     "crepusca": "🌒 Dreams shimmer at the edge of waking."
 }
 
-MODE_TEXTS = {}
+MODE_TEXTS_ENGLISH = {}
 
-MODE_TEXTS["dayform"] = {
+MODE_TEXTS_ENGLISH["dayform"] = {
     # 🌞 Language selection
     "language_intro_title": "🌞 Choose Your Whispering Tongue",
     "language_intro_desc": "{user}, welcome to the grove.\nLet the morning breeze carry your chosen voice.",
@@ -226,7 +226,7 @@ MODE_TEXTS["dayform"] = {
     "welcome_desc": "Welcome, {user}! May your time here be filled with warmth, friendship, and discovery."
 }
 
-MODE_TEXTS["nightform"] = {
+MODE_TEXTS_ENGLISH["nightform"] = {
     # 🌙 Language selection
     "language_intro_title": "🌙 Choose Your Whispering Tongue",
     "language_intro_desc": "{user}, drift softly into the grove.\nChoose the voice that guides your quiet steps.",
@@ -247,7 +247,7 @@ MODE_TEXTS["nightform"] = {
     "welcome_desc": "Welcome, {user}.\nLet your spirit rest here — where night blooms in peace."
 }
 
-MODE_TEXTS["forestform"] = {
+MODE_TEXTS_ENGLISH["forestform"] = {
     # 🌿 Language selection
     "language_intro_title": "🍃 Choose Your Whispering Tongue",
     "language_intro_desc": "{user}, the forest stirs with your presence.\nChoose the voice you’ll carry among the roots.",
@@ -268,7 +268,7 @@ MODE_TEXTS["forestform"] = {
     "welcome_desc": "Welcome, {user}. Rest beneath the branches. You are part of the forest now."
 }
 
-MODE_TEXTS["seaform"] = {
+MODE_TEXTS_ENGLISH["seaform"] = {
     # 🌊 Language selection
     "language_intro_title": "🌊 Choose Your Whispering Tongue",
     "language_intro_desc": "{user}, the tide calls softly.\nChoose the language that drifts upon your waves.",
@@ -289,7 +289,7 @@ MODE_TEXTS["seaform"] = {
     "welcome_desc": "Welcome, {user}. Let your voice join the songs of the deep."
 }
 
-MODE_TEXTS["hadesform"] = {
+MODE_TEXTS_ENGLISH["hadesform"] = {
     # 🔥 Language selection
     "language_intro_title": "🔥 Choose Your Whispering Tongue",
     "language_intro_desc": "{user}, the flames flicker in anticipation.\nWhich tongue will you stoke into brilliance?",
@@ -310,7 +310,7 @@ MODE_TEXTS["hadesform"] = {
     "welcome_desc": "Welcome, {user}. Let your steps scorch the path — the grove will grow around the heat."
 }
 
-MODE_TEXTS["auroraform"] = {
+MODE_TEXTS_ENGLISH["auroraform"] = {
     # ❄️ Language selection
     "language_intro_title": "❄️ Choose Your Whispering Tongue",
     "language_intro_desc": "{user}, beneath the shimmer of frozen skies,\nselect the voice that will drift beside you.",
@@ -331,7 +331,7 @@ MODE_TEXTS["auroraform"] = {
     "welcome_desc": "Welcome, {user}. The aurora has seen you — and the grove now glows a little brighter."
 }
 
-MODE_TEXTS["cosmosform"] = {
+MODE_TEXTS_ENGLISH["cosmosform"] = {
     # 🌌 Language selection
     "language_intro_title": "🌌 Choose Your Whispering Tongue",
     "language_intro_desc": "{user}, the stars align — a voice waits to be named.\nChoose the one that echoes brightest in you.",
@@ -352,7 +352,7 @@ MODE_TEXTS["cosmosform"] = {
     "welcome_desc": "Welcome, {user}. You’ve fallen into place among us — perfectly spaced between light and mystery."
 }
 
-MODE_TEXTS["sunfracture"] = {
+MODE_TEXTS_ENGLISH["sunfracture"] = {
     # 🔆 Language selection
     "language_intro_title": "☀️ CHOOSE YOUR TONGUE!",
     "language_intro_desc": "{user}, THE GROVE IS BURSTING WITH LIGHT!! Quick!! Pick the voice that SPARKS inside you!!",
@@ -375,7 +375,7 @@ MODE_TEXTS["sunfracture"] = {
     "welcome_desc": "WELCOME, {user}!!! The GROVE is BLINDING with JOY!!! Let’s SHINE TOGETHER FOREVER!!!"
 }
 
-MODE_TEXTS["yuleshard"] = {
+MODE_TEXTS_ENGLISH["yuleshard"] = {
     # ❄️ Language selection
     "language_intro_title": "❄️ CHOOSE... your whispering tongue...",
     "language_intro_desc": "{user}... the GROVE is still...\nvoices... frozen in the air... choose yours before it... freezes too—",
@@ -398,7 +398,7 @@ MODE_TEXTS["yuleshard"] = {
     "welcome_desc": "Welcome, {user}... the grove... remembers your warmth... as the ice takes hold..."
 }
 
-MODE_TEXTS["echovoid"] = {
+MODE_TEXTS_ENGLISH["echovoid"] = {
     # 🕳️ Language selection
     "language_intro_title": "🕳️ …choose… your whispering tongue…",
     "language_intro_desc": "{user}… {user}… the grove… has been quiet… so quiet…\nA voice… any voice… choose it… echo it…",
@@ -421,7 +421,7 @@ MODE_TEXTS["echovoid"] = {
     "welcome_desc": "Welcome, {user}… you’ve come back… or never left… the grove remembers… something…"
 }
 
-MODE_TEXTS["glitchspire"] = {
+MODE_TEXTS_ENGLISH["glitchspire"] = {
     # 🧬 Language selection
     "language_intro_title": "🧬 ▓Choose▓ your ▒whispering▒ tongue…",
     "language_intro_desc": "{user} = DETECTED\n>LOADING_LINGUAL_OPTIONS…\nSELECT //voice.signal.stable",
@@ -444,30 +444,30 @@ MODE_TEXTS["glitchspire"] = {
     "welcome_desc": "Greetings {user}… memory restored?\nEnvironment unstable… but you belong here now…"
 }
 
-MODE_TEXTS["flutterkin"] = {
+MODE_TEXTS_ENGLISH["flutterkin"] = {
     # 🤫 Language selection
     "language_intro_title": "🌈 pick ur whisper tongue!!",
-    "language_intro_desc": "{user} hiiii!! ✨ um um can u pick a voice pwease? it go pretty~!!!",
+    "language_intro_desc": "{user} hi hi!! ✨ um um can u pick a voice please? it go pretty~!!!",
 
     "language_confirm_title": "✨ yaaay!!",
-    "language_confirm_desc": "ur voice is all sparkle-sparkle now!!! 💖 the grove is goin WHEEEE~!",
+    "language_confirm_desc": "your voice is all sparkle-sparkle now!!! 💖 the grove is goin WHEEEE~!",
 
     # 📜 Rules confirmation
     "rules_confirm_title": "🧸 okay sooo…",
-    "rules_confirm_desc": "u said yesh to da rules!! 🥹 u so good. grove say fankyuu 💕",
+    "rules_confirm_desc": "you said yes to the rules!! 🥹 u so good. grove say thankyuu 💕",
 
     # 🌼 Role selection
     "role_intro_title": "🐾 pick a role!!",
-    "role_intro_desc": "dis da fun part!!! pick da sparkly hat u wanna wear!! (it's not a hat but SHHH!)",
+    "role_intro_desc": "this the fun part!!! pick the sparkly hat you wanna wear!! (it's not a hat but SHHH!)",
 
-    "role_granted": "💫 yaaaaayyy!! u iz now da **{role}**!! that’s da bestest!!! i’m clappin wit my wings!!",
+    "role_granted": "💫 yaaaaayyy!! you is now the **{role}**!! that’s the bestest!!! i’m clappin with my wings!!",
 
     # 💫 Final welcome
     "welcome_title": "🌸 hiiiiii~!!",
-    "welcome_desc": "welcoooome {user}!! 🐞💖 the grove LUVS u already!! u wan snack? or nap? or sparkle cloud???"
+    "welcome_desc": "welcoooome {user}!! 🐞💖 the grove LOVES you already!! you want snack? or nap? or sparkle cloud???"
 }
 
-MODE_TEXTS["crepusca"] = {
+MODE_TEXTS_ENGLISH["crepusca"] = {
     # 🌒 Language selection
     "language_intro_title": "🌒 …a voice… half-remembered…",
     "language_intro_desc": "{user}… the grove has fallen into a hush…\nchoose your voice… before the dream fades…",
@@ -489,6 +489,25 @@ MODE_TEXTS["crepusca"] = {
     "welcome_title": "🌒 …welcome back…",
     "welcome_desc": "welcome, {user}… the stars blink slowly in the quiet sky… we are… still dreaming…"
 }
+
+from googletrans import Translator
+
+def get_translated_mode_text(guild_id, user_id, mode, key, **kwargs):
+    lang = get_user_language(guild_id, user_id)
+    fallback = MODE_TEXTS_ENGLISH.get(mode, {}).get(key, "")
+
+    # Apply formatting like {user} or {role} before translating
+    formatted = fallback.format(**kwargs)
+
+    if not lang or lang == "en":
+        return formatted
+
+    try:
+        translator = Translator()
+        translated = translator.translate(formatted, dest=lang).text
+        return translated
+    except Exception:
+        return formatted
 
 # ================= UTIL FUNCTION =================
 def style_text(guild_id, text):
@@ -518,6 +537,35 @@ def maybe_trigger_glitch(guild_id):
     elif random.random() < 0.01:
         return "glitchspire"
     return None
+
+async def update_avatar_for_mode(mode: str):
+    avatar_paths = {
+        "dayform": "avatars/avatar_dayform.png",
+        "nightform": "avatars/avatar_nightform.png",
+        "forestform": "avatars/avatar_forestform.png",
+        "seaform": "avatars/avatar_seaform.png",
+        "hadesform": "avatars/avatar_hadesform.png",
+        "auroraform": "avatars/avatar_auroraform.png",
+        "cosmosform": "avatars/avatar_cosmosform.png",
+
+        "sunfracture": "avatars/avatar_sunfracture.png",
+        "yuleshard": "avatars/avatar_yuleshard.png",
+        "echovoid": "avatars/avatar_echovoid.png",
+        "glitchspire": "avatars/avatar_glitchspire.png",
+        "flutterkin": "avatars/avatar_flutterkin.png",
+        "crepusca": "avatars/avatar_crepusca.png",
+    }
+
+    path = avatar_paths.get(mode)
+    if path and os.path.exists(path):
+        with open(path, 'rb') as f:
+            try:
+                await bot.user.edit(avatar=f.read())
+                print(f"✨ Avatar updated for mode: {mode}")
+            except discord.HTTPException as e:
+                print(f"❗ Failed to update avatar: {e}")
+    else:
+        print(f"⚠️ No avatar found for mode: {mode}")
 
 # ================= ADMIN CONTROLS =================
 
@@ -932,7 +980,6 @@ async def send_language_selector(member, channel, lang_map, guild_config):
         mode = "flutterkin"
 
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
-    voice = MODE_TEXTS.get(mode, {})
 
     class LanguageView(View):
         def __init__(self):
@@ -954,8 +1001,8 @@ async def send_language_selector(member, channel, lang_map, guild_config):
         save_languages()
 
         # 🌸 Pull mode-specific confirmation
-        confirm_title = voice.get("language_confirm_title", "🌸 Thank you!")
-        confirm_desc = voice.get("language_confirm_desc", "You've chosen your whispering tongue. The grove awaits...")
+        confirm_title = get_translated_mode_text(guild_id, str(member.id), mode, "language_confirm_title", user=member.mention)
+        confirm_desc = get_translated_mode_text(guild_id, str(member.id), mode, "language_confirm_desc", user=member.mention)
 
         await inter.response.edit_message(
             embed=discord.Embed(
@@ -981,12 +1028,12 @@ async def send_language_selector(member, channel, lang_map, guild_config):
             item.callback = button_callback
 
     # 🌟 Pull mode-specific intro
-    intro_title = voice.get("language_intro_title", "🧚 Choose Your Whispering Tongue")
-    intro_desc = voice.get("language_intro_desc", f"{member.mention}, welcome to the grove.\nPlease choose your language to begin your journey.")
+    intro_title = get_translated_mode_text(guild_id, str(member.id), mode, "language_intro_title", user=member.mention)
+    intro_desc = get_translated_mode_text(guild_id, str(member.id), mode, "language_intro_desc", user=member.mention)
 
     embed = discord.Embed(
         title=intro_title,
-        description=intro_desc.replace("{user}", member.mention),
+        description=intro_desc,
         color=embed_color
     )
 
@@ -994,9 +1041,9 @@ async def send_language_selector(member, channel, lang_map, guild_config):
 
 async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
     guild_id = str(member.guild.id)
+    user_id = str(member.id)
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.teal())
-    voice = MODE_TEXTS.get(mode, {})
 
     class AcceptRulesView(View):
         def __init__(self):
@@ -1007,8 +1054,8 @@ async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
             return interaction.user.id == member.id
 
     async def accept_callback(interaction):
-        confirm_title = voice.get("rules_confirm_title", "🌿 The grove welcomes you.")
-        confirm_desc = voice.get("rules_confirm_desc", "Thank you for accepting the rules.")
+        confirm_title = get_translated_mode_text(guild_id, user_id, mode, "rules_confirm_title", user=member.mention)
+        confirm_desc = get_translated_mode_text(guild_id, user_id, mode, "rules_confirm_desc", user=member.mention)
 
         await interaction.response.edit_message(
             embed=discord.Embed(
@@ -1042,9 +1089,9 @@ async def send_role_selector(member, channel, guild_config):
         return
 
     guild_id = str(member.guild.id)
+    user_id = str(member.id)
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.gold())
-    voice = MODE_TEXTS.get(mode, {})
 
     class RoleSelectView(View):
         def __init__(self):
@@ -1060,7 +1107,8 @@ async def send_role_selector(member, channel, guild_config):
         role = member.guild.get_role(int(role_id))
         if role:
             try:
-                role_msg = voice.get("role_granted", f"✨ You’ve been gifted the **{{role}}** role!").replace("{role}", role.name)
+                role_msg_template = get_translated_mode_text(guild_id, user_id, mode, "role_granted")
+                role_msg = role_msg_template.replace("{role}", role.name)
                 await member.add_roles(role)
                 await interaction.response.send_message(role_msg, ephemeral=True)
             except Exception as e:
@@ -1073,8 +1121,8 @@ async def send_role_selector(member, channel, guild_config):
             item.callback = role_button_callback
 
     embed = discord.Embed(
-        title=voice.get("role_intro_title", "🌼 Choose Your Role"),
-        description=voice.get("role_intro_desc", "Select a role to express who you are in the grove."),
+        title=get_translated_mode_text(guild_id, user_id, mode, "role_intro_title"),
+        description=get_translated_mode_text(guild_id, user_id, mode, "role_intro_desc"),
         color=embed_color
     )
 
@@ -1082,14 +1130,16 @@ async def send_role_selector(member, channel, guild_config):
 
 async def send_final_welcome(member, channel, lang_code, lang_map):
     guild_id = str(member.guild.id)
+    user_id = str(member.id)
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.green())
-    voice = MODE_TEXTS.get(mode, {})
 
-    # ✨ Mode-specific welcome title and message
-    default_welcome_msg = lang_map[lang_code]["welcome"].replace("{user}", member.mention)
-    welcome_title = voice.get("welcome_title", "💫 Welcome!")
-    welcome_desc = voice.get("welcome_desc", default_welcome_msg).replace("{user}", member.mention)
+    # ✨ Translated mode-specific title/description (with fallback to lang_map)
+    welcome_title = get_translated_mode_text(guild_id, user_id, mode, "welcome_title")
+    
+    default_msg = lang_map[lang_code]["welcome"].replace("{user}", member.mention)
+    raw_welcome_desc = get_translated_mode_text(guild_id, user_id, mode, "welcome_desc", fallback=default_msg)
+    welcome_desc = raw_welcome_desc.replace("{user}", member.mention)
 
     embed = discord.Embed(
         title=welcome_title,
