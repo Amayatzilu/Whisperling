@@ -94,26 +94,6 @@ async def glitch_reversion_loop():
 
         await asyncio.sleep(60)
 
-@bot.event
-async def on_member_join(member):
-    guild_id = str(member.guild.id)
-    guild_config = all_languages["guilds"].get(guild_id)
-    if not guild_config:
-        return
-
-    welcome_channel_id = guild_config.get("welcome_channel_id")
-    if not welcome_channel_id:
-        return
-
-    channel = bot.get_channel(welcome_channel_id)
-    lang_map = guild_config.get("languages", {})
-
-    if not lang_map:
-        await channel.send(f"🌱 {member.mention}, no languages are set up yet.")
-        return
-
-    await send_language_selector(member, channel, lang_map, guild_config)
-
 # ================= MODE CONFIG =================
 STANDARD_MODES = [
     "dayform", "nightform", "cosmosform", "seaform",
@@ -523,71 +503,6 @@ def is_winter_solstice():
     today = datetime.now(timezone.utc)
     return today.month == 12 and 20 <= today.day <= 22
 
-# ================= EXPANDED /setmode COMMAND =================
-@tree.command(name="setmode", description="Switch Whisperling's form.")
-@discord.app_commands.describe(mode="Choose a form or use 'random'")
-@discord.app_commands.checks.has_permissions(administrator=True)
-async def setmode(interaction: discord.Interaction, mode: str):
-    mode = mode.lower()
-    guild_id = str(interaction.guild_id)
-
-    if mode == "random":
-        chosen = random.choice(STANDARD_MODES)
-        previous_standard_mode_by_guild[guild_id] = guild_modes[guild_id]
-        guild_modes[guild_id] = chosen
-        last_interaction_by_guild = defaultdict(lambda: datetime.now(timezone.utc))
-        await update_avatar_for_mode(chosen)
-
-        description = MODE_DESCRIPTIONS.get(chosen, "A new form awakens...")
-        await interaction.response.send_message(
-            f"🎲 Whisperling closed her eyes and chose...\n**{chosen}**!\n{description}",
-            ephemeral=True
-        )
-        return
-
-    if mode in GLITCHED_MODES:
-        await interaction.response.send_message(
-            "❗ Glitched forms are unstable and cannot be chosen directly. They appear on their own...",
-            ephemeral=True
-        )
-        return
-
-    if mode not in STANDARD_MODES:
-        valid = ", ".join(STANDARD_MODES + ["random"])
-        await interaction.response.send_message(
-            f"❗ Unknown form. Choose from: {valid}",
-            ephemeral=True
-        )
-        return
-
-    previous_standard_mode_by_guild[guild_id] = guild_modes[guild_id]
-    guild_modes[guild_id] = mode
-    last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
-    await update_avatar_for_mode(mode)
-
-    description = MODE_DESCRIPTIONS.get(mode, "A new form awakens...")
-    await interaction.response.send_message(
-        f"🧚 Whisperling now shifts into **{mode}**\n{description}",
-        ephemeral=True
-    )
-
-@tree.command(name="moodcheck", description="Check Whisperling's current mood (form).")
-async def moodcheck(interaction: discord.Interaction):
-    guild_id = str(interaction.guild_id)
-    mode = guild_modes.get(guild_id, "dayform")
-    color = MODE_COLORS.get(mode, discord.Color.green())
-    description = MODE_DESCRIPTIONS.get(mode, "A gentle presence stirs in the grove...")
-    footer = MODE_FOOTERS.get(mode, "")
-
-    embed = discord.Embed(
-        title=f"🌿 Whisperling’s Current Mood: **{mode}**",
-        description=description,
-        color=color
-    )
-    embed.set_footer(text=footer)
-    await interaction.response.send_message(embed=embed, ephemeral=True)
-
-
 # ================= RANDOM GLITCH MODE TRIGGER =================
 def maybe_trigger_glitch(guild_id):
     now = datetime.now(timezone.utc)
@@ -604,17 +519,325 @@ def maybe_trigger_glitch(guild_id):
         return "glitchspire"
     return None
 
-# ================= /whisper HIDDEN COMMAND =================
-@tree.command(name="whisper", description="(hidden) Whisper a secret translation.")
-async def whisper(interaction: discord.Interaction):
-    guild_id = str(interaction.guild_id)
-    guild_modes[guild_id] = "flutterkin"
-    await update_avatar_for_mode("flutterkin")
+# ================= ADMIN CONTROLS =================
+
+@bot.command(aliases=["formwechsel", "modedeforme", "cambiodemodo"])
+@commands.has_permissions(administrator=True)
+async def setmode(ctx, mode: str):
+    mode = mode.lower()
+    guild_id = str(ctx.guild.id)
+
+    if mode == "random":
+        chosen = random.choice(STANDARD_MODES)
+        previous_standard_mode_by_guild[guild_id] = guild_modes[guild_id]
+        guild_modes[guild_id] = chosen
+        last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
+        await update_avatar_for_mode(chosen)
+
+        description = MODE_DESCRIPTIONS.get(chosen, "A new form awakens...")
+        await ctx.send(
+            f"🎲 Whisperling closed her eyes and chose...\n**{chosen}**!\n{description}"
+        )
+        return
+
+    if mode in GLITCHED_MODES:
+        await ctx.send(
+            "❗ Glitched forms are unstable and cannot be chosen directly. They appear on their own..."
+        )
+        return
+
+    if mode not in STANDARD_MODES:
+        valid = ", ".join(STANDARD_MODES + ["random"])
+        await ctx.send(
+            f"❗ Unknown form. Choose from: {valid}"
+        )
+        return
+
+    previous_standard_mode_by_guild[guild_id] = guild_modes[guild_id]
+    guild_modes[guild_id] = mode
     last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
-    await interaction.response.send_message(
-        style_text(guild_id, "A gentle shimmer surrounds you... The flutterkin hears your wish."),
-        ephemeral=True
+    await update_avatar_for_mode(mode)
+
+    description = MODE_DESCRIPTIONS.get(mode, "A new form awakens...")
+    await ctx.send(
+        f"🧚 Whisperling now shifts into **{mode}**\n{description}"
     )
+
+@bot.command("stimmungsprüfung", "humeure", "estadodeanimo")
+async def moodcheck(ctx):
+    guild_id = str(ctx.guild.id)
+    mode = guild_modes.get(guild_id, "dayform")
+    color = MODE_COLORS.get(mode, discord.Color.green())
+    description = MODE_DESCRIPTIONS.get(mode, "A gentle presence stirs in the grove...")
+    footer = MODE_FOOTERS.get(mode, "")
+
+    embed = discord.Embed(
+        title=f"🌿 Whisperling’s Current Mood: **{mode}**",
+        description=description,
+        color=color
+    )
+    embed.set_footer(text=footer)
+
+    await ctx.send(embed=embed)
+
+@bot.command(aliases=["sprachenvorladen", "prélangues", "precargaridiomas"])
+@commands.has_permissions(administrator=True)
+async def preloadlanguages(ctx):
+    guild_id = str(ctx.guild.id)
+
+    if guild_id not in all_languages["guilds"]:
+        all_languages["guilds"][guild_id] = {}
+
+    all_languages["guilds"][guild_id]["languages"] = {
+        "en": {"emoji": "🗨️", "name": "English", "welcome": "Welcome, {user}!"},
+        "de": {"emoji": "📖", "name": "Deutsch", "welcome": "Willkommen, {user}!"},
+        "es": {"emoji": "📚", "name": "Español", "welcome": "¡Bienvenido, {user}!"},
+        "fr": {"emoji": "🧠", "name": "Français", "welcome": "Bienvenue, {user}!"}
+    }
+
+    save_languages()
+
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+
+    embed = discord.Embed(
+        title="🦋 Languages Preloaded",
+        description="English, German, Spanish, and French have been added for your grove.",
+        color=embed_color
+    )
+    embed.set_footer(text=MODE_FOOTERS.get(mode, ""))
+
+    await ctx.send(embed=embed)
+
+@bot.command(aliases=["setwillkommenskanal", "canalaccueil", "canalbienvenida"])
+@commands.has_permissions(administrator=True)
+async def setwelcomechannel(ctx, channel: discord.TextChannel):
+    guild_id = str(ctx.guild.id)
+
+    if guild_id not in all_languages["guilds"]:
+        all_languages["guilds"][guild_id] = {}
+
+    all_languages["guilds"][guild_id]["welcome_channel_id"] = channel.id
+    save_languages()
+
+    # 🌿 Mood styling
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+    footer = MODE_FOOTERS.get(mode, "")
+
+    embed = discord.Embed(
+        title="🕊️ Whisper Channel Chosen",
+        description=f"New members will now be greeted in {channel.mention}.",
+        color=embed_color
+    )
+    embed.set_footer(text=footer)
+
+    await ctx.send(embed=embed)
+
+@bot.command(aliases=["addsprache", "ajouterlangue", "agregaridioma"])
+@commands.has_permissions(administrator=True)
+async def addlanguage(ctx, code: str, emoji: str, *, name: str):
+    guild_id = str(ctx.guild.id)
+    if guild_id not in all_languages["guilds"]:
+        all_languages["guilds"][guild_id] = {}
+
+    if "languages" not in all_languages["guilds"][guild_id]:
+        all_languages["guilds"][guild_id]["languages"] = {}
+
+    languages = all_languages["guilds"][guild_id]["languages"]
+    if code in languages:
+        await ctx.send(f"❗ Language `{code}` already exists. Use `!setwelcome` to update it.")
+        return
+
+    languages[code] = {
+        "emoji": emoji,
+        "name": name,
+        "welcome": f"Welcome, {{user}}!"
+    }
+
+    save_languages()
+    await ctx.send(f"🦋 Added `{name}` as `{code}` with emoji {emoji}.")
+
+@bot.command(aliases=["sprachentfernen", "supprimerlangue", "eliminaridioma"])
+@commands.has_permissions(administrator=True)
+async def removelanguage(ctx, code: str):
+    guild_id = str(ctx.guild.id)
+    guild_config = all_languages["guilds"].get(guild_id)
+    
+    if not guild_config or "languages" not in guild_config or code not in guild_config["languages"]:
+        await ctx.send(f"❗ Language `{code}` not found for this server.")
+        return
+
+    del all_languages["guilds"][guild_id]["languages"][code]
+    save_languages()
+
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+
+    embed = discord.Embed(
+        title="🗑️ Language Removed",
+        description=f"The language with code `{code}` has been successfully removed.",
+        color=embed_color
+    )
+
+    await ctx.send(embed=embed)
+
+@bot.command(aliases=["begrüßungsetzen", "definirbienvenue", "establecerbienvenida"])
+@commands.has_permissions(administrator=True)
+async def setwelcome(ctx, code: str, *, message: str):
+    guild_id = str(ctx.guild.id)
+    guild_config = all_languages["guilds"].get(guild_id)
+    if not guild_config or "languages" not in guild_config or code not in guild_config["languages"]:
+        await ctx.send(f"❗ Language `{code}` is not set up for this server.")
+        return
+
+    all_languages["guilds"][guild_id]["languages"][code]["welcome"] = message
+    save_languages()
+
+    # 🌸 Mood styling
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+    footer = MODE_FOOTERS.get(mode, "")
+
+    embed = discord.Embed(
+        title="🌼 Welcome Message Updated",
+        description=f"The welcome message for `{code}` is now:\n\n```{message}```",
+        color=embed_color
+    )
+    embed.set_footer(text=footer)
+
+    await ctx.send(embed=embed)
+
+@bot.command(aliases=["regelnsetzen", "règlesdefinir", "definirreglas"])
+@commands.has_permissions(administrator=True)
+async def setrules(ctx, *, rules: str):
+    guild_id = str(ctx.guild.id)
+
+    if guild_id not in all_languages["guilds"]:
+        all_languages["guilds"][guild_id] = {}
+
+    all_languages["guilds"][guild_id]["rules"] = rules
+    save_languages()
+
+    # 🌿 Get mode and embed color
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.green())
+
+    embed = discord.Embed(
+        title="📜 Grove Rules Updated",
+        description="The rules have been etched into the grove’s stones.",
+        color=embed_color
+    )
+
+    await ctx.send(embed=embed)
+
+@bot.command(aliases=["rollehinzufügen", "ajouterrôle", "agregarrol"])
+@commands.has_permissions(administrator=True)
+async def addroleoption(ctx, role: discord.Role, emoji: str, *, label: str):
+    guild_id = str(ctx.guild.id)
+
+    if guild_id not in all_languages["guilds"]:
+        all_languages["guilds"][guild_id] = {}
+
+    if "role_options" not in all_languages["guilds"][guild_id]:
+        all_languages["guilds"][guild_id]["role_options"] = {}
+
+    all_languages["guilds"][guild_id]["role_options"][str(role.id)] = {
+        "emoji": emoji,
+        "label": label
+    }
+
+    save_languages()
+
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+
+    embed = discord.Embed(
+        title="🌸 Role Added",
+        description=f"Role `{label}` with emoji {emoji} is now selectable by newcomers.",
+        color=embed_color
+    )
+
+    await ctx.send(embed=embed)
+
+@bot.command(aliases=["rollentfernen", "supprimerrôle", "eliminarrol"])
+@commands.has_permissions(administrator=True)
+async def removeroleoption(ctx, role: discord.Role):
+    guild_id = str(ctx.guild.id)
+
+    role_options = all_languages["guilds"].get(guild_id, {}).get("role_options", {})
+    if str(role.id) not in role_options:
+        await ctx.send("❗ That role is not in the current selection list.")
+        return
+
+    del all_languages["guilds"][guild_id]["role_options"][str(role.id)]
+    save_languages()
+
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+
+    embed = discord.Embed(
+        title="🗑️ Role Removed",
+        description=f"Role `{role.name}` has been removed from the selection list.",
+        color=embed_color
+    )
+
+    await ctx.send(embed=embed)
+
+@bot.command(aliases=["rollenliste", "listerôles", "listarroles"])
+@commands.has_permissions(administrator=True)
+async def listroleoptions(ctx):
+    guild_id = str(ctx.guild.id)
+
+    role_options = all_languages["guilds"].get(guild_id, {}).get("role_options", {})
+    if not role_options:
+        await ctx.send("📭 No roles are currently configured for selection.")
+        return
+
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+
+    embed = discord.Embed(
+        title="🌸 Selectable Roles",
+        description="These are the roles members can choose after joining:",
+        color=embed_color
+    )
+
+    for role_id, data in role_options.items():
+        role = ctx.guild.get_role(int(role_id))
+        if role:
+            embed.add_field(name=f"{data['emoji']} {data['label']}", value=f"<@&{role.id}>", inline=False)
+
+    await ctx.send(embed=embed)
+
+@bot.command(
+    aliases=["sprachliste", "listelangues", "listaridiomas"]
+)
+@commands.has_permissions(administrator=True)
+async def listlanguages(ctx):
+    guild_id = str(ctx.guild.id)
+    guild_config = all_languages["guilds"].get(guild_id)
+    if not guild_config or "languages" not in guild_config or not guild_config["languages"]:
+        await ctx.send("❗ No languages configured for this server.")
+        return
+
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+    footer_text = MODE_FOOTERS.get(mode, "")
+
+    embed = discord.Embed(
+        title="🌍 Languages Configured",
+        description="These are the currently available whispering tongues:",
+        color=embed_color
+    )
+    embed.set_footer(text=footer_text)
+
+    for code, data in guild_config["languages"].items():
+        emoji = data.get("emoji", "❓")
+        name = data.get("name", code)
+        embed.add_field(name=f"{emoji} {name}", value=f"`{code}`", inline=True)
+
+    await ctx.send(embed=embed)
 
 # ========== FLOW HELPERS ==========
 
@@ -796,7 +1019,21 @@ async def send_final_welcome(member, channel, lang_code, lang_map):
     )
     await channel.send(embed=embed)
 
-# ========== SLASH COMMAND ==========
+# ========== FLUTTERKIN ==========
+
+@bot.command(aliases=["babywish", "sparkleshift", "fluttertime", "snacktime", "glitterpuff", "bloop", "peekaboo", "glitzerfee", "petitpapillon", "chispa", "nibnib", "piccolina", "snugglezap", "twinkleflit" "pünktchen", "shirokuma", "cocotín", "cucciolotta", "snuzzlepuff", "sparkleboop", "miniblossom"])
+@commands.has_permissions(administrator=True)
+async def whisper(ctx):
+    guild_id = str(ctx.guild.id)
+    previous_standard_mode_by_guild[guild_id] = guild_modes[guild_id]
+    guild_modes[guild_id] = "flutterkin"
+    glitch_timestamps_by_guild[guild_id] = datetime.now(timezone.utc)
+    await update_avatar_for_mode("flutterkin")
+    last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
+
+    await ctx.send(style_text(guild_id, "a gentle shimmer surrounds you... the flutterkin hears your wish."))
+
+# ========== GENERAL COMMANDS ==========
 
 @tree.command(name="help", description="See the magical commands Whisperling knows.")
 async def help(interaction: discord.Interaction):
@@ -894,15 +1131,21 @@ async def translate(interaction: discord.Interaction):
 
     try:
         result = translator.translate(content, dest=user_lang)
-
-        # Apply tone styling from current mode
         styled_output = style_text(guild_id, result.text)
 
-        await interaction.response.send_message(
-            f"""✨ Whispered into `{user_lang}`:
-> {styled_output}""",
-            ephemeral=True
+        embed_color = MODE_COLORS.get(guild_modes[guild_id], discord.Color.blurple())
+        footer = MODE_FOOTERS.get(guild_modes[guild_id], "")
+
+        embed = discord.Embed(
+            title=f"✨ Whispered Translation to `{user_lang}`",
+            description=f"> {styled_output}",
+            color=embed_color
         )
+        if footer:
+            embed.set_footer(text=footer)
+
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
     except Exception as e:
         print("Translation error:", e)
         await interaction.response.send_message("❗ The winds failed to carry the words. Please try again.", ephemeral=True)
@@ -949,8 +1192,11 @@ async def chooselanguage(interaction: discord.Interaction):
             for code, data in lang_map.items():
                 self.add_item(Button(label=data['name'], emoji=data['emoji'], custom_id=code))
 
-        async def interaction_check(self, button_interaction: discord.Interaction) -> bool:
-            return button_interaction.user.id == interaction.user.id
+            # 🌸 Add a Cancel button
+            self.add_item(Button(label="❌ Cancel", style=discord.ButtonStyle.danger, custom_id="cancel"))
+
+        async def interaction_check(self, interaction):
+            return interaction.user.id == member.id
 
         async def on_timeout(self):
             try:
@@ -996,183 +1242,14 @@ async def chooselanguage(interaction: discord.Interaction):
     message = await interaction.channel.send(embed=embed, view=view)
     await interaction.response.send_message("✨ Please choose your language above.", ephemeral=True)
 
-# ========== ADMIN COMMANDS ==========
-
-
-@bot.command(aliases=["sprachenvorladen", "prélangues", "precargaridiomas"])
-@commands.has_permissions(administrator=True)
-async def preloadlanguages(ctx):
-    guild_id = str(ctx.guild.id)
-    if guild_id not in all_languages["guilds"]:
-        all_languages["guilds"][guild_id] = {}
-
-    all_languages["guilds"][guild_id]["languages"] = {
-        "en": {"emoji": "🗨️", "name": "English", "welcome": "Welcome, {user}!"},
-        "de": {"emoji": "📖", "name": "Deutsch", "welcome": "Willkommen, {user}!"},
-        "es": {"emoji": "📚", "name": "Español", "welcome": "¡Bienvenido, {user}!"},
-        "fr": {"emoji": "🧠", "name": "Français", "welcome": "Bienvenue, {user}!"}
-    }
-
-    save_languages()
-    await ctx.send("🦋 Preloaded English, German, Spanish, and French.")
-
-
-@bot.command(aliases=["setwillkommenskanal", "canalaccueil", "canalbienvenida"])
-@commands.has_permissions(administrator=True)
-async def setwelcomechannel(ctx, channel: discord.TextChannel):
-    guild_id = str(ctx.guild.id)
-    if guild_id not in all_languages["guilds"]:
-        all_languages["guilds"][guild_id] = {}
-
-    all_languages["guilds"][guild_id]["welcome_channel_id"] = channel.id
-    save_languages()
-    await ctx.send(f"🕊️ Welcome channel set to {channel.mention}")
-
-
-@bot.command(aliases=["addsprache", "ajouterlangue", "agregaridioma"])
-@commands.has_permissions(administrator=True)
-async def addlanguage(ctx, code: str, emoji: str, *, name: str):
-    guild_id = str(ctx.guild.id)
-    if guild_id not in all_languages["guilds"]:
-        all_languages["guilds"][guild_id] = {}
-
-    if "languages" not in all_languages["guilds"][guild_id]:
-        all_languages["guilds"][guild_id]["languages"] = {}
-
-    languages = all_languages["guilds"][guild_id]["languages"]
-    if code in languages:
-        await ctx.send(f"❗ Language `{code}` already exists. Use `!setwelcome` to update it.")
-        return
-
-    languages[code] = {
-        "emoji": emoji,
-        "name": name,
-        "welcome": f"Welcome, {{user}}!"
-    }
-
-    save_languages()
-    await ctx.send(f"🦋 Added `{name}` as `{code}` with emoji {emoji}.")
-
-
-@bot.command(aliases=["begrüßungsetzen", "definirbienvenue", "establecerbienvenida"])
-@commands.has_permissions(administrator=True)
-async def setwelcome(ctx, code: str, *, message: str):
-    guild_id = str(ctx.guild.id)
-    guild_config = all_languages["guilds"].get(guild_id)
-    if not guild_config or "languages" not in guild_config or code not in guild_config["languages"]:
-        await ctx.send(f"❗ Language `{code}` is not set up for this server.")
-        return
-
-    all_languages["guilds"][guild_id]["languages"][code]["welcome"] = message
-    save_languages()
-    await ctx.send(f"✅ Updated welcome message for `{code}`.")
-
-@tree.command(name="setrules", description="Set the rules that Whisperling should show new members after they choose a language.")
-@app_commands.checks.has_permissions(administrator=True)
-@app_commands.describe(rules="The rules or welcome guidelines you'd like to show.")
-async def setrules(interaction: discord.Interaction, rules: str):
-    guild_id = str(interaction.guild_id)
-
-    if guild_id not in all_languages["guilds"]:
-        all_languages["guilds"][guild_id] = {}
-
-    all_languages["guilds"][guild_id]["rules"] = rules
-    save_languages()
-
-    await interaction.response.send_message("📜 The rules have been etched into the grove’s stones.", ephemeral=True)
-
-@tree.command(name="addroleoption", description="Add a role that members can select after joining.")
-@app_commands.checks.has_permissions(administrator=True)
-@app_commands.describe(role="The role to offer", emoji="An emoji to display", label="Display name for the role")
-async def addroleoption(interaction: discord.Interaction, role: discord.Role, emoji: str, label: str):
-    guild_id = str(interaction.guild_id)
-
-    if guild_id not in all_languages["guilds"]:
-        all_languages["guilds"][guild_id] = {}
-
-    if "role_options" not in all_languages["guilds"][guild_id]:
-        all_languages["guilds"][guild_id]["role_options"] = {}
-
-    all_languages["guilds"][guild_id]["role_options"][str(role.id)] = {
-        "emoji": emoji,
-        "label": label
-    }
-
-    save_languages()
-    await interaction.response.send_message(f"🌿 Role `{label}` with emoji {emoji} has been added as a selectable option.", ephemeral=True)
-
-
-@tree.command(name="removeroleoption", description="Remove a role option from the selection list.")
-@app_commands.checks.has_permissions(administrator=True)
-@app_commands.describe(role="The role to remove")
-async def removeroleoption(interaction: discord.Interaction, role: discord.Role):
-    guild_id = str(interaction.guild_id)
-
-    role_options = all_languages["guilds"].get(guild_id, {}).get("role_options", {})
-
-    if str(role.id) not in role_options:
-        return await interaction.response.send_message("❗ That role is not in the current selection list.", ephemeral=True)
-
-    del all_languages["guilds"][guild_id]["role_options"][str(role.id)]
-    save_languages()
-    await interaction.response.send_message(f"🗑️ Role `{role.name}` has been removed from the selection list.", ephemeral=True)
-
-
-@tree.command(name="listroleoptions", description="List all currently selectable roles for new members.")
-@app_commands.checks.has_permissions(administrator=True)
-async def listroleoptions(interaction: discord.Interaction):
-    guild_id = str(interaction.guild_id)
-
-    role_options = all_languages["guilds"].get(guild_id, {}).get("role_options", {})
-    if not role_options:
-        return await interaction.response.send_message("📭 No roles are currently configured for selection.", ephemeral=True)
-
-    embed = discord.Embed(
-        title="🌸 Selectable Roles",
-        description="These are the roles members can choose after joining:",
-        color=discord.Color.blurple()
-    )
-
-    for role_id, data in role_options.items():
-        role = interaction.guild.get_role(int(role_id))
-        if role:
-            embed.add_field(name=f"{data['emoji']} {data['label']}", value=f"<@&{role.id}>", inline=False)
-
-    await interaction.response.send_message(embed=embed, ephemeral=True)
-
-@bot.command(aliases=["sprachliste", "listelangues", "listaridiomas"])
-@commands.has_permissions(administrator=True)
-async def listlanguages(ctx):
-    guild_id = str(ctx.guild.id)
-    guild_config = all_languages["guilds"].get(guild_id)
-    if not guild_config or "languages" not in guild_config or not guild_config["languages"]:
-        await ctx.send("❗ No languages configured for this server.")
-        return
-
-    msg_lines = ["🌍 **Languages configured:**"]
-    for code, data in guild_config["languages"].items():
-        emoji = data.get("emoji", "❓")
-        name = data.get("name", code)
-        msg_lines.append(f"{emoji} `{code}` — {name}")
-    await ctx.send("\n".join(msg_lines))
-
-
-@bot.command(aliases=["sprachentfernen", "supprimerlangue", "eliminaridioma"])
-@commands.has_permissions(administrator=True)
-async def removelanguage(ctx, code: str):
-    guild_id = str(ctx.guild.id)
-    guild_config = all_languages["guilds"].get(guild_id)
-    if not guild_config or "languages" not in guild_config or code not in guild_config["languages"]:
-        await ctx.send(f"❗ Language `{code}` not found for this server.")
-        return
-
-    del all_languages["guilds"][guild_id]["languages"][code]
-    save_languages()
-    await ctx.send(f"🗑️ Removed language `{code}`.")
-
-
 @bot.command(aliases=["sprachenkürzel", "codeslangues", "codigosidioma"])
 async def langcodes(ctx):
+    guild_id = str(ctx.guild.id)
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+    voice = MODE_TEXTS.get(mode, {})
+    footer = MODE_FOOTERS.get(mode, "🌍 Whisperling is fluent in many tongues...")
+
     codes = {
         "en": "English 🌐",
         "de": "Deutsch 🇩🇪",
@@ -1188,9 +1265,16 @@ async def langcodes(ctx):
         "tr": "Türkçe 🇹🇷"
     }
 
-    msg_lines = ["🌐 **Common Language Codes** (for use with `/translate` or `!translate`)"]
+    embed = discord.Embed(
+        title="📚 Whisperling’s Language Codes",
+        description="Use these with `/translate` or `!translate` to whisper across tongues:",
+        color=embed_color
+    )
+
     for code, name in codes.items():
-        msg_lines.append(f"`{code}` — {name}")
-    await ctx.send("\n".join(msg_lines))
+        embed.add_field(name=f"`{code}`", value=name, inline=True)
+
+    embed.set_footer(text=footer)
+    await ctx.send(embed=embed)
 
 bot.run(TOKEN)
