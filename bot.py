@@ -276,12 +276,13 @@ MODE_TEXTS_ENGLISH["nightform"] = {
     "cosmetic_intro_title": "🌙 Add a Moonlit Sparkle?",
     "cosmetic_intro_desc": "Select a **cosmetic role** to shimmer gently in the quiet dark.\nOr press **Skip** to remain subtle beneath the stars.",
     "cosmetic_granted": "🌌 You've chosen the sparkle of **{role}** — it glows like starlight.",
-    "cosmetic_skipped": "🌒 You remain quietly unadorned — the night welcomes you still."
+    "cosmetic_skipped": "🌒 You remain quietly unadorned — the night welcomes you still.",
 
     # 💫 Final welcome
-    "welcome_title": "💫 Welcome.",
+    "welcome_title": "💫 Welcome!",
     "welcome_desc": "Welcome, {user}.\nLet your spirit rest here — where night blooms in peace."
 }
+
 
 MODE_TEXTS_ENGLISH["forestform"] = {
     # 🌿 Language selection
@@ -298,7 +299,7 @@ MODE_TEXTS_ENGLISH["forestform"] = {
     "cosmetic_intro_title": "🍂 Add a Woodland Sparkle?",
     "cosmetic_intro_desc": "Choose a **cosmetic role** to wear like moss on bark — subtle and rooted.\nOr press **Skip** to walk the woods untouched.",
     "cosmetic_granted": "🌾 You've chosen the charm of **{role}** — may it grow with you.",
-    "cosmetic_skipped": "🍃 You wander bare-footed, and the grove still smiles."
+    "cosmetic_skipped": "🍃 You wander bare-footed, and the grove still smiles.",
 
     # 🌼 Role selection
     "role_intro_title": "🌾 Choose Your Role",
@@ -330,7 +331,7 @@ MODE_TEXTS_ENGLISH["seaform"] = {
     "cosmetic_intro_title": "🌊 Add a Ripple of Sparkle?",
     "cosmetic_intro_desc": "Choose a **cosmetic role** to flow with — gentle and glimmering.\nOr tap **Skip** to let the tide decide.",
     "cosmetic_granted": "🐚 You've chosen **{role}** — may it shimmer with the sea’s grace.",
-    "cosmetic_skipped": "🌊 No shimmer today — the current carries you all the same."
+    "cosmetic_skipped": "🌊 No shimmer today — the current carries you all the same.",
 
     # 💫 Final welcome
     "welcome_title": "🌊 Welcome to the Waters.",
@@ -357,7 +358,7 @@ MODE_TEXTS_ENGLISH["hadesform"] = {
     "cosmetic_intro_title": "🔥 Wanna Add Some Sizzle?",
     "cosmetic_intro_desc": "Pick a **cosmetic role** that *crackles*. Or hit **Skip** if you’re already hot enough.",
     "cosmetic_granted": "🔥 Oho! **{role}** suits you — now you’re really smokin’!",
-    "cosmetic_skipped": "😈 Skipped the glam? Bold move. Let the grove smolder without it."
+    "cosmetic_skipped": "😈 Skipped the glam? Bold move. Let the grove smolder without it.",
 
     # 💫 Final welcome
     "welcome_title": "🔥 Welcome, Firestarter.",
@@ -384,7 +385,7 @@ MODE_TEXTS_ENGLISH["auroraform"] = {
     "cosmetic_intro_title": "❄️ Add a Glimmer?",
     "cosmetic_intro_desc": "Choose a **cosmetic role** to shimmer just right.\nOr click **Skip** and stay subtly radiant.",
     "cosmetic_granted": "✨ The role of **{role}** gleams softly upon you — just lovely.",
-    "cosmetic_skipped": "🌫️ No sparkle? That’s okay. You already glow in your own way."
+    "cosmetic_skipped": "🌫️ No sparkle? That’s okay. You already glow in your own way.",
 
     # 💫 Final welcome
     "welcome_title": "✨ Welcome, Light-Dancer.",
@@ -411,7 +412,7 @@ MODE_TEXTS_ENGLISH["cosmosform"] = {
     "cosmetic_intro_title": "🌌 Add a Starlit Thread?",
     "cosmetic_intro_desc": "Select a **cosmetic role** to shine like your own constellation.\nOr press **Skip** to drift on without one.",
     "cosmetic_granted": "🌟 The stars align — **{role}** now sparkles in your orbit.",
-    "cosmetic_skipped": "💫 No twinkle added, but the cosmos still hum with your presence."
+    "cosmetic_skipped": "💫 No twinkle added, but the cosmos still hum with your presence.",
 
     # 💫 Final welcome
     "welcome_title": "🌌 Welcome, Starborn.",
@@ -440,7 +441,7 @@ MODE_TEXTS_ENGLISH["sunfracture"] = {
     "cosmetic_intro_title": "☀️ EXTRA SPARKLE?! YES PLEASE!!!",
     "cosmetic_intro_desc": "Pick a **cosmetic role** to SHIMMER EVEN HARDER!!! Or hit **Skip** if you’re TOO BRIGHT ALREADY!!!",
     "cosmetic_granted": "🌟 WHOOOO!! You got **{role}** and now you’re EVEN MORE FABULOUS!!!",
-    "cosmetic_skipped": "💥 Skipped it?! BOLD. BRILLIANT. A PURE BEAM OF CHOICE!!!"
+    "cosmetic_skipped": "💥 Skipped it?! BOLD. Brilliant. A PURE BEAM OF CHOICE!!!",
 
     # 💫 Final welcome
     "welcome_title": "☀️ WELCOME!!!",
@@ -469,7 +470,7 @@ MODE_TEXTS_ENGLISH["yuleshard"] = {
     "cosmetic_intro_title": "❄️ choose... a shimmer…",
     "cosmetic_intro_desc": "select... a cosmetic role... to reflect your frozen light...\nor... click **Skip**... if the cold is enough...",
     "cosmetic_granted": "🧊 you now glimmer as **{role}**… brittle... beautiful… unforgettable…",
-    "cosmetic_skipped": "🌨️ the frost deepens... no shimmer chosen... only silence remains…"
+    "cosmetic_skipped": "🌨️ the frost deepens... no shimmer chosen... only silence remains…",
 
     # 💫 Final welcome
     "welcome_title": "❄️ Welcome...",
@@ -498,7 +499,7 @@ MODE_TEXTS_ENGLISH["echovoid"] = {
     "cosmetic_intro_title": "🕳️ …choose… a shimmer…",
     "cosmetic_intro_desc": "…a role… a glimmer… a name to wear… or… nothing… the void remembers either…",
     "cosmetic_granted": "🌫️ …you are now… **{role}**… or were… or could be… it’s… unclear…",
-    "cosmetic_skipped": "🕳️ …no sparkle… only echoes… fading…"
+    "cosmetic_skipped": "🕳️ …no sparkle… only echoes… fading…",
 
     # 💫 Final welcome
     "welcome_title": "…welcome…",
@@ -527,7 +528,7 @@ MODE_TEXTS_ENGLISH["glitchspire"] = {
     "cosmetic_intro_title": "🧬 ▓SELECT▓ YOUR ▒SPARKLE▒ MODULE",
     "cosmetic_intro_desc": "…scanning available cosmetic roles… ::injecting identity flair…",
     "cosmetic_granted": "📎 COSMETIC ROLE = **{role}** …visual anomaly: accepted.",
-    "cosmetic_skipped": "🧬 Skipped cosmetic role injection… stability maintained… for now."
+    "cosmetic_skipped": "🧬 Skipped cosmetic role injection… stability maintained… for now.",
 
     # 💫 Final welcome
     "welcome_title": "🧬 ::WELCOME::",
@@ -556,7 +557,7 @@ MODE_TEXTS_ENGLISH["flutterkin"] = {
     "cosmetic_intro_title": "✨ Time to pick a sparkle!",
     "cosmetic_intro_desc": "Do you want to add a cute little role to show your sparkle? You can choose one or skip if you’re shy~",
     "cosmetic_granted": "Yay! You have the {role} role now. It’s soooo sparkly!",
-    "cosmetic_skipped": "No sparkle today? That’s okay. You're still the cutest~"
+    "cosmetic_skipped": "No sparkle today? That’s okay. You're still the cutest~",
 
     # 💫 Final welcome
     "welcome_title": "🌸 hiiiiii~!!",
@@ -585,7 +586,7 @@ MODE_TEXTS_ENGLISH["crepusca"] = {
     "cosmetic_intro_title": "🌒 A quiet glimmer...",
     "cosmetic_intro_desc": "The twilight stirs... Would you like to choose a soft sparkle to carry into the dusk? Or let the silence stay.",
     "cosmetic_granted": "The role of {role} settles on you, gentle as falling stars.",
-    "cosmetic_skipped": "You remain unadorned — a quiet light in the dreaming dark."
+    "cosmetic_skipped": "You remain unadorned — a quiet light in the dreaming dark.",
 
     # 💫 Final welcome
     "welcome_title": "🌒 …welcome back…",
