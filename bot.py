@@ -249,7 +249,7 @@ MODE_TEXTS_ENGLISH["dayform"] = {
     "cosmetic_intro_title": "🌼 Add a Sunny Sparkle?",
     "cosmetic_intro_desc": "Choose a **cosmetic role** to show your colors in the light of day.\nOr click **Skip** to continue basking.",
     "cosmetic_granted": "✨ You've added a sunshine sparkle: **{role}**! Shine on!",
-    "cosmetic_skipped": "🌿 No sparkle today — the grove still smiles warmly."
+    "cosmetic_skipped": "🌿 No sparkle today — the grove still smiles warmly.",
 
     # 💫 Final welcome
     "welcome_title": "💫 Welcome!",
