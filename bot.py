@@ -42,6 +42,7 @@ def get_user_language(guild_id: str, user_id: str):
     except KeyError:
         return None
 
+
 # ========== EVENTS ==========
 
 @bot.event
@@ -93,6 +94,29 @@ async def glitch_reversion_loop():
                 await update_avatar_for_mode(previous)
 
         await asyncio.sleep(60)
+
+@bot.event
+async def on_member_join(member):
+    guild_id = str(member.guild.id)
+    guild_config = all_languages["guilds"].get(guild_id)
+
+    if not guild_config:
+        print(f"👤 Member joined, but no guild config for {guild_id}.")
+        return
+
+    welcome_channel_id = guild_config.get("welcome_channel_id")
+    if not welcome_channel_id:
+        print(f"👤 Member joined, but no welcome_channel set for {guild_id}.")
+        return
+
+    channel = bot.get_channel(welcome_channel_id)
+    lang_map = guild_config.get("languages", {})
+
+    if not lang_map:
+        await channel.send(f"🌱 {member.mention}, no languages are set up yet.")
+        return
+
+    await send_language_selector(member, channel, lang_map, guild_config)
 
 # ================= MODE CONFIG =================
 STANDARD_MODES = [
@@ -221,6 +245,12 @@ MODE_TEXTS_ENGLISH["dayform"] = {
     "role_intro_desc": "Select a role to bloom into who you are beneath the sun.",
     "role_granted": "✨ You’ve been gifted the **{role}** role! May it shine with purpose.",
 
+    # ✨ Cosmetic Role Selection
+    "cosmetic_intro_title": "🌼 Add a Sunny Sparkle?",
+    "cosmetic_intro_desc": "Choose a **cosmetic role** to show your colors in the light of day.\nOr click **Skip** to continue basking.",
+    "cosmetic_granted": "✨ You've added a sunshine sparkle: **{role}**! Shine on!",
+    "cosmetic_skipped": "🌿 No sparkle today — the grove still smiles warmly."
+
     # 💫 Final welcome
     "welcome_title": "💫 Welcome!",
     "welcome_desc": "Welcome, {user}! May your time here be filled with warmth, friendship, and discovery."
@@ -242,6 +272,12 @@ MODE_TEXTS_ENGLISH["nightform"] = {
     "role_intro_desc": "Select a role to carry with you beneath the moon’s gaze.",
     "role_granted": "🌙 The role of **{role}** rests upon your shoulders, light as starlight.",
 
+    # ✨ Cosmetic Role Selection
+    "cosmetic_intro_title": "🌙 Add a Moonlit Sparkle?",
+    "cosmetic_intro_desc": "Select a **cosmetic role** to shimmer gently in the quiet dark.\nOr press **Skip** to remain subtle beneath the stars.",
+    "cosmetic_granted": "🌌 You've chosen the sparkle of **{role}** — it glows like starlight.",
+    "cosmetic_skipped": "🌒 You remain quietly unadorned — the night welcomes you still."
+
     # 💫 Final welcome
     "welcome_title": "💫 Welcome.",
     "welcome_desc": "Welcome, {user}.\nLet your spirit rest here — where night blooms in peace."
@@ -257,6 +293,12 @@ MODE_TEXTS_ENGLISH["forestform"] = {
     # 📜 Rules confirmation
     "rules_confirm_title": "🌿 The grove welcomes with stillness.",
     "rules_confirm_desc": "The leaves accept your pact. Let your steps tread gently.",
+
+    # ✨ Cosmetic Role Selection
+    "cosmetic_intro_title": "🍂 Add a Woodland Sparkle?",
+    "cosmetic_intro_desc": "Choose a **cosmetic role** to wear like moss on bark — subtle and rooted.\nOr press **Skip** to walk the woods untouched.",
+    "cosmetic_granted": "🌾 You've chosen the charm of **{role}** — may it grow with you.",
+    "cosmetic_skipped": "🍃 You wander bare-footed, and the grove still smiles."
 
     # 🌼 Role selection
     "role_intro_title": "🌾 Choose Your Role",
@@ -284,6 +326,12 @@ MODE_TEXTS_ENGLISH["seaform"] = {
     "role_intro_desc": "Select a role to guide you along the ever-changing shoreline.",
     "role_granted": "🌊 The sea grants you the role of **{role}** — carry it with the grace of the tide.",
 
+    # ✨ Cosmetic Role Selection
+    "cosmetic_intro_title": "🌊 Add a Ripple of Sparkle?",
+    "cosmetic_intro_desc": "Choose a **cosmetic role** to flow with — gentle and glimmering.\nOr tap **Skip** to let the tide decide.",
+    "cosmetic_granted": "🐚 You've chosen **{role}** — may it shimmer with the sea’s grace.",
+    "cosmetic_skipped": "🌊 No shimmer today — the current carries you all the same."
+
     # 💫 Final welcome
     "welcome_title": "🌊 Welcome to the Waters.",
     "welcome_desc": "Welcome, {user}. Let your voice join the songs of the deep."
@@ -304,6 +352,12 @@ MODE_TEXTS_ENGLISH["hadesform"] = {
     "role_intro_title": "🔥 Choose Your Role (before it chooses you)",
     "role_intro_desc": "Pick what sets your soul ablaze — the grove likes bold sparks.",
     "role_granted": "🔥 The role of **{role}** has been seared into your name. Don’t let it burn out.",
+
+    # ✨ Cosmetic Role Selection
+    "cosmetic_intro_title": "🔥 Wanna Add Some Sizzle?",
+    "cosmetic_intro_desc": "Pick a **cosmetic role** that *crackles*. Or hit **Skip** if you’re already hot enough.",
+    "cosmetic_granted": "🔥 Oho! **{role}** suits you — now you’re really smokin’!",
+    "cosmetic_skipped": "😈 Skipped the glam? Bold move. Let the grove smolder without it."
 
     # 💫 Final welcome
     "welcome_title": "🔥 Welcome, Firestarter.",
@@ -326,6 +380,12 @@ MODE_TEXTS_ENGLISH["auroraform"] = {
     "role_intro_desc": "Select a role to wear like starlight on ice — delicate, bright, and uniquely yours.",
     "role_granted": "❄️ You now bear the role of **{role}** — may it gleam quietly within you.",
 
+    # ✨ Cosmetic Role Selection
+    "cosmetic_intro_title": "❄️ Add a Glimmer?",
+    "cosmetic_intro_desc": "Choose a **cosmetic role** to shimmer just right.\nOr click **Skip** and stay subtly radiant.",
+    "cosmetic_granted": "✨ The role of **{role}** gleams softly upon you — just lovely.",
+    "cosmetic_skipped": "🌫️ No sparkle? That’s okay. You already glow in your own way."
+
     # 💫 Final welcome
     "welcome_title": "✨ Welcome, Light-Dancer.",
     "welcome_desc": "Welcome, {user}. The aurora has seen you — and the grove now glows a little brighter."
@@ -346,6 +406,12 @@ MODE_TEXTS_ENGLISH["cosmosform"] = {
     "role_intro_title": "💫 Choose Your Role Among the Stars",
     "role_intro_desc": "Select a role that resonates like a pulse in the void — vibrant and unforgotten.",
     "role_granted": "🌟 The role of **{role}** burns bright in your constellation now.",
+
+    # ✨ Cosmetic Role Selection
+    "cosmetic_intro_title": "🌌 Add a Starlit Thread?",
+    "cosmetic_intro_desc": "Select a **cosmetic role** to shine like your own constellation.\nOr press **Skip** to drift on without one.",
+    "cosmetic_granted": "🌟 The stars align — **{role}** now sparkles in your orbit.",
+    "cosmetic_skipped": "💫 No twinkle added, but the cosmos still hum with your presence."
 
     # 💫 Final welcome
     "welcome_title": "🌌 Welcome, Starborn.",
@@ -370,6 +436,12 @@ MODE_TEXTS_ENGLISH["sunfracture"] = {
 
     "role_granted": "🌞 The role of **{role}** is YOURS!! You’re GLOWING!! You're on FIRE!! (In the good way!)",
 
+    # ✨ Cosmetic Role Selection
+    "cosmetic_intro_title": "☀️ EXTRA SPARKLE?! YES PLEASE!!!",
+    "cosmetic_intro_desc": "Pick a **cosmetic role** to SHIMMER EVEN HARDER!!! Or hit **Skip** if you’re TOO BRIGHT ALREADY!!!",
+    "cosmetic_granted": "🌟 WHOOOO!! You got **{role}** and now you’re EVEN MORE FABULOUS!!!",
+    "cosmetic_skipped": "💥 Skipped it?! BOLD. BRILLIANT. A PURE BEAM OF CHOICE!!!"
+
     # 💫 Final welcome
     "welcome_title": "☀️ WELCOME!!!",
     "welcome_desc": "WELCOME, {user}!!! The GROVE is BLINDING with JOY!!! Let’s SHINE TOGETHER FOREVER!!!"
@@ -392,6 +464,12 @@ MODE_TEXTS_ENGLISH["yuleshard"] = {
     "role_intro_desc": "Each path glimmers like frost on glass...\nselect the one that speaks through the cold...",
 
     "role_granted": "❄️ You now hold the role of **{role}**... brittle and beautiful... don’t let it shatter.",
+
+    # ✨ Cosmetic Role Selection
+    "cosmetic_intro_title": "❄️ choose... a shimmer…",
+    "cosmetic_intro_desc": "select... a cosmetic role... to reflect your frozen light...\nor... click **Skip**... if the cold is enough...",
+    "cosmetic_granted": "🧊 you now glimmer as **{role}**… brittle... beautiful… unforgettable…",
+    "cosmetic_skipped": "🌨️ the frost deepens... no shimmer chosen... only silence remains…"
 
     # 💫 Final welcome
     "welcome_title": "❄️ Welcome...",
@@ -416,6 +494,12 @@ MODE_TEXTS_ENGLISH["echovoid"] = {
 
     "role_granted": "🕳️ You… you are now… **{role}**… or were… or will be… it’s hard to tell…",
 
+    # ✨ Cosmetic Role Selection
+    "cosmetic_intro_title": "🕳️ …choose… a shimmer…",
+    "cosmetic_intro_desc": "…a role… a glimmer… a name to wear… or… nothing… the void remembers either…",
+    "cosmetic_granted": "🌫️ …you are now… **{role}**… or were… or could be… it’s… unclear…",
+    "cosmetic_skipped": "🕳️ …no sparkle… only echoes… fading…"
+
     # 💫 Final welcome
     "welcome_title": "…welcome…",
     "welcome_desc": "Welcome, {user}… you’ve come back… or never left… the grove remembers… something…"
@@ -439,6 +523,12 @@ MODE_TEXTS_ENGLISH["glitchspire"] = {
 
     "role_granted": "🧬 Role assigned: **{role}**\n{user}.unit // configuration updated.",
 
+    # ✨ Cosmetic Role Selection
+    "cosmetic_intro_title": "🧬 ▓SELECT▓ YOUR ▒SPARKLE▒ MODULE",
+    "cosmetic_intro_desc": "…scanning available cosmetic roles… ::injecting identity flair…",
+    "cosmetic_granted": "📎 COSMETIC ROLE = **{role}** …visual anomaly: accepted.",
+    "cosmetic_skipped": "🧬 Skipped cosmetic role injection… stability maintained… for now."
+
     # 💫 Final welcome
     "welcome_title": "🧬 ::WELCOME::",
     "welcome_desc": "Greetings {user}… memory restored?\nEnvironment unstable… but you belong here now…"
@@ -460,7 +550,13 @@ MODE_TEXTS_ENGLISH["flutterkin"] = {
     "role_intro_title": "🐾 pick a role!!",
     "role_intro_desc": "this the fun part!!! pick the sparkly hat you wanna wear!! (it's not a hat but SHHH!)",
 
-    "role_granted": "💫 yaaaaayyy!! you is now the **{role}**!! that’s the bestest!!! i’m clappin with my wings!!",
+    "role_granted": "💫 yaaaaayyy!! you is now the **{role}**!! that’s the bestest!!! i’m clapping with my wings!!",
+
+    # ✨ Cosmetic Role Selection
+    "cosmetic_intro_title": "✨ Time to pick a sparkle!",
+    "cosmetic_intro_desc": "Do you want to add a cute little role to show your sparkle? You can choose one or skip if you’re shy~",
+    "cosmetic_granted": "Yay! You have the {role} role now. It’s soooo sparkly!",
+    "cosmetic_skipped": "No sparkle today? That’s okay. You're still the cutest~"
 
     # 💫 Final welcome
     "welcome_title": "🌸 hiiiiii~!!",
@@ -484,6 +580,12 @@ MODE_TEXTS_ENGLISH["crepusca"] = {
     "role_intro_desc": "roles drift like fog… reach for the one that hums with quiet truth…",
 
     "role_granted": "🌒 the role of **{role}** settles around you… like dusk falling slow…",
+
+    # ✨ Cosmetic Role Selection
+    "cosmetic_intro_title": "🌒 A quiet glimmer...",
+    "cosmetic_intro_desc": "The twilight stirs... Would you like to choose a soft sparkle to carry into the dusk? Or let the silence stay.",
+    "cosmetic_granted": "The role of {role} settles on you, gentle as falling stars.",
+    "cosmetic_skipped": "You remain unadorned — a quiet light in the dreaming dark."
 
     # 💫 Final welcome
     "welcome_title": "🌒 …welcome back…",
@@ -521,6 +623,16 @@ def is_summer_solstice():
 def is_winter_solstice():
     today = datetime.now(timezone.utc)
     return today.month == 12 and 20 <= today.day <= 22
+
+# ================= AVATAR UPDATE =================
+async def update_avatar_for_mode(mode):
+    avatar_path = f"avatars/{mode}.png"  # Or .webp/.jpg based on your files
+    try:
+        with open(avatar_path, "rb") as img:
+            await bot.user.edit(avatar=img.read())
+        print(f"🖼️ Avatar updated for mode: {mode}")
+    except Exception as e:
+        print(f"❗ Failed to update avatar for {mode}: {e}")
 
 # ================= RANDOM GLITCH MODE TRIGGER =================
 def maybe_trigger_glitch(guild_id):
@@ -597,7 +709,7 @@ async def adminhelp(interaction: discord.Interaction):
         value=(
             "`!preloadlanguages` – Adds English, German, Spanish, and French\n"
             "`!addlanguage <code> <emoji> <name>` – Add manually\n"
-            "Example: `!addlanguage it 🇮🇹 Italiano`"
+            "_Example:_ `!addlanguage it 🇮🇹 Italiano`"
         ),
         inline=False
     )
@@ -607,33 +719,52 @@ async def adminhelp(interaction: discord.Interaction):
         value=(
             "`!setwelcome <code> <message>` – Per-language message\n"
             "Use `{user}` for the joining member’s name.\n"
-            "Example: `!setwelcome fr Bienvenue, {user} !`"
+            "_Example:_ `!setwelcome fr Bienvenue, {user} !`"
         ),
         inline=False
     )
 
     embed.add_field(
         name="4️⃣ Server Rules",
-        value="`!setrules <text>` – Show rules after language selection.",
+        value="`!setrules <text>` – Shown after language is chosen.",
         inline=False
     )
 
     embed.add_field(
         name="5️⃣ Role Setup",
         value=(
-            "`!addroleoption @role <emoji> <label>` – Add a role\n"
-            "`!removeroleoption @role` – Remove a role\n"
-            "`!listroleoptions` – View added roles"
+            "`!addroleoption @role <emoji> <label>` – Add a main role\n"
+            "`!removeroleoption @role` – Remove a main role\n"
+            "`!listroleoptions` – View all added main roles"
         ),
         inline=False
     )
 
     embed.add_field(
-        name="🌐 Language Management",
+        name="6️⃣ Cosmetic Roles",
+        value=(
+            "`!addcosmetic @role <emoji> <label>` – Add a cosmetic flair\n"
+            "`!removecosmetic @role` – Remove a flair\n"
+            "`!listcosmetics` – See added sparkles ✨"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="7️⃣ Manually Start Welcome Flow",
+        value=(
+            "`!startwelcome @member` – Triggers full welcome (language, rules, roles)\n"
+            "Use for existing members who joined before setup."
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="🌐 Language Tools",
         value=(
             "`!listlanguages` – View active\n"
-            "`!removelanguage <code>` – Remove one\n"
-            "`!langcodes` – View translation codes"
+            "`!removelanguage <code>` – Remove\n"
+            "`!langcodes` – View common translation codes"
         ),
         inline=False
     )
@@ -939,6 +1070,59 @@ async def listroleoptions(ctx):
 
     await ctx.send(embed=embed)
 
+@bot.command(aliases=["Kosmetikhinzufügen", "ajouterrolecosmetique", "agregarrolcosmetico"])
+@commands.has_permissions(administrator=True)
+async def addcosmetic(ctx, role: discord.Role, emoji: str, *, label: str):
+    guild_id = str(ctx.guild.id)
+    config = all_languages["guilds"].setdefault(guild_id, {})
+    config.setdefault("cosmetic_role_options", {})[str(role.id)] = {
+        "emoji": emoji,
+        "label": label
+    }
+    save_languages()
+    await ctx.send(f"✨ Added cosmetic role `{label}` with emoji {emoji}.")
+
+@bot.command(aliases=["Kosmetikentfernen", "supprimerrolecosmetique", "eliminarrolcosmetico"])
+@commands.has_permissions(administrator=True)
+async def removecosmetic(ctx, role: discord.Role):
+    guild_id = str(ctx.guild.id)
+    cosmetic_roles = all_languages["guilds"].get(guild_id, {}).get("cosmetic_role_options", {})
+
+    if str(role.id) not in cosmetic_roles:
+        await ctx.send("❗ That cosmetic role is not currently configured.")
+        return
+
+    del all_languages["guilds"][guild_id]["cosmetic_role_options"][str(role.id)]
+    save_languages()
+    await ctx.send(f"🗑️ Removed cosmetic role `{role.name}`.")
+
+@bot.command(aliases=["Kosmetikliste", "listerolescosmetiques", "listarrolescosmeticos"])
+@commands.has_permissions(administrator=True)
+async def listcosmetics(ctx):
+    guild_id = str(ctx.guild.id)
+    cosmetic_roles = all_languages["guilds"].get(guild_id, {}).get("cosmetic_role_options", {})
+
+    if not cosmetic_roles:
+        await ctx.send("📭 No cosmetic roles are currently configured.")
+        return
+
+    embed = discord.Embed(
+        title="✨ Cosmetic Roles",
+        description="These roles add flair without affecting permissions:",
+        color=discord.Color.purple()
+    )
+
+    for role_id, data in cosmetic_roles.items():
+        role = ctx.guild.get_role(int(role_id))
+        if role:
+            embed.add_field(
+                name=f"{data['emoji']} {data['label']}",
+                value=f"<@&{role.id}>",
+                inline=False
+            )
+
+    await ctx.send(embed=embed)
+
 @bot.command(aliases=["sprachliste", "listelangues", "listaridiomas"])
 @commands.has_permissions(administrator=True)
 async def listlanguages(ctx):
@@ -966,10 +1150,39 @@ async def listlanguages(ctx):
 
     await ctx.send(embed=embed)
 
+@bot.command(aliases=["willkommenstart", "demarreraccueil", "iniciarbienvenida"])
+@commands.has_permissions(administrator=True)
+async def startwelcome(ctx, member: discord.Member):
+    guild_id = str(ctx.guild.id)
+    guild_config = all_languages["guilds"].get(guild_id)
+
+    if not guild_config:
+        await ctx.send("❗ This server hasn’t been configured for Whisperling yet.")
+        return
+
+    welcome_channel_id = guild_config.get("welcome_channel_id")
+    if not welcome_channel_id:
+        await ctx.send("❗ No welcome channel is set for this server.")
+        return
+
+    lang_map = guild_config.get("languages", {})
+    if not lang_map:
+        await ctx.send("❗ No languages are configured yet.")
+        return
+
+    channel = ctx.guild.get_channel(welcome_channel_id)
+    if not channel:
+        await ctx.send("❗ The configured welcome channel doesn’t exist or can’t be accessed.")
+        return
+
+    await send_language_selector(member, channel, lang_map, guild_config)
+    await ctx.send(f"🌿 Manually started the welcome flow for {member.mention}.")
+
 # ========== FLOW HELPERS ==========
 
 async def send_language_selector(member, channel, lang_map, guild_config):
     guild_id = str(member.guild.id)
+    user_id = str(member.id)
     mode = guild_modes.get(guild_id, "dayform")
 
     # 🎀 Flutterkin glitch chance
@@ -981,37 +1194,46 @@ async def send_language_selector(member, channel, lang_map, guild_config):
 
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
 
+    # 🌟 Pull translated intro
+    intro_title = get_translated_mode_text(guild_id, user_id, mode, "language_intro_title", user=member.mention)
+    intro_desc = get_translated_mode_text(guild_id, user_id, mode, "language_intro_desc", user=member.mention)
+
     class LanguageView(View):
         def __init__(self):
             super().__init__(timeout=60)
             for code, data in lang_map.items():
                 self.add_item(Button(label=data['name'], emoji=data['emoji'], custom_id=code))
+            self.add_item(Button(label="❌ Cancel", style=discord.ButtonStyle.danger, custom_id="cancel"))
 
         async def interaction_check(self, interaction):
             return interaction.user.id == member.id
 
+        async def on_timeout(self):
+            try:
+                await channel.send(f"⏳ {member.mention} Time ran out for language selection.")
+            except:
+                pass
+
     async def button_callback(inter):
         selected_code = inter.data['custom_id']
+        if selected_code == "cancel":
+            await inter.response.send_message("❌ Cancelled language selection.", ephemeral=True)
+            return
+
         if selected_code not in lang_map:
             return
 
         if "users" not in guild_config:
             guild_config["users"] = {}
-        guild_config["users"][str(member.id)] = selected_code
+        guild_config["users"][user_id] = selected_code
         save_languages()
 
-        # 🌸 Pull mode-specific confirmation
-        confirm_title = get_translated_mode_text(guild_id, str(member.id), mode, "language_confirm_title", user=member.mention)
-        confirm_desc = get_translated_mode_text(guild_id, str(member.id), mode, "language_confirm_desc", user=member.mention)
+        # 🌸 Pull confirmation
+        confirm_title = get_translated_mode_text(guild_id, user_id, mode, "language_confirm_title", user=member.mention)
+        confirm_desc = get_translated_mode_text(guild_id, user_id, mode, "language_confirm_desc", user=member.mention)
 
-        await inter.response.edit_message(
-            embed=discord.Embed(
-                title=confirm_title,
-                description=confirm_desc,
-                color=embed_color
-            ),
-            view=None
-        )
+        confirm_embed = discord.Embed(title=confirm_title, description=confirm_desc, color=embed_color)
+        await channel.send(content=member.mention, embed=confirm_embed)
 
         await asyncio.sleep(2)
 
@@ -1020,6 +1242,7 @@ async def send_language_selector(member, channel, lang_map, guild_config):
             await send_rules_embed(member, channel, selected_code, lang_map, guild_config)
         else:
             await send_role_selector(member, channel, guild_config)
+            await send_cosmetic_selector(member, channel, guild_config)
             await send_final_welcome(member, channel, selected_code, lang_map)
 
     view = LanguageView()
@@ -1027,17 +1250,8 @@ async def send_language_selector(member, channel, lang_map, guild_config):
         if isinstance(item, Button):
             item.callback = button_callback
 
-    # 🌟 Pull mode-specific intro
-    intro_title = get_translated_mode_text(guild_id, str(member.id), mode, "language_intro_title", user=member.mention)
-    intro_desc = get_translated_mode_text(guild_id, str(member.id), mode, "language_intro_desc", user=member.mention)
-
-    embed = discord.Embed(
-        title=intro_title,
-        description=intro_desc,
-        color=embed_color
-    )
-
-    await channel.send(embed=embed, view=view)
+    embed = discord.Embed(title=intro_title, description=intro_desc, color=embed_color)
+    await channel.send(content=member.mention, embed=embed, view=view)
 
 async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
     guild_id = str(member.guild.id)
@@ -1048,26 +1262,27 @@ async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
     class AcceptRulesView(View):
         def __init__(self):
             super().__init__(timeout=90)
-            self.add_item(Button(label="I Accept the Rules", style=discord.ButtonStyle.success, custom_id="accept_rules"))
+            self.add_item(Button(label="✅ I Accept the Rules", style=discord.ButtonStyle.success, custom_id="accept_rules"))
 
         async def interaction_check(self, interaction):
             return interaction.user.id == member.id
+
+        async def on_timeout(self):
+            try:
+                await channel.send(f"⏳ {member.mention} Time ran out to accept the rules.")
+            except:
+                pass
 
     async def accept_callback(interaction):
         confirm_title = get_translated_mode_text(guild_id, user_id, mode, "rules_confirm_title", user=member.mention)
         confirm_desc = get_translated_mode_text(guild_id, user_id, mode, "rules_confirm_desc", user=member.mention)
 
-        await interaction.response.edit_message(
-            embed=discord.Embed(
-                title=confirm_title,
-                description=confirm_desc,
-                color=embed_color
-            ),
-            view=None
-        )
+        confirm_embed = discord.Embed(title=confirm_title, description=confirm_desc, color=embed_color)
+        await channel.send(content=member.mention, embed=confirm_embed)
 
         await asyncio.sleep(2)
         await send_role_selector(member, channel, guild_config)
+        await send_cosmetic_selector(member, channel, guild_config)
         await send_final_welcome(member, channel, lang_code, lang_map)
 
     view = AcceptRulesView()
@@ -1102,15 +1317,26 @@ async def send_role_selector(member, channel, guild_config):
         async def interaction_check(self, interaction: discord.Interaction):
             return interaction.user.id == member.id
 
+        async def on_timeout(self):
+            try:
+                await channel.send(f"⏳ {member.mention}, the grove waited for your role, but silence came instead.")
+            except:
+                pass
+
     async def role_button_callback(interaction: discord.Interaction):
         role_id = interaction.data['custom_id']
         role = member.guild.get_role(int(role_id))
         if role:
             try:
-                role_msg_template = get_translated_mode_text(guild_id, user_id, mode, "role_granted")
-                role_msg = role_msg_template.replace("{role}", role.name)
                 await member.add_roles(role)
+                role_msg = get_translated_mode_text(guild_id, user_id, mode, "role_granted", role=role.name)
                 await interaction.response.send_message(role_msg, ephemeral=True)
+
+                # 👇 Call cosmetic selector and final welcome
+                await send_cosmetic_selector(member, channel, guild_config)
+                lang_code = all_languages["guilds"][guild_id]["users"].get(user_id, "en")
+                await send_final_welcome(member, channel, lang_code, all_languages["guilds"][guild_id]["languages"])
+
             except Exception as e:
                 await interaction.response.send_message("❗ I couldn’t assign that role. Please contact a mod.", ephemeral=True)
                 print("Role assign error:", e)
@@ -1128,17 +1354,93 @@ async def send_role_selector(member, channel, guild_config):
 
     await channel.send(content=member.mention, embed=embed, view=view)
 
+async def send_cosmetic_selector(member, channel, guild_config):
+    cosmetic_options = guild_config.get("cosmetic_role_options", {})
+    if not cosmetic_options:
+        return await send_final_welcome(
+            member,
+            channel,
+            all_languages["guilds"][str(member.guild.id)]["users"].get(str(member.id), "en"),
+            all_languages["guilds"][str(member.guild.id)]["languages"]
+        )
+
+    guild_id = str(member.guild.id)
+    user_id = str(member.id)
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+
+    class CosmeticRoleView(View):
+        def __init__(self):
+            super().__init__(timeout=60)
+            for role_id, data in cosmetic_options.items():
+                self.add_item(Button(label=data['label'], emoji=data['emoji'], custom_id=role_id))
+            self.add_item(Button(label="Skip", style=discord.ButtonStyle.secondary, custom_id="skip_cosmetic"))
+
+        async def interaction_check(self, interaction):
+            return interaction.user.id == member.id
+
+        async def on_timeout(self):
+            try:
+                await channel.send(f"⏳ {member.mention}, we didn’t see your sparkle. Moving along...")
+                await send_final_welcome(
+                    member,
+                    channel,
+                    all_languages["guilds"][guild_id]["users"].get(user_id, "en"),
+                    all_languages["guilds"][guild_id]["languages"]
+                )
+            except:
+                pass
+
+    async def button_callback(interaction):
+        selected = interaction.data["custom_id"]
+
+        if selected == "skip_cosmetic":
+            await interaction.response.send_message("🌸 Skipping cosmetic role selection.", ephemeral=True)
+        else:
+            role = member.guild.get_role(int(selected))
+            if role:
+                try:
+                    await member.add_roles(role)
+                    await interaction.response.send_message(
+                        f"🧚 You’ve added a sparkle: **{role.name}**!", ephemeral=True
+                    )
+                except Exception as e:
+                    await interaction.response.send_message("❗ Couldn’t assign that sparkle.", ephemeral=True)
+                    print("Cosmetic role error:", e)
+
+        # 🪄 Now send the final welcome after interaction
+        await send_final_welcome(
+            member,
+            channel,
+            all_languages["guilds"][guild_id]["users"].get(user_id, "en"),
+            all_languages["guilds"][guild_id]["languages"]
+        )
+
+    view = CosmeticRoleView()
+    for item in view.children:
+        if isinstance(item, Button):
+            item.callback = button_callback
+
+    embed = discord.Embed(
+        title="✨ Add a Sparkle?",
+        description="Choose a **cosmetic role** to add your own flair.\nOr click **Skip** to continue.",
+        color=embed_color
+    )
+
+    await channel.send(content=member.mention, embed=embed, view=view)
+
 async def send_final_welcome(member, channel, lang_code, lang_map):
     guild_id = str(member.guild.id)
     user_id = str(member.id)
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.green())
 
-    # ✨ Translated mode-specific title/description (with fallback to lang_map)
+    # ✨ Get translated mode-specific title
     welcome_title = get_translated_mode_text(guild_id, user_id, mode, "welcome_title")
-    
-    default_msg = lang_map[lang_code]["welcome"].replace("{user}", member.mention)
-    raw_welcome_desc = get_translated_mode_text(guild_id, user_id, mode, "welcome_desc", fallback=default_msg)
+
+    # 💬 Fallback to guild-configured welcome if mode text missing
+    fallback_msg = lang_map.get(lang_code, {}).get("welcome", "Welcome, {user}!").replace("{user}", member.mention)
+    raw_welcome_desc = get_translated_mode_text(guild_id, user_id, mode, "welcome_desc", fallback=fallback_msg)
     welcome_desc = raw_welcome_desc.replace("{user}", member.mention)
 
     embed = discord.Embed(
