@@ -1414,7 +1414,7 @@ async def send_role_selector(member, channel, guild_config):
                     user=member.mention
                 )
                 await channel.send(timeout_msg)
-            except:
+           except:
                 pass
 
 
