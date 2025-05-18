@@ -625,34 +625,6 @@ def is_winter_solstice():
     today = datetime.now(timezone.utc)
     return today.month == 12 and 20 <= today.day <= 22
 
-# ================= AVATAR UPDATE =================
-async def update_avatar_for_mode(mode):
-    avatar_path = f"avatars/{mode}.png"
-    try:
-        with open(avatar_path, "rb") as img:
-            await bot.user.edit(avatar=img.read())
-        print(f"🖼️ Avatar updated for mode: {mode}")
-    except Exception as e:
-        print(f"❗ Failed to update avatar for {mode}: {e}")
-
-last_avatar_update = None  # global or per-guild
-
-async def update_avatar_for_mode(mode):
-    global last_avatar_update
-    now = datetime.now(timezone.utc)
-    if last_avatar_update and (now - last_avatar_update).total_seconds() < 3600:
-        print("⏳ Skipping avatar change to avoid rate limit.")
-        return
-
-    avatar_path = f"avatars/{mode}.png"
-    try:
-        with open(avatar_path, "rb") as img:
-            await bot.user.edit(avatar=img.read())
-        last_avatar_update = now
-        print(f"🖼️ Avatar updated for mode: {mode}")
-    except Exception as e:
-        print(f"❗ Failed to update avatar for {mode}: {e}")
-
 # ================= RANDOM GLITCH MODE TRIGGER =================
 def maybe_trigger_glitch(guild_id):
     now = datetime.now(timezone.utc)
@@ -671,20 +643,20 @@ def maybe_trigger_glitch(guild_id):
 
 async def update_avatar_for_mode(mode: str):
     avatar_paths = {
-        "dayform": "avatars/avatar_dayform.png",
-        "nightform": "avatars/avatar_nightform.png",
-        "forestform": "avatars/avatar_forestform.png",
-        "seaform": "avatars/avatar_seaform.png",
-        "hadesform": "avatars/avatar_hadesform.png",
-        "auroraform": "avatars/avatar_auroraform.png",
-        "cosmosform": "avatars/avatar_cosmosform.png",
+        "dayform": "avatars/dayform.png",
+        "nightform": "avatars/nightform.png",
+        "forestform": "avatars/forestform.png",
+        "seaform": "avatars/seaform.png",
+        "hadesform": "avatars/hadesform.png",
+        "auroraform": "avatars/auroraform.png",
+        "cosmosform": "avatars/cosmosform.png",
 
-        "sunfracture": "avatars/avatar_sunfracture.png",
-        "yuleshard": "avatars/avatar_yuleshard.png",
-        "echovoid": "avatars/avatar_echovoid.png",
-        "glitchspire": "avatars/avatar_glitchspire.png",
-        "flutterkin": "avatars/avatar_flutterkin.png",
-        "crepusca": "avatars/avatar_crepusca.png",
+        "sunfracture": "avatars/sunfracture.png",
+        "yuleshard": "avatars/yuleshard.png",
+        "echovoid": "avatars/echovoid.png",
+        "glitchspire": "avatars/glitchspire.png",
+        "flutterkin": "avatars/flutterkin.png",
+        "crepusca": "avatars/crepusca.png",
     }
 
     path = avatar_paths.get(mode)
