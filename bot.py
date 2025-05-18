@@ -69,7 +69,14 @@ async def glitch_reversion_loop():
                 continue
 
             # ⏳ Handle timed-out glitches (non-solstice)
-            if mode in ["echovoid", "glitchspire", "crepusca", "flutterkin"]:
+            if mode == "flutterkin":
+                if timestamp and (now - timestamp > timedelta(minutes=30)):
+                    previous = previous_standard_mode_by_guild[guild_id]
+                    print(f"🍼 Flutterkin nap time for {guild_id}. Reverting to {previous}.")
+                    guild_modes[guild_id] = previous
+                    glitch_timestamps_by_guild[guild_id] = None
+                    await update_avatar_for_mode(previous)
+            elif mode in ["echovoid", "glitchspire", "crepusca"]:
                 if timestamp and (now - timestamp > timedelta(minutes=30)):
                     previous = previous_standard_mode_by_guild[guild_id]
                     print(f"⏳ Glitch expired for {guild_id}. Reverting to {previous}.")
@@ -536,6 +543,8 @@ MODE_TEXTS_ENGLISH["glitchspire"] = {
 }
 
 MODE_TEXTS_ENGLISH["flutterkin"] = {
+    "flutterkin_activation": "✨ {user} a gentle shimmer surrounds you... the flutterkin hears your wish. yay~ ✨"
+
     # 🤫 Language selection
     "language_intro_title": "🌈 pick ur whisper tongue!!",
     "language_intro_desc": "{user} hi hi!! ✨ um um can u pick a voice please? it go pretty~!!!",
@@ -1225,14 +1234,18 @@ async def send_language_selector(member, channel, lang_map, guild_config):
 
         await asyncio.sleep(2)
 
-        rules_text = guild_config.get("rules")
-        if rules_text:
+        # 🌿 Continue journey
+        if guild_config.get("rules"):
             await send_rules_embed(member, channel, selected_code, lang_map, guild_config)
         else:
             await send_role_selector(member, channel, guild_config)
-            await send_cosmetic_selector(member, channel, guild_config)
-            await send_final_welcome(member, channel, selected_code, lang_map)
 
+            # 👇 Await cosmetic selector and call final welcome only if not handled
+            cosmetic_shown = await send_cosmetic_selector(member, channel, guild_config)
+            if not cosmetic_shown:
+                await send_final_welcome(member, channel, selected_code, lang_map)
+
+    # 🔘 Assign callbacks to each button
     view = LanguageView()
     for item in view.children:
         if isinstance(item, Button):
@@ -1270,8 +1283,11 @@ async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
 
         await asyncio.sleep(2)
         await send_role_selector(member, channel, guild_config)
-        await send_cosmetic_selector(member, channel, guild_config)
-        await send_final_welcome(member, channel, lang_code, lang_map)
+
+        # 👇 Cosmetic flow now controls whether final welcome is sent
+        cosmetic_shown = await send_cosmetic_selector(member, channel, guild_config)
+        if not cosmetic_shown:
+            await send_final_welcome(member, channel, lang_code, lang_map)
 
     view = AcceptRulesView()
     for item in view.children:
@@ -1320,10 +1336,11 @@ async def send_role_selector(member, channel, guild_config):
                 role_msg = get_translated_mode_text(guild_id, user_id, mode, "role_granted", role=role.name)
                 await interaction.response.send_message(role_msg, ephemeral=True)
 
-                # 👇 Call cosmetic selector and final welcome
-                await send_cosmetic_selector(member, channel, guild_config)
-                lang_code = all_languages["guilds"][guild_id]["users"].get(user_id, "en")
-                await send_final_welcome(member, channel, lang_code, all_languages["guilds"][guild_id]["languages"])
+                # 👇 Call cosmetic selector next
+                cosmetic_shown = await send_cosmetic_selector(member, channel, guild_config)
+                if not cosmetic_shown:
+                    lang_code = all_languages["guilds"][guild_id]["users"].get(user_id, "en")
+                    await send_final_welcome(member, channel, lang_code, all_languages["guilds"][guild_id]["languages"])
 
             except Exception as e:
                 await interaction.response.send_message("❗ I couldn’t assign that role. Please contact a mod.", ephemeral=True)
@@ -1352,7 +1369,7 @@ async def send_cosmetic_selector(member, channel, guild_config):
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
 
     if not cosmetic_options:
-        return await send_final_welcome(member, channel, lang_code, lang_map)
+        return False  # ⛔ Skip if no options
 
     class CosmeticRoleView(View):
         def __init__(self):
@@ -1391,7 +1408,6 @@ async def send_cosmetic_selector(member, channel, guild_config):
                     await interaction.response.send_message("❗ Couldn’t assign that sparkle.", ephemeral=True)
                     print("Cosmetic role error:", e)
 
-        # 🪄 Send final welcome
         await send_final_welcome(member, channel, lang_code, lang_map)
 
     view = CosmeticRoleView()
@@ -1406,6 +1422,7 @@ async def send_cosmetic_selector(member, channel, guild_config):
     )
 
     await channel.send(content=member.mention, embed=embed, view=view)
+    return True  # ✅ View was sent successfully
 
 async def send_final_welcome(member, channel, lang_code, lang_map):
     guild_id = str(member.guild.id)
@@ -1436,17 +1453,57 @@ async def send_final_welcome(member, channel, lang_code, lang_map):
 
 # ========== FLUTTERKIN ==========
 
+flutterkin_last_triggered = {}  # guild_id -> datetime
+
 @bot.command(aliases=["babywish", "sparkleshift", "fluttertime", "snacktime", "glitterpuff", "bloop", "peekaboo", "glitzerfee", "petitpapillon", "chispa", "nibnib", "piccolina", "snugglezap", "twinkleflit" "pünktchen", "shirokuma", "cocotín", "cucciolotta", "snuzzlepuff", "sparkleboop", "miniblossom"])
-@commands.has_permissions(administrator=True)
 async def whisper(ctx):
     guild_id = str(ctx.guild.id)
-    previous_standard_mode_by_guild[guild_id] = guild_modes[guild_id]
-    guild_modes[guild_id] = "flutterkin"
-    glitch_timestamps_by_guild[guild_id] = datetime.now(timezone.utc)
-    await update_avatar_for_mode("flutterkin")
-    last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
+    user_id = str(ctx.author.id)
+    now = datetime.now(timezone.utc)
+    current_mode = guild_modes.get(guild_id, "dayform")
 
-    await ctx.send(style_text(guild_id, "a gentle shimmer surrounds you... the flutterkin hears your wish."))
+    # ⏳ 30-minute cooldown check
+    last_used = flutterkin_last_triggered.get(guild_id)
+    if last_used and (now - last_used).total_seconds() < 1800:
+        minutes = int(30 - (now - last_used).total_seconds() // 60)
+        await ctx.send(f"🕰️ Flutterkin is resting... please wait {minutes} more minutes!")
+        return
+
+    # 🦋 Activate Flutterkin only if not already in it
+    if current_mode != "flutterkin":
+        previous_standard_mode_by_guild[guild_id] = current_mode
+        guild_modes[guild_id] = "flutterkin"
+        glitch_timestamps_by_guild[guild_id] = now
+        await update_avatar_for_mode("flutterkin")
+
+    # Update cooldown tracking and activity time
+    flutterkin_last_triggered[guild_id] = now
+    last_interaction_by_guild[guild_id] = now
+
+    # 🍼 Intro message (translated and styled)
+    intro = get_translated_mode_text(guild_id, user_id, "flutterkin", "language_confirm_desc", user=ctx.author.mention)
+    await ctx.send(style_text(guild_id, intro))
+
+    # 🗨️ Optional: Translate replied message
+    if ctx.message.reference:
+        try:
+            replied_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+            content = replied_msg.content
+            if not content:
+                return await ctx.send("🧺 that message has no words to sparkle~ ✨")
+
+            user_lang = get_user_language(guild_id, user_id)
+            if not user_lang:
+                return await ctx.send("🤔 you don’t got a chosen tongue yet!! go pick one!! 🐞")
+
+            translated = translator.translate(content, dest=user_lang).text
+            styled_translated = style_text(guild_id, translated)
+
+            await ctx.send(f"💫 translated!! look!!:\n> {styled_translated}")
+
+        except Exception as e:
+            print("whisper translate error:", e)
+            await ctx.send("😥 uh oh... i tried and it broke. no sparkle... try again?")
 
 # ========== GENERAL COMMANDS ==========
 
@@ -1516,14 +1573,19 @@ async def translate(interaction: discord.Interaction):
     if not interaction.channel:
         return await interaction.response.send_message("🌫️ This spell can only be whispered in a server.", ephemeral=True)
 
-    if not interaction.message or not interaction.message.reference:
-        return await interaction.response.send_message("🌸 Please use this on a message you'd like translated (reply to it).", ephemeral=True)
+    # 🧙 Try to get the replied-to message
+    ref = interaction.channel.last_message_id  # fallback if no reply
+    try:
+        ref_message = await interaction.channel.fetch_message(interaction.target.id if hasattr(interaction, "target") else interaction.message.reference.message_id)
+    except Exception as e:
+        print("Message fetch error:", e)
+        return await interaction.response.send_message("❗ I couldn’t retrieve the message you replied to.", ephemeral=True)
 
-    original_msg = await interaction.channel.fetch_message(interaction.message.reference.message_id)
-    content = original_msg.content
+    content = ref_message.content
     if not content:
         return await interaction.response.send_message("🧺 That message carries no words to whisper.", ephemeral=True)
 
+    # 🌍 Translate it
     guild_id = str(interaction.guild_id)
     user_id = str(interaction.user.id)
     user_lang = get_user_language(guild_id, user_id)
@@ -1531,17 +1593,16 @@ async def translate(interaction: discord.Interaction):
     if not user_lang:
         return await interaction.response.send_message("🕊️ You haven’t chosen a language yet, gentle one.", ephemeral=True)
 
-    # 🌒 Trigger potential glitch form
+    # 🌀 Glitch form trigger
     maybe_glitch = maybe_trigger_glitch(guild_id)
     current_mode = guild_modes[guild_id]
-
     if maybe_glitch and current_mode in STANDARD_MODES:
         previous_standard_mode_by_guild[guild_id] = current_mode
         guild_modes[guild_id] = maybe_glitch
         glitch_timestamps_by_guild[guild_id] = datetime.now(timezone.utc)
         await update_avatar_for_mode(maybe_glitch)
 
-    # 🌿 Update last interaction time
+    # 🪵 Update last interaction
     last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
 
     try:
