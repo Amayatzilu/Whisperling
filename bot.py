@@ -1409,14 +1409,15 @@ async def send_role_selector(member, channel, guild_config):
             return interaction.user.id == member.id
 
         async def on_timeout(self):
+            try:
                 timeout_msg = get_translated_mode_text(
-                    guild_id, user_id, mode, "timeout_language", fallback=f"⏳ {member.mention} Time ran out for language selection.",
+                    guild_id, user_id, mode, "timeout_role",
+                    fallback=f"⏳ {member.mention} Time ran out to choose a role.",
                     user=member.mention
                 )
                 await channel.send(timeout_msg)
-           except:
-                pass
-
+            except Exception as e:
+                print("Timeout error (role selector):", e)
 
     async def role_button_callback(interaction: discord.Interaction):
         role_id = interaction.data['custom_id']
@@ -1432,7 +1433,6 @@ async def send_role_selector(member, channel, guild_config):
                 if not cosmetic_shown:
                     lang_code = all_languages["guilds"][guild_id]["users"].get(user_id, "en")
                     await send_final_welcome(member, channel, lang_code, all_languages["guilds"][guild_id]["languages"])
-
             except Exception as e:
                 await interaction.response.send_message("❗ I couldn’t assign that role. Please contact a mod.", ephemeral=True)
                 print("Role assign error:", e)
