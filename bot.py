@@ -627,10 +627,28 @@ def is_winter_solstice():
 
 # ================= AVATAR UPDATE =================
 async def update_avatar_for_mode(mode):
-    avatar_path = f"avatars/{mode}.png"  # Or .webp/.jpg based on your files
+    avatar_path = f"avatars/{mode}.png"
     try:
         with open(avatar_path, "rb") as img:
             await bot.user.edit(avatar=img.read())
+        print(f"🖼️ Avatar updated for mode: {mode}")
+    except Exception as e:
+        print(f"❗ Failed to update avatar for {mode}: {e}")
+
+last_avatar_update = None  # global or per-guild
+
+async def update_avatar_for_mode(mode):
+    global last_avatar_update
+    now = datetime.now(timezone.utc)
+    if last_avatar_update and (now - last_avatar_update).total_seconds() < 3600:
+        print("⏳ Skipping avatar change to avoid rate limit.")
+        return
+
+    avatar_path = f"avatars/{mode}.png"
+    try:
+        with open(avatar_path, "rb") as img:
+            await bot.user.edit(avatar=img.read())
+        last_avatar_update = now
         print(f"🖼️ Avatar updated for mode: {mode}")
     except Exception as e:
         print(f"❗ Failed to update avatar for {mode}: {e}")
