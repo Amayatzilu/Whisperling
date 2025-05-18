@@ -1661,7 +1661,50 @@ async def help(interaction: discord.Interaction):
 
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
-@bot.command(aliases=["whispertranslate", "übersetzen", "traduire", "traducir"])
+@tree.command(name="hilfe", description="📖 Entdecke, was Whisperling für alle Reisenden tun kann.")
+async def hilfe(interaction: discord.Interaction):
+    guild_id = str(interaction.guild_id)
+
+    # 🌒 Handle potential glitch trigger
+    maybe_glitch = maybe_trigger_glitch(guild_id)
+    current_mode = guild_modes.get(guild_id, "dayform")
+
+    if maybe_glitch and current_mode in STANDARD_MODES:
+        previous_standard_mode_by_guild[guild_id] = current_mode
+        guild_modes[guild_id] = maybe_glitch
+        glitch_timestamps_by_guild[guild_id] = datetime.now(timezone.utc)
+        await update_avatar_for_mode(maybe_glitch)
+        current_mode = maybe_glitch
+
+    # 🕰️ Update interaction timestamp
+    last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
+
+    # ✨ Embed theming
+    embed_color = MODE_COLORS.get(current_mode, discord.Color.blurple())
+    description = MODE_DESCRIPTIONS.get(current_mode, "Whisperling schimmert leise im Hain.")
+    footer = MODE_FOOTERS.get(current_mode, "Whisperling lauscht dem Hain...")
+
+    embed = discord.Embed(
+        title="📖 Whisperlings Zauberbuch",
+        description=description,
+        color=embed_color
+    )
+
+    embed.add_field(
+        name="🧚 Befehle für Reisende",
+        value=(
+            "`!translate` – Übersetzt eine beantwortete Nachricht in deine gewählte Sprache\n"
+            "`!chooselanguage` – Wähle oder ändere deine bevorzugte Sprache\n"
+            "`!... es gibt einen geheimen Befehl ...` – Wenn der Wind flüstert, erwacht vielleicht Flutterkin 🍼✨"
+        ),
+        inline=False
+    )
+
+    embed.set_footer(text=footer)
+
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
+@bot.command(aliases=["übersetzen", "traduire", "traducir"])
 async def translate(ctx):
     # Check for replied message
     if not ctx.message.reference:
@@ -1831,7 +1874,7 @@ async def langcodes(ctx):
 
     embed = discord.Embed(
         title="📚 Whisperling’s Language Codes",
-        description="Use these with `/translate` or `!translate` to whisper across tongues:",
+        description="Use these with `!translate` to whisper across tongues:",
         color=embed_color
     )
 
