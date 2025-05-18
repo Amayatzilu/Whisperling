@@ -1411,13 +1411,16 @@ async def send_role_selector(member, channel, guild_config):
         async def on_timeout(self):
             try:
                 timeout_msg = get_translated_mode_text(
-                    guild_id, user_id, mode, "timeout_role",
-                    fallback=f"⏳ {member.mention} Time ran out to choose a role.",
+                    guild_id,
+                    user_id,
+                    mode,
+                    "timeout_role",
+                    fallback=f"⏳ {member.mention}, time ran out to choose a role.",
                     user=member.mention
                 )
                 await channel.send(timeout_msg)
             except Exception as e:
-                print("Timeout error (role selector):", e)
+                print("⚠️ Timeout error (role selector):", e)
 
     async def role_button_callback(interaction: discord.Interaction):
         role_id = interaction.data['custom_id']
@@ -1425,18 +1428,28 @@ async def send_role_selector(member, channel, guild_config):
         if role:
             try:
                 await member.add_roles(role)
-                role_msg = get_translated_mode_text(guild_id, user_id, mode, "role_granted", role=role.name)
+                role_msg = get_translated_mode_text(
+                    guild_id,
+                    user_id,
+                    mode,
+                    "role_granted",
+                    role=role.name,
+                    user=member.mention
+                )
                 await interaction.response.send_message(role_msg, ephemeral=True)
 
-                # 👇 Call cosmetic selector next
+                # 🌸 Continue to cosmetic selector
                 cosmetic_shown = await send_cosmetic_selector(member, channel, guild_config)
                 if not cosmetic_shown:
                     lang_code = all_languages["guilds"][guild_id]["users"].get(user_id, "en")
-                    await send_final_welcome(member, channel, lang_code, all_languages["guilds"][guild_id]["languages"])
-            except Exception as e:
-                await interaction.response.send_message("❗ I couldn’t assign that role. Please contact a mod.", ephemeral=True)
-                print("Role assign error:", e)
+                    lang_map = all_languages["guilds"][guild_id]["languages"]
+                    await send_final_welcome(member, channel, lang_code, lang_map)
 
+            except Exception as e:
+                print("⚠️ Role assign error:", e)
+                await interaction.response.send_message("❗ I couldn’t assign that role. Please contact a mod.", ephemeral=True)
+
+    # 💠 Assign button callbacks
     view = RoleSelectView()
     for item in view.children:
         if isinstance(item, Button):
