@@ -543,7 +543,7 @@ MODE_TEXTS_ENGLISH["glitchspire"] = {
 }
 
 MODE_TEXTS_ENGLISH["flutterkin"] = {
-    "flutterkin_activation": "✨ {user} a gentle shimmer surrounds you... the flutterkin hears your wish. yay~ ✨"
+    "flutterkin_activation": "✨ {user} a gentle shimmer surrounds you... the flutterkin hears your wish. yay~ ✨",
 
     # 🤫 Language selection
     "language_intro_title": "🌈 pick ur whisper tongue!!",
