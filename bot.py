@@ -1338,8 +1338,6 @@ async def send_role_selector(member, channel, guild_config):
         title=get_translated_mode_text(guild_id, user_id, mode, "role_intro_title", user=member.mention),
         description=get_translated_mode_text(guild_id, user_id, mode, "role_intro_desc", user=member.mention),
         color=embed_color
-)
-
     )
 
     await channel.send(content=member.mention, embed=embed, view=view)
