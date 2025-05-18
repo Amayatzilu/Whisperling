@@ -595,18 +595,15 @@ MODE_TEXTS_ENGLISH["crepusca"] = {
 
 from googletrans import Translator
 
-def get_translated_mode_text(guild_id, user_id, mode, key, **kwargs):
+def get_translated_mode_text(guild_id, user_id, mode, key, fallback="", **kwargs):
     lang = get_user_language(guild_id, user_id)
-    fallback = MODE_TEXTS_ENGLISH.get(mode, {}).get(key, "")
-
-    # Apply formatting like {user} or {role} before translating
-    formatted = fallback.format(**kwargs)
+    base_text = MODE_TEXTS_ENGLISH.get(mode, {}).get(key, fallback)
+    formatted = base_text.format(**kwargs)
 
     if not lang or lang == "en":
         return formatted
 
     try:
-        translator = Translator()
         translated = translator.translate(formatted, dest=lang).text
         return translated
     except Exception:
@@ -1338,27 +1335,26 @@ async def send_role_selector(member, channel, guild_config):
             item.callback = role_button_callback
 
     embed = discord.Embed(
-        title=get_translated_mode_text(guild_id, user_id, mode, "role_intro_title"),
-        description=get_translated_mode_text(guild_id, user_id, mode, "role_intro_desc"),
+        title=get_translated_mode_text(guild_id, user_id, mode, "role_intro_title", user=member.mention),
+        description=get_translated_mode_text(guild_id, user_id, mode, "role_intro_desc", user=member.mention),
         color=embed_color
+)
+
     )
 
     await channel.send(content=member.mention, embed=embed, view=view)
 
 async def send_cosmetic_selector(member, channel, guild_config):
-    cosmetic_options = guild_config.get("cosmetic_role_options", {})
-    if not cosmetic_options:
-        return await send_final_welcome(
-            member,
-            channel,
-            all_languages["guilds"][str(member.guild.id)]["users"].get(str(member.id), "en"),
-            all_languages["guilds"][str(member.guild.id)]["languages"]
-        )
-
     guild_id = str(member.guild.id)
     user_id = str(member.id)
     mode = guild_modes.get(guild_id, "dayform")
+    lang_code = all_languages["guilds"][guild_id]["users"].get(user_id, "en")
+    lang_map = all_languages["guilds"][guild_id]["languages"]
+    cosmetic_options = guild_config.get("cosmetic_role_options", {})
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+
+    if not cosmetic_options:
+        return await send_final_welcome(member, channel, lang_code, lang_map)
 
     class CosmeticRoleView(View):
         def __init__(self):
@@ -1372,13 +1368,9 @@ async def send_cosmetic_selector(member, channel, guild_config):
 
         async def on_timeout(self):
             try:
-                await channel.send(f"⏳ {member.mention}, we didn’t see your sparkle. Moving along...")
-                await send_final_welcome(
-                    member,
-                    channel,
-                    all_languages["guilds"][guild_id]["users"].get(user_id, "en"),
-                    all_languages["guilds"][guild_id]["languages"]
-                )
+                timeout_msg = f"⏳ {member.mention}, we didn’t see your sparkle. Moving along..."
+                await channel.send(timeout_msg)
+                await send_final_welcome(member, channel, lang_code, lang_map)
             except:
                 pass
 
@@ -1386,26 +1378,23 @@ async def send_cosmetic_selector(member, channel, guild_config):
         selected = interaction.data["custom_id"]
 
         if selected == "skip_cosmetic":
-            await interaction.response.send_message("🌸 Skipping cosmetic role selection.", ephemeral=True)
+            skip_msg = get_translated_mode_text(guild_id, user_id, mode, "cosmetic_skipped", user=member.mention)
+            await interaction.response.send_message(skip_msg, ephemeral=True)
         else:
             role = member.guild.get_role(int(selected))
             if role:
                 try:
                     await member.add_roles(role)
-                    await interaction.response.send_message(
-                        f"🧚 You’ve added a sparkle: **{role.name}**!", ephemeral=True
+                    grant_msg = get_translated_mode_text(
+                        guild_id, user_id, mode, "cosmetic_granted", role=role.name, user=member.mention
                     )
+                    await interaction.response.send_message(grant_msg, ephemeral=True)
                 except Exception as e:
                     await interaction.response.send_message("❗ Couldn’t assign that sparkle.", ephemeral=True)
                     print("Cosmetic role error:", e)
 
-        # 🪄 Now send the final welcome after interaction
-        await send_final_welcome(
-            member,
-            channel,
-            all_languages["guilds"][guild_id]["users"].get(user_id, "en"),
-            all_languages["guilds"][guild_id]["languages"]
-        )
+        # 🪄 Send final welcome
+        await send_final_welcome(member, channel, lang_code, lang_map)
 
     view = CosmeticRoleView()
     for item in view.children:
@@ -1413,8 +1402,8 @@ async def send_cosmetic_selector(member, channel, guild_config):
             item.callback = button_callback
 
     embed = discord.Embed(
-        title="✨ Add a Sparkle?",
-        description="Choose a **cosmetic role** to add your own flair.\nOr click **Skip** to continue.",
+        title=get_translated_mode_text(guild_id, user_id, mode, "cosmetic_intro_title", user=member.mention),
+        description=get_translated_mode_text(guild_id, user_id, mode, "cosmetic_intro_desc", user=member.mention),
         color=embed_color
     )
 
@@ -1430,9 +1419,15 @@ async def send_final_welcome(member, channel, lang_code, lang_map):
     welcome_title = get_translated_mode_text(guild_id, user_id, mode, "welcome_title")
 
     # 💬 Fallback to guild-configured welcome if mode text missing
-    fallback_msg = lang_map.get(lang_code, {}).get("welcome", "Welcome, {user}!").replace("{user}", member.mention)
-    raw_welcome_desc = get_translated_mode_text(guild_id, user_id, mode, "welcome_desc", fallback=fallback_msg)
-    welcome_desc = raw_welcome_desc.replace("{user}", member.mention)
+    admin_welcome = lang_map.get(lang_code, {}).get("welcome")
+    if admin_welcome:
+        welcome_desc = admin_welcome.replace("{user}", member.mention)
+    else:
+        # 🧚 Fallback to translated mode-specific welcome
+        raw_welcome_desc = get_translated_mode_text(
+            guild_id, user_id, mode, "welcome_desc", fallback="Welcome, {user}!", user=member.mention
+        )
+        welcome_desc = raw_welcome_desc
 
     embed = discord.Embed(
         title=welcome_title,
