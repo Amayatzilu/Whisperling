@@ -260,7 +260,14 @@ MODE_TEXTS_ENGLISH["dayform"] = {
 
     # 💫 Final welcome
     "welcome_title": "💫 Welcome!",
-    "welcome_desc": "Welcome, {user}! May your time here be filled with warmth, friendship, and discovery."
+    "welcome_desc": "Welcome, {user}! May your time here be filled with warmth, friendship, and discovery.",
+
+    # ⏳ Timeout Text
+    "timeout_language": "⏳ {user}, the morning breeze faded before you spoke. Try again when you're ready.",
+    "timeout_rules": "⏳ {user}, the grove waited for your promise, but the sun dipped a little lower. You can return anytime.",
+    "timeout_role": "⏳ {user}, no role was chosen — the petals closed gently. Come find your bloom again soon.",
+    "timeout_cosmetic": "⏳ {user}, no sparkle was chosen, but the grove still glows with your presence."
+
 }
 
 MODE_TEXTS_ENGLISH["nightform"] = {
@@ -287,7 +294,13 @@ MODE_TEXTS_ENGLISH["nightform"] = {
 
     # 💫 Final welcome
     "welcome_title": "💫 Welcome!",
-    "welcome_desc": "Welcome, {user}.\nLet your spirit rest here — where night blooms in peace."
+    "welcome_desc": "Welcome, {user}.\nLet your spirit rest here — where night blooms in peace.",
+
+    # ⏳ Timeout Text
+    "timeout_language": "⏳ {user}, the stars waited… but your voice did not rise. Return when you are ready to whisper.",
+    "timeout_rules": "⏳ {user}, the night listened… but your vow was never spoken. Come back when the hush feels right.",
+    "timeout_role": "⏳ {user}, beneath the moon’s gaze, no path was chosen. The grove sleeps on — your journey can begin later.",
+    "timeout_cosmetic": "⏳ {user}, no shimmer adorned you, but the dark welcomes you just the same."
 }
 
 
@@ -315,7 +328,13 @@ MODE_TEXTS_ENGLISH["forestform"] = {
 
     # 💫 Final welcome
     "welcome_title": "🌳 Welcome to the Grove.",
-    "welcome_desc": "Welcome, {user}. Rest beneath the branches. You are part of the forest now."
+    "welcome_desc": "Welcome, {user}. Rest beneath the branches. You are part of the forest now.",
+
+    # ⏳ Timeout Text
+    "timeout_language": "⏳ {user}, the forest rustled, but your voice did not take root. Return when your words are ready to grow.",
+    "timeout_rules": "⏳ {user}, the trees waited for your vow, but only wind passed through. The path remains, should you wish to walk it.",
+    "timeout_role": "⏳ {user}, no trail was chosen — the leaves curled softly. Return when your steps are sure.",
+    "timeout_cosmetic": "⏳ {user}, no charm was picked — yet the grove still knows your presence among its roots."
 }
 
 MODE_TEXTS_ENGLISH["seaform"] = {
@@ -342,7 +361,13 @@ MODE_TEXTS_ENGLISH["seaform"] = {
 
     # 💫 Final welcome
     "welcome_title": "🌊 Welcome to the Waters.",
-    "welcome_desc": "Welcome, {user}. Let your voice join the songs of the deep."
+    "welcome_desc": "Welcome, {user}. Let your voice join the songs of the deep.",
+
+    # ⏳ Timeout Text
+    "timeout_language": "⏳ {user}, the tide waited, but no voice rode its waves. When you're ready, let it flow once more.",
+    "timeout_rules": "⏳ {user}, the sea listened for your vow… but only silence returned. The current will welcome you when you’re ready.",
+    "timeout_role": "⏳ {user}, no current carried your choice ashore. Drift back when the pull of purpose finds you.",
+    "timeout_cosmetic": "⏳ {user}, no shimmer joined your tide, but the ocean still holds you gently."
 }
 
 MODE_TEXTS_ENGLISH["hadesform"] = {
@@ -364,12 +389,18 @@ MODE_TEXTS_ENGLISH["hadesform"] = {
     # ✨ Cosmetic Role Selection
     "cosmetic_intro_title": "🔥 Wanna Add Some Sizzle?",
     "cosmetic_intro_desc": "Pick a **cosmetic role** that *crackles*. Or hit **Skip** if you’re already hot enough.",
-    "cosmetic_granted": "🔥 Oho! **{role}** suits you — now you’re really smokin’!",
+    "cosmetic_granted": "🔥 Oh! **{role}** suits you — now you’re really smokin’!",
     "cosmetic_skipped": "😈 Skipped the glam? Bold move. Let the grove smolder without it.",
 
     # 💫 Final welcome
     "welcome_title": "🔥 Welcome, Firestarter.",
-    "welcome_desc": "Welcome, {user}. Let your steps scorch the path — the grove will grow around the heat."
+    "welcome_desc": "Welcome, {user}. Let your steps scorch the path — the grove will grow around the heat.",
+
+    # ⏳ Timeout Text
+    "timeout_language": "⏳ {user}, the flames flickered… but you didn’t speak. Got stage fright, or just dramatic timing?",
+    "timeout_rules": "⏳ {user}, no vow? No problem. The grove’s rules are still smoldering — come back when you're ready to stir the coals.",
+    "timeout_role": "⏳ {user}, no role chosen? Bold move. Just vibing in the firelight, huh?",
+    "timeout_cosmetic": "⏳ {user}, no sizzle today — guess you're already hot enough. 🔥"
 }
 
 MODE_TEXTS_ENGLISH["auroraform"] = {
@@ -377,7 +408,7 @@ MODE_TEXTS_ENGLISH["auroraform"] = {
     "language_intro_title": "❄️ Choose Your Whispering Tongue",
     "language_intro_desc": "{user}, beneath the shimmer of frozen skies,\nselect the voice that will drift beside you.",
     "language_confirm_title": "✨ It sparkles just right.",
-    "language_confirm_desc": "Your tongue has been kissed by frostlight. Let it shimmer softly through the grove.",
+    "language_confirm_desc": "Your tongue has been kissed by frost light. Let it shimmer softly through the grove.",
 
     # 📜 Rules confirmation
     "rules_confirm_title": "❄️ The stillness welcomes you.",
@@ -385,7 +416,7 @@ MODE_TEXTS_ENGLISH["auroraform"] = {
 
     # 🌼 Role selection
     "role_intro_title": "💫 Choose Your Role",
-    "role_intro_desc": "Select a role to wear like starlight on ice — delicate, bright, and uniquely yours.",
+    "role_intro_desc": "Select a role to wear like star light on ice — delicate, bright, and uniquely yours.",
     "role_granted": "❄️ You now bear the role of **{role}** — may it gleam quietly within you.",
 
     # ✨ Cosmetic Role Selection
@@ -396,7 +427,13 @@ MODE_TEXTS_ENGLISH["auroraform"] = {
 
     # 💫 Final welcome
     "welcome_title": "✨ Welcome, Light-Dancer.",
-    "welcome_desc": "Welcome, {user}. The aurora has seen you — and the grove now glows a little brighter."
+    "welcome_desc": "Welcome, {user}. The aurora has seen you — and the grove now glows a little brighter.",
+
+    # ⏳ Timeout Text
+    "timeout_language": "⏳ {user}, the shimmer faded before you spoke. Return when the light calls softly again.",
+    "timeout_rules": "⏳ {user}, no vow was whispered… only the hush of frost remains. The grove waits in stillness.",
+    "timeout_role": "⏳ {user}, no path was chosen — the light dimmed quietly. Drift back when the skies stir once more.",
+    "timeout_cosmetic": "⏳ {user}, no sparkle joined your glow, but even the quietest star still shines."
 }
 
 MODE_TEXTS_ENGLISH["cosmosform"] = {
@@ -423,7 +460,13 @@ MODE_TEXTS_ENGLISH["cosmosform"] = {
 
     # 💫 Final welcome
     "welcome_title": "🌌 Welcome, Starborn.",
-    "welcome_desc": "Welcome, {user}. You’ve fallen into place among us — perfectly spaced between light and mystery."
+    "welcome_desc": "Welcome, {user}. You’ve fallen into place among us — perfectly spaced between light and mystery.",
+
+    # ⏳ Timeout Text
+    "timeout_language": "⏳ {user}, the stars waited for your signal... but it never came. When your voice is ready, the cosmos will listen.",
+    "timeout_rules": "⏳ {user}, no vow joined the cosmic rhythm. The silence echoes — but stardust remembers.",
+    "timeout_role": "⏳ {user}, your constellation remains unclaimed. Drift back when you feel the stars align.",
+    "timeout_cosmetic": "⏳ {user}, no shimmer found its orbit — but you still hum softly in the dark."
 }
 
 MODE_TEXTS_ENGLISH["sunfracture"] = {
@@ -452,7 +495,13 @@ MODE_TEXTS_ENGLISH["sunfracture"] = {
 
     # 💫 Final welcome
     "welcome_title": "☀️ WELCOME!!!",
-    "welcome_desc": "WELCOME, {user}!!! The GROVE is BLINDING with JOY!!! Let’s SHINE TOGETHER FOREVER!!!"
+    "welcome_desc": "WELCOME, {user}!!! The GROVE is BLINDING with JOY!!! Let’s SHINE TOGETHER FOREVER!!!",
+
+    # ⏳ Timeout Text
+    "timeout_language": "⏳ {user}!!! YOU TOOK TOO LONG!! THE GROVE IS STILL BRIGHT BUT LIKE!! HURRY NEXT TIME!! 💛💥🌻",
+    "timeout_rules": "⏳ {user}, rules were GLOWING, pages were TURNING… but you MISSED THEM!! No worries!! COME BACK SOON OKAY?! 🌞🔥📜",
+    "timeout_role": "⏳ {user}!!! NO ROLE?! NO GLOW-UP?? 😱😱 okay okay breathe... YOU CAN STILL SHINE LATER!!! 🌟💫",
+    "timeout_cosmetic": "⏳ {user}!!! YOU DIDN’T SPARKLE!!! but like... YOU’RE STILL FABULOUS!!! 😘✨✨✨"
 }
 
 MODE_TEXTS_ENGLISH["yuleshard"] = {
@@ -481,7 +530,13 @@ MODE_TEXTS_ENGLISH["yuleshard"] = {
 
     # 💫 Final welcome
     "welcome_title": "❄️ Welcome...",
-    "welcome_desc": "Welcome, {user}... the grove... remembers your warmth... as the ice takes hold..."
+    "welcome_desc": "Welcome, {user}... the grove... remembers your warmth... as the ice takes hold...",
+
+    # ⏳ Timeout Text
+    "timeout_language": "⏳ {user}... the cold waited... your voice never arrived... it’s... so quiet now...",
+    "timeout_rules": "⏳ {user}... the pact was never spoken... the ice holds... nothing...",
+    "timeout_role": "⏳ {user}... your choice... froze before it formed... the grove forgets the shape of it...",
+    "timeout_cosmetic": "⏳ {user}... no shimmer... only frost settling deeper... and deeper..."
 }
 
 MODE_TEXTS_ENGLISH["echovoid"] = {
@@ -510,7 +565,13 @@ MODE_TEXTS_ENGLISH["echovoid"] = {
 
     # 💫 Final welcome
     "welcome_title": "…welcome…",
-    "welcome_desc": "Welcome, {user}… you’ve come back… or never left… the grove remembers… something…"
+    "welcome_desc": "Welcome, {user}… you’ve come back… or never left… the grove remembers… something…",
+
+    # ⏳ Timeout Text
+    "timeout_language": "⏳ {user}… (you were going to choose…) …but the moment passed… and passed again…",
+    "timeout_rules": "⏳ {user}… the rules waited… (or did they?) …they echo now… in the quiet…",
+    "timeout_role": "⏳ {user}… no role… no name… (no identity?) …just echoes where a choice could have been…",
+    "timeout_cosmetic": "⏳ {user}… no sparkle chosen… (or maybe you did…) …it’s hard to remember now…"
 }
 
 MODE_TEXTS_ENGLISH["glitchspire"] = {
@@ -539,7 +600,13 @@ MODE_TEXTS_ENGLISH["glitchspire"] = {
 
     # 💫 Final welcome
     "welcome_title": "🧬 ::WELCOME::",
-    "welcome_desc": "Greetings {user}… memory restored?\nEnvironment unstable… but you belong here now…"
+    "welcome_desc": "Greetings {user}… memory restored?\nEnvironment unstable… but you belong here now…",
+
+    # ⏳ Timeout Text
+    "timeout_language": "⏳ {user}… <response_timeout>… [voice.selection=FAILED] :: system will attempt memory restoration… later…",
+    "timeout_rules": "⏳ {user}… RULE.CONFIRMATION.MISSED… frost.byte()… protocol.standby…",
+    "timeout_role": "⏳ {user}… ROLE_UNASSIGNED… identity packet corrupted… awaiting input retry…",
+    "timeout_cosmetic": "⏳ {user}… COSMETIC.FLARE=VOID… no sparkle attached… system stability: ⬇️ 81%…"
 }
 
 MODE_TEXTS_ENGLISH["flutterkin"] = {
@@ -570,7 +637,13 @@ MODE_TEXTS_ENGLISH["flutterkin"] = {
 
     # 💫 Final welcome
     "welcome_title": "🌸 hiiiiii~!!",
-    "welcome_desc": "welcoooome {user}!! 🐞💖 the grove LOVES you already!! you want snack? or nap? or sparkle cloud???"
+    "welcome_desc": "welcoooome {user}!! 🐞💖 the grove LOVES you already!! you want snack? or nap? or sparkle cloud???",
+
+    # ⏳ Timeout Text
+    "timeout_language": "⏳ {user} ummm you didn’t pick the thing?? that’s ok!! we can try again later yayyy 💖✨",
+    "timeout_rules": "⏳ {user} oh nooo rules went bye bye!! 😢 the grove still loves you though!! maybe come back and tap the button??",
+    "timeout_role": "⏳ {user} oh!!! wait!! you didn’t pick a sparkly hat!! 🌟 next time next time!!",
+    "timeout_cosmetic": "⏳ {user} no sparkle?! 😱 its okay!! you still squishy!!! 🐛✨💕"
 }
 
 MODE_TEXTS_ENGLISH["crepusca"] = {
@@ -599,7 +672,13 @@ MODE_TEXTS_ENGLISH["crepusca"] = {
 
     # 💫 Final welcome
     "welcome_title": "🌒 …welcome back…",
-    "welcome_desc": "welcome, {user}… the stars blink slowly in the quiet sky… we are… still dreaming…"
+    "welcome_desc": "welcome, {user}… the stars blink slowly in the quiet sky… we are… still dreaming…",
+
+    # ⏳ Timeout Text
+    "timeout_language": "⏳ {user}… the hush held its breath… but your voice never arrived… it’s okay… the stars are still listening…",
+    "timeout_rules": "⏳ {user}… your vow… was almost spoken… then lost… like smoke in the dusk…",
+    "timeout_role": "⏳ {user}… the grove waited… but no path was chosen… only mist remains…",
+    "timeout_cosmetic": "⏳ {user}… the glimmer passed you by… but you still glow in the dreaming dark…"
 }
 
 from googletrans import Translator
@@ -1207,7 +1286,11 @@ async def send_language_selector(member, channel, lang_map, guild_config):
 
         async def on_timeout(self):
             try:
-                await channel.send(f"⏳ {member.mention} Time ran out for language selection.")
+                timeout_msg = get_translated_mode_text(
+                    guild_id, user_id, mode, "timeout_language", fallback=f"⏳ {member.mention} Time ran out for language selection.",
+                    user=member.mention
+                )
+                await channel.send(timeout_msg)
             except:
                 pass
 
@@ -1270,7 +1353,11 @@ async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
 
         async def on_timeout(self):
             try:
-                await channel.send(f"⏳ {member.mention} Time ran out to accept the rules.")
+                timeout_msg = get_translated_mode_text(
+                    guild_id, user_id, mode, "timeout_rules", fallback=f"⏳ {member.mention} Time ran out for language selection.",
+                    user=member.mention
+                )
+                await channel.send(timeout_msg)
             except:
                 pass
 
@@ -1322,10 +1409,14 @@ async def send_role_selector(member, channel, guild_config):
             return interaction.user.id == member.id
 
         async def on_timeout(self):
-            try:
-                await channel.send(f"⏳ {member.mention}, the grove waited for your role, but silence came instead.")
+                timeout_msg = get_translated_mode_text(
+                    guild_id, user_id, mode, "timeout_language", fallback=f"⏳ {member.mention} Time ran out for language selection.",
+                    user=member.mention
+                )
+                await channel.send(timeout_msg)
             except:
                 pass
+
 
     async def role_button_callback(interaction: discord.Interaction):
         role_id = interaction.data['custom_id']
@@ -1383,9 +1474,11 @@ async def send_cosmetic_selector(member, channel, guild_config):
 
         async def on_timeout(self):
             try:
-                timeout_msg = f"⏳ {member.mention}, we didn’t see your sparkle. Moving along..."
+                timeout_msg = get_translated_mode_text(
+                    guild_id, user_id, mode, "timeout_cosmetic", fallback=f"⏳ {member.mention} Time ran out for language selection.",
+                    user=member.mention
+                )
                 await channel.send(timeout_msg)
-                await send_final_welcome(member, channel, lang_code, lang_map)
             except:
                 pass
 
@@ -1507,102 +1600,86 @@ async def whisper(ctx):
 
 # ========== GENERAL COMMANDS ==========
 
-@tree.command(name="help", description="See the magical commands Whisperling knows.")
+@tree.command(name="help", description="📖 See the magical things Whisperling can do (for all users).")
 async def help(interaction: discord.Interaction):
     guild_id = str(interaction.guild_id)
 
-    # 🌒 Check for glitch form trigger
+    # 🌒 Handle potential glitch trigger
     maybe_glitch = maybe_trigger_glitch(guild_id)
-    current_mode = guild_modes[guild_id]
+    current_mode = guild_modes.get(guild_id, "dayform")
 
     if maybe_glitch and current_mode in STANDARD_MODES:
         previous_standard_mode_by_guild[guild_id] = current_mode
         guild_modes[guild_id] = maybe_glitch
         glitch_timestamps_by_guild[guild_id] = datetime.now(timezone.utc)
         await update_avatar_for_mode(maybe_glitch)
+        current_mode = maybe_glitch
 
-    # 🌿 Update last interaction
+    # 🕰️ Update interaction timestamp
     last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
 
-    # 🎨 Determine color from mode
-    mode = guild_modes.get(guild_id, "dayform")
-    embed_color = MODE_COLORS.get(mode, discord.Color.lilac())
+    # ✨ Embed theming
+    embed_color = MODE_COLORS.get(current_mode, discord.Color.blurple())
+    description = MODE_DESCRIPTIONS.get(current_mode, "Whisperling shimmers softly in the grove.")
+    footer = MODE_FOOTERS.get(current_mode, "Whisperling watches the grove gently...")
 
     embed = discord.Embed(
         title="📖 Whisperling's Grimoire",
-        description="A gentle guide to all the enchantments I can perform.",
+        description=description,
         color=embed_color
     )
 
     embed.add_field(
-        name="🌸 For All Wanderers",
+        name="🧚 Commands for Wanderers",
         value=(
-            "`/chooselanguage` – Choose your language again\n"
-            "`/translate` – Translate a replied message to your chosen language"
+            "`!translate` – Translate a replied message into your chosen language\n"
+            "`!chooselanguage` – Pick or change your preferred language\n"
+            "`!... there is a hidden command ...` – If the winds allow, Flutterkin may awaken 🍼✨"
         ),
         inline=False
     )
 
-    embed.add_field(
-        name="🛠️ For Grove Keepers (Admins)",
-        value=(
-            "`!preloadlanguages` – Load EN/DE/FR/ES\n"
-            "`!addlanguage` – Add a new language\n"
-            "`!setwelcome` – Set custom welcome text\n"
-            "`!setwelcomechannel` – Choose the channel for new arrivals\n"
-            "`/setrules` – Define rules for new members\n"
-            "`/addroleoption` – Add a role to the selection list\n"
-            "`/removeroleoption` – Remove a role\n"
-            "`/listroleoptions` – Show available roles\n"
-            "`!listlanguages` – Show current languages\n"
-            "`!removelanguage` – Remove a language\n"
-            "`!langcodes` – Show supported translation codes"
-        ),
-        inline=False
-    )
-
-    footer_text = MODE_FOOTERS.get(mode, "Whisperling is here to help your grove bloom 🌷")
-    embed.set_footer(text=footer_text)
-
+    embed.set_footer(text=footer)
 
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
-@tree.command(name="translate", description="Whisper a translation of a message into your language.")
-@app_commands.checks.has_permissions(send_messages=True)
-async def translate(interaction: discord.Interaction):
-    if not interaction.channel:
-        return await interaction.response.send_message("🌫️ This spell can only be whispered in a server.", ephemeral=True)
+@bot.command(aliases=["whispertranslate", "übersetzen", "traduire", "traducir"])
+async def translate(ctx):
+    # Check for replied message
+    if not ctx.message.reference:
+        await ctx.send("🌸 Please reply to the message you want translated.", delete_after=10)
+        return
 
-    # 🧙 Try to get the replied-to message
-    ref = interaction.channel.last_message_id  # fallback if no reply
     try:
-        ref_message = await interaction.channel.fetch_message(interaction.target.id if hasattr(interaction, "target") else interaction.message.reference.message_id)
+        original_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+        content = original_msg.content
+        if not content:
+            await ctx.send("🧺 That message carries no words to whisper.", delete_after=10)
+            return
     except Exception as e:
-        print("Message fetch error:", e)
-        return await interaction.response.send_message("❗ I couldn’t retrieve the message you replied to.", ephemeral=True)
+        print("Fetch error:", e)
+        await ctx.send("❗ I couldn’t find the message you replied to.", delete_after=10)
+        return
 
-    content = ref_message.content
-    if not content:
-        return await interaction.response.send_message("🧺 That message carries no words to whisper.", ephemeral=True)
-
-    # 🌍 Translate it
-    guild_id = str(interaction.guild_id)
-    user_id = str(interaction.user.id)
+    guild_id = str(ctx.guild.id)
+    user_id = str(ctx.author.id)
     user_lang = get_user_language(guild_id, user_id)
 
     if not user_lang:
-        return await interaction.response.send_message("🕊️ You haven’t chosen a language yet, gentle one.", ephemeral=True)
+        await ctx.send("🕊️ You haven’t chosen a language yet, gentle one.", delete_after=10)
+        return
 
-    # 🌀 Glitch form trigger
+    # 🌒 Trigger potential glitch form
     maybe_glitch = maybe_trigger_glitch(guild_id)
     current_mode = guild_modes[guild_id]
+
     if maybe_glitch and current_mode in STANDARD_MODES:
         previous_standard_mode_by_guild[guild_id] = current_mode
         guild_modes[guild_id] = maybe_glitch
         glitch_timestamps_by_guild[guild_id] = datetime.now(timezone.utc)
         await update_avatar_for_mode(maybe_glitch)
 
-    # 🪵 Update last interaction
+    # Update last interaction
     last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
 
     try:
@@ -1620,16 +1697,17 @@ async def translate(interaction: discord.Interaction):
         if footer:
             embed.set_footer(text=footer)
 
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await ctx.send(embed=embed)
 
     except Exception as e:
         print("Translation error:", e)
-        await interaction.response.send_message("❗ The winds failed to carry the words. Please try again.", ephemeral=True)
+        await ctx.send("❗ The winds failed to carry the words. Please try again.", delete_after=10)
 
-@tree.command(name="chooselanguage", description="Choose your preferred language for Whisperling to use.")
-async def chooselanguage(interaction: discord.Interaction):
-    guild_id = str(interaction.guild_id)
-    user_id = str(interaction.user.id)
+@bot.command(aliases=["wählesprache", "choisirlalangue", "eligelenguaje"])
+async def chooselanguage(ctx):
+    guild_id = str(ctx.guild.id)
+    user_id = str(ctx.author.id)
+    member = ctx.author
     guild_config = all_languages["guilds"].get(guild_id)
 
     # 🌒 Trigger potential glitch form
@@ -1646,29 +1724,36 @@ async def chooselanguage(interaction: discord.Interaction):
     last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
 
     if not guild_config:
-        return await interaction.response.send_message("❗ This server isn't set up for Whisperling yet.", ephemeral=True)
+        return await ctx.send("❗ This server isn't set up for Whisperling yet.")
 
     welcome_channel_id = guild_config.get("welcome_channel_id")
     if not welcome_channel_id:
-        return await interaction.response.send_message("❗ No welcome channel has been set for this server.", ephemeral=True)
+        return await ctx.send("❗ No welcome channel has been set for this server.")
 
-    if interaction.channel.id != welcome_channel_id:
-        return await interaction.response.send_message(
-            f"🌸 Please use this command in the <#{welcome_channel_id}> channel where fairy winds can guide it.",
-            ephemeral=True
+    if ctx.channel.id != welcome_channel_id:
+        return await ctx.send(
+            f"🌸 Please use this command in the <#{welcome_channel_id}> channel where fairy winds can guide it."
         )
 
     lang_map = guild_config.get("languages", {})
     if not lang_map:
-        return await interaction.response.send_message("❗ No languages are configured yet.", ephemeral=True)
+        return await ctx.send("❗ No languages are configured yet.")
+
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.purple())
+    voice = MODE_TEXTS_ENGLISH.get(mode, {})
+
+    embed = discord.Embed(
+        title=voice.get("language_intro_title", "🧚 Choose Your Whispering Tongue"),
+        description=voice.get("language_intro_desc", "").replace("{user}", member.mention),
+        color=embed_color
+    )
 
     class LanguageView(View):
         def __init__(self):
             super().__init__(timeout=60)
             for code, data in lang_map.items():
                 self.add_item(Button(label=data['name'], emoji=data['emoji'], custom_id=code))
-
-            # 🌸 Add a Cancel button
             self.add_item(Button(label="❌ Cancel", style=discord.ButtonStyle.danger, custom_id="cancel"))
 
         async def interaction_check(self, interaction):
@@ -1680,10 +1765,7 @@ async def chooselanguage(interaction: discord.Interaction):
             except:
                 pass
 
-        async def on_error(self, interaction: discord.Interaction, error: Exception, item):
-            print(f"❗ Whisperling button error: {error}")
-
-    async def button_callback(inter: discord.Interaction):
+    async def button_callback(inter):
         selected_code = inter.data['custom_id']
         if selected_code == "cancel":
             await inter.response.edit_message(content="❌ Cancelled.", embed=None, view=None)
@@ -1704,19 +1786,7 @@ async def chooselanguage(interaction: discord.Interaction):
         if isinstance(item, Button):
             item.callback = button_callback
 
-    mode = guild_modes.get(guild_id, "dayform")
-    voice = MODE_TEXTS.get(mode, {})
-    embed_color = MODE_COLORS.get(mode, discord.Color.purple())
-
-    embed = discord.Embed(
-        title=voice.get("language_intro_title", "🧚 Choose Your Whispering Tongue"),
-        description=voice.get("language_intro_desc", "").replace("{user}", interaction.user.mention),
-        color=embed_color
-)
-
-
-    message = await interaction.channel.send(embed=embed, view=view)
-    await interaction.response.send_message("✨ Please choose your language above.", ephemeral=True)
+    message = await ctx.send(embed=embed, view=view)
 
 @bot.command(aliases=["sprachenkürzel", "codeslangues", "codigosidioma"])
 async def langcodes(ctx):
