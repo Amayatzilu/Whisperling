@@ -1287,7 +1287,8 @@ async def send_language_selector(member, channel, lang_map, guild_config):
         async def on_timeout(self):
             try:
                 timeout_msg = get_translated_mode_text(
-                    guild_id, user_id, mode, "timeout_language", fallback=f"⏳ {member.mention} Time ran out for language selection.",
+                    guild_id, user_id, mode, "timeout_language",
+                    fallback=f"⏳ {member.mention} Time ran out for language selection.",
                     user=member.mention
                 )
                 await channel.send(timeout_msg)
@@ -1305,8 +1306,11 @@ async def send_language_selector(member, channel, lang_map, guild_config):
 
         if "users" not in guild_config:
             guild_config["users"] = {}
+
         guild_config["users"][user_id] = selected_code
         save_languages()
+
+        view.stop()
 
         # 🌸 Pull confirmation
         confirm_title = get_translated_mode_text(guild_id, user_id, mode, "language_confirm_title", user=member.mention)
@@ -1322,17 +1326,7 @@ async def send_language_selector(member, channel, lang_map, guild_config):
             await send_rules_embed(member, channel, selected_code, lang_map, guild_config)
         else:
             await send_role_selector(member, channel, guild_config)
-
-            # 👇 Await cosmetic selector and call final welcome only if not handled
-            cosmetic_shown = await send_cosmetic_selector(member, channel, guild_config)
-            if not cosmetic_shown:
-                timeout_msg = get_translated_mode_text(
-                    guild_id, user_id, mode, "timeout_language",
-                    fallback=f"⏳ {member.mention}, we didn’t see your sparkle. Come back when you’re ready to glow!",
-                    user=member.mention
-                )
-                await channel.send(timeout_msg)
-
+            await send_cosmetic_selector(member, channel, guild_config)
 
     # 🔘 Assign callbacks to each button
     view = LanguageView()
@@ -1360,7 +1354,8 @@ async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
         async def on_timeout(self):
             try:
                 timeout_msg = get_translated_mode_text(
-                    guild_id, user_id, mode, "timeout_rules", fallback=f"⏳ {member.mention} Time ran out for language selection.",
+                    guild_id, user_id, mode, "timeout_rules",
+                    fallback=f"⏳ {member.mention} Time ran out to accept the rules.",
                     user=member.mention
                 )
                 await channel.send(timeout_msg)
@@ -1374,18 +1369,12 @@ async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
         confirm_embed = discord.Embed(title=confirm_title, description=confirm_desc, color=embed_color)
         await channel.send(content=member.mention, embed=confirm_embed)
 
+        view.stop()  # ✅ Stop the timeout here on successful press
+
         await asyncio.sleep(2)
         await send_role_selector(member, channel, guild_config)
+        await send_cosmetic_selector(member, channel, guild_config)
 
-        # 👇 Cosmetic flow now controls whether final welcome is sent
-        cosmetic_shown = await send_cosmetic_selector(member, channel, guild_config)
-        if not cosmetic_shown:
-                timeout_msg = get_translated_mode_text(
-                    guild_id, user_id, mode, "timeout_rules",
-                    fallback=f"⏳ {member.mention}, we didn’t see your sparkle. Come back when you’re ready to glow!",
-                    user=member.mention
-                )
-                await channel.send(timeout_msg)
     view = AcceptRulesView()
     for item in view.children:
         if isinstance(item, Button):
@@ -1447,18 +1436,14 @@ async def send_role_selector(member, channel, guild_config):
                     user=member.mention
                 )
                 await interaction.response.send_message(role_msg, ephemeral=True)
+                view.stop()  # ✅ Stop timeout on successful button click
 
                 # 🌸 Continue to cosmetic selector
                 cosmetic_shown = await send_cosmetic_selector(member, channel, guild_config)
                 if not cosmetic_shown:
                     lang_code = all_languages["guilds"][guild_id]["users"].get(user_id, "en")
                     lang_map = all_languages["guilds"][guild_id]["languages"]
-                timeout_msg = get_translated_mode_text(
-                    guild_id, user_id, mode, "timeout_role",
-                    fallback=f"⏳ {member.mention}, we didn’t see your sparkle. Come back when you’re ready to glow!",
-                    user=member.mention
-                )
-                await channel.send(timeout_msg)
+                    await send_final_welcome(member, channel, lang_code, lang_map)
 
             except Exception as e:
                 print("⚠️ Role assign error:", e)
@@ -1503,7 +1488,8 @@ async def send_cosmetic_selector(member, channel, guild_config):
         async def on_timeout(self):
             try:
                 timeout_msg = get_translated_mode_text(
-                    guild_id, user_id, mode, "timeout_cosmetic", fallback=f"⏳ {member.mention} Time ran out for language selection.",
+                    guild_id, user_id, mode, "timeout_cosmetic",
+                    fallback=f"⏳ {member.mention}, we didn’t see your sparkle. Come back when you’re ready to glow!",
                     user=member.mention
                 )
                 await channel.send(timeout_msg)
@@ -1529,12 +1515,11 @@ async def send_cosmetic_selector(member, channel, guild_config):
                     await interaction.response.send_message("❗ Couldn’t assign that sparkle.", ephemeral=True)
                     print("Cosmetic role error:", e)
 
-                timeout_msg = get_translated_mode_text(
-                    guild_id, user_id, mode, "timeout_cosmetic",
-                    fallback=f"⏳ {member.mention}, we didn’t see your sparkle. Come back when you’re ready to glow!",
-                    user=member.mention
-                )
-                await channel.send(timeout_msg)
+        # ✅ Stop the view so the timeout doesn't fire
+        view.stop()
+
+        # 🎉 Final welcome
+        await send_final_welcome(member, channel, lang_code, lang_map)
 
     view = CosmeticRoleView()
     for item in view.children:
@@ -1548,7 +1533,7 @@ async def send_cosmetic_selector(member, channel, guild_config):
     )
 
     await channel.send(content=member.mention, embed=embed, view=view)
-    return True  # ✅ View was sent successfully
+    return True
 
 async def send_final_welcome(member, channel, lang_code, lang_map):
     guild_id = str(member.guild.id)
