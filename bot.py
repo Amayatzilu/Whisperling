@@ -823,8 +823,11 @@ async def adminhelp(interaction: discord.Interaction):
     )
 
     embed.add_field(
-        name="4️⃣ Server Rules",
-        value="`!setrules <text>` – Shown after language is chosen.",
+        name="4️⃣ Server Rules (Multi-Language)",
+        value=(
+            "`!setrules <code> <text>` – Per-language rules text\n"
+            "_Example:_ `!setrules en Please be kind.`"
+        ),
         inline=False
     )
 
@@ -853,6 +856,15 @@ async def adminhelp(interaction: discord.Interaction):
         value=(
             "`!startwelcome @member` – Triggers full welcome (language, rules, roles)\n"
             "Use for existing members who joined before setup."
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="8️⃣ Assign a Language",
+        value=(
+            "`!assignlanguage @member <code>` – Manually set a user’s language\n"
+            "_Example:_ `!assignlanguage @luna de`"
         ),
         inline=False
     )
@@ -1035,6 +1047,41 @@ async def removelanguage(ctx, code: str):
     embed = discord.Embed(
         title="🗑️ Language Removed",
         description=f"The language with code `{code}` has been successfully removed.",
+        color=embed_color
+    )
+
+    await ctx.send(embed=embed)
+
+@bot.command(aliases=["sprachefestlegen", "assignlangue", "asignaridioma"])
+@commands.has_permissions(administrator=True)
+async def assignlanguage(ctx, member: discord.Member, lang_code: str):
+    guild_id = str(ctx.guild.id)
+    user_id = str(member.id)
+
+    # Check if the guild has languages configured
+    guild_config = all_languages["guilds"].get(guild_id)
+    if not guild_config or "languages" not in guild_config:
+        return await ctx.send("❗ This server has no languages configured yet.")
+
+    lang_map = guild_config["languages"]
+    if lang_code not in lang_map:
+        available = ", ".join(lang_map.keys())
+        return await ctx.send(f"❗ Invalid language code. Available codes: `{available}`")
+
+    if "users" not in guild_config:
+        guild_config["users"] = {}
+
+    guild_config["users"][user_id] = lang_code
+    save_languages()
+
+    # 🌿 Theming and response
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.green())
+
+    lang_name = lang_map[lang_code]["name"]
+    embed = discord.Embed(
+        title="🌐 Language Assigned",
+        description=f"{member.mention}'s language has been set to **{lang_name}**.",
         color=embed_color
     )
 

@@ -1,3 +1,86 @@
 {
-  "guilds": {}
+  "guilds": {
+    "1366144007012483122": {
+      "welcome_channel_id": 1366150423005757472,
+      "languages": {
+        "en": {
+          "emoji": "🌛",
+          "name": "English",
+          "welcome": "Welcome to Sanctuary, home away from home. The coffee is always hot (and tea if you prefer), conversation is friendly (though you never know which subject it will be about) More rooms to come soon, and we have cookies!! So come on in, have a seat and enjoy the ride."
+        },
+        "de": {
+          "emoji": "🌜",
+          "name": "Deutsch",
+          "welcome": "Herzlich willkommen bei Sanctuary, fühl dich wie zu Hause aber bitte behalte deine Sachen an. Im Kühlschrank stehen kalte Getränke, das Buffet sollte auch gleich öffnen. Dieser Server wird geleitet von unser einzigartigen Amaya, sie bemüht sich sehr um es hier für uns schön kuschelig zu machen. Bei Fragen und Anregungen bitte eine Nummer ziehen und hinten anstellen. Halte schon mal 10€ Bearbeitungsgebühr bereit.\nKeine Fragen? Perfekt dann viel Spaß beim durch stöbern der channels."
+        }
+      },
+      "rules": {
+        "de": "🐍 1. Ruhig bleiben: Kein Drama, kein Gezeter. Wir bleiben ganz entspannt.\n\n🍃 2. Positivität ist das A und O: Wir sind hier, um Spaß zu haben – nicht zum Meckern. Sanctuary lebt von guter Stimmung.\n\n💬 3. Wer nicht fragt, bleibt dumm: Du brauchst was? Frag einfach! Wenn du nichts sagst, wissen wir’s nicht – unsere Kristallkugel ist leider kaputt. 🔮\n\n🎮 4. Spiel mit Herz: Hab Spaß am Spiel, genieße den Weg – und sei immer respektvoll.",
+        "en": "🐍  1. Stay Calm: No fits, no fuss. We’re all about keeping it cool.\n\n🍃  2. Positivity is Key: We’re here to have fun, not to complain. Sanctuary thrives on good vibes.\n\n💬  3. Ask, and You Shall Receive: Need something? Ask away, and we’ll help if we can. If you don’t tell us, we don’t know. Our crystal ball broke.  🔮 \n\n 🎮 4. Play Hard, Have Fun: Enjoy the game, enjoy the journey, and always be respectful."
+      },
+      "role_options": {
+        "1367144725257125888": {
+          "emoji": "🤝",
+          "label": "Ally"
+        },
+        "1366167685850726530": {
+          "emoji": "🐌",
+          "label": "R1-3"
+        },
+        "1366167872740659360": {
+          "emoji": "🦋",
+          "label": "R4"
+        }
+      },
+      "cosmetic_role_options": {
+        "1373714868791935026": {
+          "emoji": "🪽",
+          "label": "White"
+        },
+        "1373715184291676161": {
+          "emoji": "☄️",
+          "label": "Teal"
+        },
+        "1373715310544289802": {
+          "emoji": "🦋",
+          "label": "Blue"
+        },
+        "1373715506464424028": {
+          "emoji": "🐉",
+          "label": "DarkGreen"
+        },
+        "1373715615696687235": {
+          "emoji": "🦎",
+          "label": "LimeGreen"
+        },
+        "1373715734508605501": {
+          "emoji": "☀️",
+          "label": "Yellow"
+        },
+        "1373715835587133580": {
+          "emoji": "💫",
+          "label": "Orange"
+        },
+        "1373715929753587853": {
+          "emoji": "🐦",
+          "label": "Red"
+        },
+        "1373716071173066886": {
+          "emoji": "🪻",
+          "label": "Purple"
+        },
+        "1373716210092347463": {
+          "emoji": "🌸",
+          "label": "LightPink"
+        },
+        "1373717336606904370": {
+          "emoji": "💖",
+          "label": "Magenta"
+        }
+      },
+      "users": {
+        "755526916949147752": "en"
+      }
+    }
+  }
 }
