@@ -757,6 +757,28 @@ async def update_avatar_for_mode(mode: str):
 
 # ================= ADMIN CONTROLS =================
 
+@bot.command(aliases=["backup", "dumpjson"])
+@commands.has_permissions(administrator=True)
+async def backup_json(ctx):
+    """📦 Sends the current languages.json as a backup."""
+    try:
+        file_path = "languages.json"
+
+        if not os.path.exists(file_path):
+            await ctx.send("❗ languages.json doesn't exist.")
+            return
+
+        await ctx.author.send(
+            content="📂 Here is your current `languages.json` backup:",
+            file=discord.File(file_path)
+        )
+        await ctx.send("✅ Sent you the backup in DMs!")
+
+    except discord.Forbidden:
+        await ctx.send("❌ I couldn't DM you. Please enable DMs from server members or try again later.")
+    except Exception as e:
+        await ctx.send(f"❗ Error sending backup: {e}")
+
 @tree.command(name="adminhelp", description="📘 A magical guide to setting up Whisperling (Admin only)")
 @app_commands.checks.has_permissions(administrator=True)
 async def adminhelp(interaction: discord.Interaction):
@@ -1046,25 +1068,27 @@ async def setwelcome(ctx, code: str, *, message: str):
 
 @bot.command(aliases=["regelnsetzen", "règlesdefinir", "definirreglas"])
 @commands.has_permissions(administrator=True)
-async def setrules(ctx, *, rules: str):
+async def setrules(ctx, lang_code: str, *, rules: str):
     guild_id = str(ctx.guild.id)
 
     if guild_id not in all_languages["guilds"]:
         all_languages["guilds"][guild_id] = {}
 
-    all_languages["guilds"][guild_id]["rules"] = rules
+    # 🌿 Initialize rules structure if not present
+    if "rules" not in all_languages["guilds"][guild_id]:
+        all_languages["guilds"][guild_id]["rules"] = {}
+
+    all_languages["guilds"][guild_id]["rules"][lang_code] = rules
     save_languages()
 
-    # 🌿 Get mode and embed color
+    # 🌿 Themed embed confirmation
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.green())
-
     embed = discord.Embed(
         title="📜 Grove Rules Updated",
-        description="The rules have been etched into the grove’s stones.",
+        description=f"The rules for `{lang_code}` have been etched into the grove’s stones.",
         color=embed_color
     )
-
     await ctx.send(embed=embed)
 
 @bot.command(aliases=["rollehinzufügen", "ajouterrôle", "agregarrol"])
@@ -1382,7 +1406,7 @@ async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
 
     embed = discord.Embed(
         title="📜 Grove Guidelines",
-        description=guild_config["rules"],
+        description=guild_config.get("rules", {}).get(lang_code, "📜 No rules are set in your language."),
         color=embed_color
     )
 
@@ -1410,10 +1434,7 @@ async def send_role_selector(member, channel, guild_config):
         async def on_timeout(self):
             try:
                 timeout_msg = get_translated_mode_text(
-                    guild_id,
-                    user_id,
-                    mode,
-                    "timeout_role",
+                    guild_id, user_id, mode, "timeout_role",
                     fallback=f"⏳ {member.mention}, time ran out to choose a role.",
                     user=member.mention
                 )
@@ -1428,17 +1449,18 @@ async def send_role_selector(member, channel, guild_config):
             try:
                 await member.add_roles(role)
                 role_msg = get_translated_mode_text(
-                    guild_id,
-                    user_id,
-                    mode,
-                    "role_granted",
-                    role=role.name,
-                    user=member.mention
+                    guild_id, user_id, mode, "role_granted",
+                    role=role.name, user=member.mention
                 )
                 await interaction.response.send_message(role_msg, ephemeral=True)
-                view.stop()  # ✅ Stop timeout on successful button click
 
-                # 🌸 Continue to cosmetic selector
+                # Stop the view after selection
+                view.stop()
+
+                # Wait a moment before showing the next
+                await asyncio.sleep(1)
+
+                # 🌸 Now trigger cosmetic selection AFTER view has ended
                 cosmetic_shown = await send_cosmetic_selector(member, channel, guild_config)
                 if not cosmetic_shown:
                     lang_code = all_languages["guilds"][guild_id]["users"].get(user_id, "en")
@@ -1449,7 +1471,6 @@ async def send_role_selector(member, channel, guild_config):
                 print("⚠️ Role assign error:", e)
                 await interaction.response.send_message("❗ I couldn’t assign that role. Please contact a mod.", ephemeral=True)
 
-    # 💠 Assign button callbacks
     view = RoleSelectView()
     for item in view.children:
         if isinstance(item, Button):
