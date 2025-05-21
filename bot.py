@@ -42,7 +42,6 @@ def get_user_language(guild_id: str, user_id: str):
     except KeyError:
         return None
 
-
 # ========== EVENTS ==========
 
 @bot.event
@@ -157,6 +156,7 @@ guild_modes = defaultdict(lambda: "dayform")
 last_interaction_by_guild = defaultdict(lambda: datetime.now(timezone.utc))
 previous_standard_mode_by_guild = defaultdict(lambda: "dayform")
 glitch_timestamps_by_guild = defaultdict(lambda: None)
+flutterkin_usage_count_by_guild = {}
 
 # ================= TEXT STYLE BY MODE =================
 def flutter_baby_speak(text):
@@ -1641,29 +1641,34 @@ async def whisper(ctx):
     now = datetime.now(timezone.utc)
     current_mode = guild_modes.get(guild_id, "dayform")
 
-    # ⏳ 30-minute cooldown check
-    last_used = flutterkin_last_triggered.get(guild_id)
-    if last_used and (now - last_used).total_seconds() < 1800:
-        minutes = int(30 - (now - last_used).total_seconds() // 60)
-        await ctx.send(f"🕰️ Flutterkin is resting... please wait {minutes} more minutes!")
+    # ⏳ Check and reset daily usage count
+    usage_data = flutterkin_usage_count_by_guild.get(guild_id)
+    if not usage_data or now >= usage_data["reset_time"]:
+        flutterkin_usage_count_by_guild[guild_id] = {
+            "count": 0,
+            "reset_time": now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+        }
+    elif usage_data["count"] >= 3 and current_mode != "flutterkin":
+        await ctx.send("🍼 Flutterkin is too tired for more wishes today... come back tomorrow! 🌙")
         return
 
-    # 🦋 Activate Flutterkin only if not already in it
+    # 🌸 If not already flutter, activate Flutterkin
     if current_mode != "flutterkin":
         previous_standard_mode_by_guild[guild_id] = current_mode
         guild_modes[guild_id] = "flutterkin"
         glitch_timestamps_by_guild[guild_id] = now
         await update_avatar_for_mode("flutterkin")
+        flutterkin_usage_count_by_guild[guild_id]["count"] += 1
 
-    # Update cooldown tracking and activity time
+    # ✨ Log time
     flutterkin_last_triggered[guild_id] = now
     last_interaction_by_guild[guild_id] = now
 
-    # 🍼 Intro message (translated and styled)
+    # 🌼 Sparkly intro message
     intro = get_translated_mode_text(guild_id, user_id, "flutterkin", "language_confirm_desc", user=ctx.author.mention)
     await ctx.send(style_text(guild_id, intro))
 
-    # 🗨️ Optional: Translate replied message
+    # 🗨️ If used on a reply, do translation!
     if ctx.message.reference:
         try:
             replied_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
@@ -1772,8 +1777,92 @@ async def hilfe(interaction: discord.Interaction):
 
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
+@bot.event
+async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
+    if str(payload.emoji) != "❓":
+        return  # Only respond to the ❓ emoji
+
+    # Fetch full message and context
+    guild = bot.get_guild(payload.guild_id)
+    if not guild:
+        return
+
+    member = guild.get_member(payload.user_id)
+    if not member or member.bot:
+        return  # Ignore bots
+
+    channel = guild.get_channel(payload.channel_id)
+    if not channel:
+        return
+
+    try:
+        message = await channel.fetch_message(payload.message_id)
+    except Exception as e:
+        print(f"❗ Failed to fetch message for translation: {e}")
+        return
+
+    content = message.content
+    if not content:
+        return
+
+    guild_id = str(guild.id)
+    user_id = str(member.id)
+    user_lang = get_user_language(guild_id, user_id)
+    if not user_lang:
+        try:
+            await channel.send(
+                f"{member.mention} 🕊️ You haven’t chosen a language yet. Use `!chooselanguage` first!",
+                delete_after=10
+            )
+        except:
+            pass
+        return
+
+    # ✨ Optional glitch trigger
+    maybe_glitch = maybe_trigger_glitch(guild_id)
+    current_mode = guild_modes.get(guild_id, "dayform")
+    if maybe_glitch and current_mode in STANDARD_MODES:
+        previous_standard_mode_by_guild[guild_id] = current_mode
+        guild_modes[guild_id] = maybe_glitch
+        glitch_timestamps_by_guild[guild_id] = datetime.now(timezone.utc)
+        await update_avatar_for_mode(maybe_glitch)
+        current_mode = maybe_glitch
+
+    last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
+
+    try:
+        result = translator.translate(content, dest=user_lang)
+        styled_output = style_text(guild_id, result.text)
+
+        embed_color = MODE_COLORS.get(current_mode, discord.Color.blurple())
+        footer = MODE_FOOTERS.get(current_mode, "")
+
+        embed = discord.Embed(
+            title=f"❓ Whispered Translation to `{user_lang}`",
+            description=f"> {styled_output}",
+            color=embed_color
+        )
+        if footer:
+            embed.set_footer(text=footer)
+
+        # Send as ephemeral via DM
+        await member.send(embed=embed)
+
+    except Exception as e:
+        print("Translation error (reaction):", e)
+        try:
+            await channel.send(f"{member.mention} ❗ Something went wrong with the translation.", delete_after=10)
+        except:
+            pass
+
 @bot.command(aliases=["übersetzen", "traduire", "traducir"])
 async def translate(ctx):
+    # 💬 Delete the command message after 10s regardless
+    try:
+        await ctx.message.delete(delay=10)
+    except discord.Forbidden:
+        print("❗ Missing permission to delete the user's !translate command.")
+
     # Check for replied message
     if not ctx.message.reference:
         await ctx.send("🌸 Please reply to the message you want translated.", delete_after=10)
@@ -1826,13 +1915,11 @@ async def translate(ctx):
         if footer:
             embed.set_footer(text=footer)
 
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, delete_after=30)
 
     except Exception as e:
         print("Translation error:", e)
         await ctx.send("❗ The winds failed to carry the words. Please try again.", delete_after=10)
-
-from discord import app_commands
 
 @bot.command(aliases=["wählesprache", "choisirlalangue", "eligelenguaje"])
 async def chooselanguage(ctx):
