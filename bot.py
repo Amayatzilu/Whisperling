@@ -1857,9 +1857,9 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
 
 @bot.command(aliases=["übersetzen", "traduire", "traducir"])
 async def translate(ctx):
-    # 💬 Delete the command message after 10s regardless
+    # 💬 Delete the command message after 60s regardless
     try:
-        await ctx.message.delete(delay=10)
+        await ctx.message.delete(delay=60)
     except discord.Forbidden:
         print("❗ Missing permission to delete the user's !translate command.")
 
@@ -1915,7 +1915,7 @@ async def translate(ctx):
         if footer:
             embed.set_footer(text=footer)
 
-        await ctx.send(embed=embed, delete_after=30)
+        await ctx.send(embed=embed, delete_after=60)
 
     except Exception as e:
         print("Translation error:", e)
