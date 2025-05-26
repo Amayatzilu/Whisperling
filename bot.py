@@ -1908,13 +1908,14 @@ async def chooselanguage(ctx):
 
     # 🌒 Trigger potential glitch form
     maybe_glitch = maybe_trigger_glitch(guild_id)
-    current_mode = guild_modes[guild_id]
+    current_mode = guild_modes.get(guild_id, "dayform")
 
     if maybe_glitch and current_mode in STANDARD_MODES:
         previous_standard_mode_by_guild[guild_id] = current_mode
         guild_modes[guild_id] = maybe_glitch
         glitch_timestamps_by_guild[guild_id] = datetime.now(timezone.utc)
         await update_avatar_for_mode(maybe_glitch)
+        current_mode = maybe_glitch
 
     # 🌿 Update last interaction timestamp
     last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
@@ -1948,8 +1949,18 @@ async def chooselanguage(ctx):
     class LanguageView(View):
         def __init__(self):
             super().__init__(timeout=60)
+            i = 0
             for code, data in lang_map.items():
-                self.add_itemButton(label=data['name'], custom_id=code))
+                # Alternate styles for a prettier layout
+                style = [
+                    discord.ButtonStyle.primary,
+                    discord.ButtonStyle.success,
+                    discord.ButtonStyle.secondary,
+                    discord.ButtonStyle.danger
+                ][i % 4]
+                self.add_item(Button(label=data['name'], custom_id=code, style=style))
+                i += 1
+
             self.add_item(Button(label="❌ Cancel", style=discord.ButtonStyle.danger, custom_id="cancel"))
 
         async def interaction_check(self, interaction):
@@ -1961,10 +1972,10 @@ async def chooselanguage(ctx):
             except:
                 pass
 
-    async def button_callback(inter):
-        selected_code = inter.data['custom_id']
+    async def button_callback(interaction):
+        selected_code = interaction.data['custom_id']
         if selected_code == "cancel":
-            await inter.response.edit_message(content="❌ Cancelled.", embed=None, view=None)
+            await interaction.response.edit_message(content="❌ Cancelled.", embed=None, view=None)
             return
 
         if "users" not in guild_config:
@@ -1972,8 +1983,9 @@ async def chooselanguage(ctx):
 
         guild_config["users"][user_id] = selected_code
         save_languages()
+
         lang_name = lang_map[selected_code]["name"]
-        await inter.response.edit_message(
+        await interaction.response.edit_message(
             content=f"✨ Your whisper has been tuned to **{lang_name}**.", embed=None, view=None
         )
 
