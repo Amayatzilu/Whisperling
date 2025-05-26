@@ -806,8 +806,8 @@ async def adminhelp(interaction: discord.Interaction):
         name="2️⃣ Add Languages",
         value=(
             "`!preloadlanguages` – Adds English, German, Spanish, and French\n"
-            "`!addlanguage <code> <emoji> <name>` – Add manually\n"
-            "_Example:_ `!addlanguage it 🇮🇹 Italiano`"
+            "`!addlanguage <code> <name>` – Add manually\n"
+            "_Example:_ `!addlanguage it Italiano`"
         ),
         inline=False
     )
@@ -959,10 +959,10 @@ async def preloadlanguages(ctx):
         all_languages["guilds"][guild_id] = {}
 
     all_languages["guilds"][guild_id]["languages"] = {
-        "en": {"emoji": "🗨️", "name": "English", "welcome": "Welcome, {user}!"},
-        "de": {"emoji": "📖", "name": "Deutsch", "welcome": "Willkommen, {user}!"},
-        "es": {"emoji": "📚", "name": "Español", "welcome": "¡Bienvenido, {user}!"},
-        "fr": {"emoji": "🧠", "name": "Français", "welcome": "Bienvenue, {user}!"}
+        "en": {"name": "English", "welcome": "Welcome, {user}!"},
+        "de": {"name": "Deutsch", "welcome": "Willkommen, {user}!"},
+        "es": {"name": "Español", "welcome": "¡Bienvenido, {user}!"},
+        "fr": {"name": "Français", "welcome": "Bienvenue, {user}!"}
     }
 
     save_languages()
@@ -1006,8 +1006,9 @@ async def setwelcomechannel(ctx, channel: discord.TextChannel):
 
 @bot.command(aliases=["addsprache", "ajouterlangue", "agregaridioma"])
 @commands.has_permissions(administrator=True)
-async def addlanguage(ctx, code: str, emoji: str, *, name: str):
+async def addlanguage(ctx, code: str, *, name: str):
     guild_id = str(ctx.guild.id)
+
     if guild_id not in all_languages["guilds"]:
         all_languages["guilds"][guild_id] = {}
 
@@ -1015,18 +1016,18 @@ async def addlanguage(ctx, code: str, emoji: str, *, name: str):
         all_languages["guilds"][guild_id]["languages"] = {}
 
     languages = all_languages["guilds"][guild_id]["languages"]
+
     if code in languages:
         await ctx.send(f"❗ Language `{code}` already exists. Use `!setwelcome` to update it.")
         return
 
     languages[code] = {
-        "emoji": emoji,
         "name": name,
         "welcome": f"Welcome, {{user}}!"
     }
 
     save_languages()
-    await ctx.send(f"🦋 Added `{name}` as `{code}` with emoji {emoji}.")
+    await ctx.send(f"🦋 Added language: `{name}` with code `{code}`.")
 
 @bot.command(aliases=["sprachentfernen", "supprimerlangue", "eliminaridioma"])
 @commands.has_permissions(administrator=True)
@@ -1059,11 +1060,12 @@ async def assignlanguage(ctx, member: discord.Member, lang_code: str):
     user_id = str(member.id)
 
     # Check if the guild has languages configured
-    guild_config = all_languages["guilds"].get(guild_id)
-    if not guild_config or "languages" not in guild_config:
+    guild_config = all_languages["guilds"].get(guild_id, {})
+    lang_map = guild_config.get("languages", {})
+
+    if not lang_map:
         return await ctx.send("❗ This server has no languages configured yet.")
 
-    lang_map = guild_config["languages"]
     if lang_code not in lang_map:
         available = ", ".join(lang_map.keys())
         return await ctx.send(f"❗ Invalid language code. Available codes: `{available}`")
@@ -1077,13 +1079,16 @@ async def assignlanguage(ctx, member: discord.Member, lang_code: str):
     # 🌿 Theming and response
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.green())
+    footer = MODE_FOOTERS.get(mode, "")
 
-    lang_name = lang_map[lang_code]["name"]
+    lang_name = lang_map[lang_code].get("name", lang_code)
     embed = discord.Embed(
         title="🌐 Language Assigned",
         description=f"{member.mention}'s language has been set to **{lang_name}**.",
         color=embed_color
     )
+    if footer:
+        embed.set_footer(text=footer)
 
     await ctx.send(embed=embed)
 
@@ -1274,26 +1279,27 @@ async def listcosmetics(ctx):
 @commands.has_permissions(administrator=True)
 async def listlanguages(ctx):
     guild_id = str(ctx.guild.id)
-    guild_config = all_languages["guilds"].get(guild_id)
-    if not guild_config or "languages" not in guild_config or not guild_config["languages"]:
+    guild_config = all_languages["guilds"].get(guild_id, {})
+    languages = guild_config.get("languages", {})
+
+    if not languages:
         await ctx.send("❗ No languages configured for this server.")
         return
 
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
-    footer_text = MODE_FOOTERS.get(mode, "")
+    footer_text = MODE_FOOTERS.get(mode, "🧚 Whisperling watches over the languages of the grove...")
 
     embed = discord.Embed(
-        title="🌍 Languages Configured",
-        description="These are the currently available whispering tongues:",
+        title="🌍 Configured Languages",
+        description="These are the currently available whispering tongues in this server:",
         color=embed_color
     )
     embed.set_footer(text=footer_text)
 
-    for code, data in guild_config["languages"].items():
-        emoji = data.get("emoji", "❓")
-        name = data.get("name", code)
-        embed.add_field(name=f"{emoji} {name}", value=f"`{code}`", inline=True)
+    for code, data in languages.items():
+        name = data.get("name", f"Unknown ({code})")
+        embed.add_field(name=name, value=f"`{code}`", inline=True)
 
     await ctx.send(embed=embed)
 
@@ -1348,8 +1354,14 @@ async def send_language_selector(member, channel, lang_map, guild_config):
     class LanguageView(View):
         def __init__(self):
             super().__init__(timeout=60)
-            for code, data in lang_map.items():
-                self.add_item(Button(label=data['name'], emoji=data['emoji'], custom_id=code))
+            button_styles = [
+                discord.ButtonStyle.primary,
+                discord.ButtonStyle.success,
+                discord.ButtonStyle.secondary,
+            ]
+            for idx, (code, data) in enumerate(lang_map.items()):
+                style = button_styles[idx % len(button_styles)]
+                self.add_item(Button(label=data['name'], style=style, custom_id=code))
             self.add_item(Button(label="❌ Cancel", style=discord.ButtonStyle.danger, custom_id="cancel"))
 
         async def interaction_check(self, interaction):
@@ -1377,7 +1389,6 @@ async def send_language_selector(member, channel, lang_map, guild_config):
 
         if "users" not in guild_config:
             guild_config["users"] = {}
-
         guild_config["users"][user_id] = selected_code
         save_languages()
 
@@ -1723,58 +1734,25 @@ async def help(interaction: discord.Interaction):
     embed.add_field(
         name="🧚 Commands for Wanderers",
         value=(
-            "`!translate` – Translate a replied message into your chosen language\n"
+            "`!translate` – Translate a replied message into your chosen language (auto-deletes)\n"
+            "`?` – React with ❓ to translate a message to your DMs\n"
             "`!chooselanguage` – Pick or change your preferred language\n"
             "`!... there is a hidden command ...` – If the winds allow, Flutterkin may awaken 🍼✨"
         ),
         inline=False
     )
 
-    embed.set_footer(text=footer)
-
-    await interaction.response.send_message(embed=embed, ephemeral=True)
-
-@tree.command(name="hilfe", description="📖 Entdecke, was Whisperling für alle Reisenden tun kann.")
-async def hilfe(interaction: discord.Interaction):
-    guild_id = str(interaction.guild_id)
-
-    # 🌒 Handle potential glitch trigger
-    maybe_glitch = maybe_trigger_glitch(guild_id)
-    current_mode = guild_modes.get(guild_id, "dayform")
-
-    if maybe_glitch and current_mode in STANDARD_MODES:
-        previous_standard_mode_by_guild[guild_id] = current_mode
-        guild_modes[guild_id] = maybe_glitch
-        glitch_timestamps_by_guild[guild_id] = datetime.now(timezone.utc)
-        await update_avatar_for_mode(maybe_glitch)
-        current_mode = maybe_glitch
-
-    # 🕰️ Update interaction timestamp
-    last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
-
-    # ✨ Embed theming
-    embed_color = MODE_COLORS.get(current_mode, discord.Color.blurple())
-    description = MODE_DESCRIPTIONS.get(current_mode, "Whisperling schimmert leise im Hain.")
-    footer = MODE_FOOTERS.get(current_mode, "Whisperling lauscht dem Hain...")
-
-    embed = discord.Embed(
-        title="📖 Whisperlings Zauberbuch",
-        description=description,
-        color=embed_color
-    )
-
-    embed.add_field(
-        name="🧚 Befehle für Reisende",
-        value=(
-            "`!translate` – Übersetzt eine beantwortete Nachricht in deine gewählte Sprache\n"
-            "`!chooselanguage` – Wähle oder ändere deine bevorzugte Sprache\n"
-            "`!... es gibt einen geheimen Befehl ...` – Wenn der Wind flüstert, erwacht vielleicht Flutterkin 🍼✨"
-        ),
-        inline=False
-    )
+    # 🌍 Show which languages are available in this server
+    lang_map = all_languages["guilds"].get(guild_id, {}).get("languages", {})
+    if lang_map:
+        langs = [f"{data['name']}" for code, data in lang_map.items()]
+        embed.add_field(
+            name="🌍 Available Languages",
+            value=", ".join(langs),
+            inline=False
+        )
 
     embed.set_footer(text=footer)
-
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @bot.event
@@ -1971,7 +1949,7 @@ async def chooselanguage(ctx):
         def __init__(self):
             super().__init__(timeout=60)
             for code, data in lang_map.items():
-                self.add_item(Button(label=data['name'], emoji=data['emoji'], custom_id=code))
+                self.add_itemButton(label=data['name'], custom_id=code))
             self.add_item(Button(label="❌ Cancel", style=discord.ButtonStyle.danger, custom_id="cancel"))
 
         async def interaction_check(self, interaction):
@@ -2011,7 +1989,6 @@ async def langcodes(ctx):
     guild_id = str(ctx.guild.id)
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
-    voice = MODE_TEXTS.get(mode, {})
     footer = MODE_FOOTERS.get(mode, "🌍 Whisperling is fluent in many tongues...")
 
     codes = {
@@ -2031,7 +2008,8 @@ async def langcodes(ctx):
 
     embed = discord.Embed(
         title="📚 Whisperling’s Language Codes",
-        description="Use these with `!translate` to whisper across tongues:",
+        description="Use these with `!translate` or for admin language setup commands.\n\n"
+                    "[🌐 Full list of supported codes (Google Translate)](https://cloud.google.com/translate/docs/languages)",
         color=embed_color
     )
 

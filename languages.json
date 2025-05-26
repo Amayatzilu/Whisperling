@@ -4,12 +4,10 @@
       "welcome_channel_id": 1366150423005757472,
       "languages": {
         "en": {
-          "emoji": "🌛",
           "name": "English",
           "welcome": "Welcome to Sanctuary, home away from home. The coffee is always hot (and tea if you prefer), conversation is friendly (though you never know which subject it will be about) More rooms to come soon, and we have cookies!! So come on in, have a seat and enjoy the ride."
         },
         "de": {
-          "emoji": "🌜",
           "name": "Deutsch",
           "welcome": "Herzlich willkommen bei Sanctuary, fühl dich wie zu Hause aber bitte behalte deine Sachen an. Im Kühlschrank stehen kalte Getränke, das Buffet sollte auch gleich öffnen. Dieser Server wird geleitet von unser einzigartigen Amaya, sie bemüht sich sehr um es hier für uns schön kuschelig zu machen. Bei Fragen und Anregungen bitte eine Nummer ziehen und hinten anstellen. Halte schon mal 10€ Bearbeitungsgebühr bereit.\nKeine Fragen? Perfekt dann viel Spaß beim durch stöbern der channels."
         }
@@ -86,7 +84,10 @@
         "1055915327290081311": "en",
         "745500157205807155": "en",
         "1332342534139285618": "de",
-        "1291396569068863488": "en"
+        "1291396569068863488": "en",
+        "555137532803678256": "en",
+        "1228472472320475236": "en",
+        "938539765739978813": "de"
       }
     }
   }
