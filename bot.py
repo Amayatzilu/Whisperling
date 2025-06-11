@@ -44,6 +44,19 @@ def get_user_language(guild_id: str, user_id: str):
 
 # ========== EVENTS ==========
 
+@bot.event
+async def on_ready():
+    print(f"✨ Whisperling has fluttered to life as {bot.user}!")
+    try:
+        synced = await tree.sync()
+        print(f"🧚 Synced {len(synced)} fairy commands.")
+    except Exception as e:
+        print(f"❗ Failed to sync spells: {e}")
+
+    bot.loop.create_task(glitch_reversion_loop())
+    bot.loop.create_task(decay_activity_loop())
+    bot.loop.create_task(grove_heartbeat(bot))
+
 async def glitch_reversion_loop():
     await bot.wait_until_ready()
     while not bot.is_closed():
@@ -83,6 +96,14 @@ async def glitch_reversion_loop():
                 await update_avatar_for_mode(previous)
 
         await asyncio.sleep(60)
+
+@bot.event
+async def on_message(message):
+    if message.author.bot:
+        return
+
+    register_message_activity(str(message.guild.id), str(message.channel.id))
+    await bot.process_commands(message)
 
 @bot.event
 async def on_member_join(member):
@@ -240,7 +261,7 @@ MODE_FOOTERS = {
     "crepusca": "🌒 Dreams shimmer at the edge of waking."
 }
 
-# ================= EMOJI AND AVATAR REFERENCES =================
+# ================= MOODY COOKIES =================
 
 
 MODE_TEXTS_ENGLISH = {}
@@ -772,6 +793,306 @@ def get_translated_mode_text(guild_id, user_id, mode, key, fallback="", **kwargs
     except Exception:
         return formatted
 
+FLAVOR_TEXTS = {
+    "dayform": [
+        "☀️ The grove feels alive with light today.",
+        "🌻 Whisperling hums as sunlight filters through the leaves.",
+        "🐦 The birds sing their morning secrets.",
+        "🌞 The air is warm, and hope glows like amber.",
+        "🍯 The bees hum softly near golden blossoms.",
+        "🦋 A breeze carries petals across the clearing.",
+        "🌼 The grove drinks deeply of the morning light.",
+        "🍃 Leaves shimmer like polished emeralds.",
+        "🕊️ Gentle peace settles beneath the canopy.",
+        "✨ The world feels soft, and very much awake.",
+        "🌿 The light finds every hidden corner and makes it dance.",
+        "🌞 'It’s a perfect day to simply *be,* isn’t it?' Whisperling muses.",
+        "☀️ The grove is wide awake, stretching toward the sun.",
+        "🌼 Flowers bloom with quiet determination.",
+        "🧚‍♀️ 'I could listen to the morning songs forever.'"
+    ]
+    "nightform": [
+        "🌙 The grove hums beneath a silver moon.",
+        "✨ Starlight drips through the branches like glittering rain.",
+        "🦉 An owl calls softly from the shadows.",
+        "🌌 Whisperling listens to dreams carried on the breeze.",
+        "🌿 The night breathes in quiet rhythm.",
+        "💤 'Rest easy, little ones,' she whispers into the cool air.",
+        "🕯️ A soft glow flickers where fireflies gather.",
+        "🌒 'The stars are always listening. Always.'",
+        "🌙 The hush of night wraps the grove like a gentle shawl.",
+        "🦋 Moths dance in delicate spirals near lantern blooms.",
+        "🌌 The moon smiles quietly from her high place.",
+        "✨ 'Your worries are safe here. Let them drift like mist.'",
+        "🌙 The grove slows its heartbeat beneath the constellations.",
+        "🕊️ Cool air carries forgotten lullabies.",
+        "🌿 'Even in silence, there is song.'"
+    ]
+    "forestform": [
+        "🍃 The trees murmur ancient songs in the wind.",
+        "🌿 Moss blankets the roots like a patient embrace.",
+        "🦌 A quiet rustle reveals shy creatures watching from the brush.",
+        "🌳 Whisperling hums alongside the gentle sway of branches.",
+        "🦋 Leaves fall like drifting stories written in green.",
+        "🌲 The grove remembers every footstep, every whisper.",
+        "🍂 Dappled sunlight filters through the woven canopy.",
+        "🪵 The scent of earth and rain lingers in the air.",
+        "🦔 Tiny feet scamper beneath fallen logs.",
+        "🌿 'Patience grows here like roots beneath the surface.'",
+        "🧚‍♀️ Whisperling traces vines curling upward, reaching toward unseen skies.",
+        "🍃 The forest breathes in cycles older than memory.",
+        "🪺 Birds weave homes among high branches, safe and unseen.",
+        "🌳 'All paths here are watched by quiet eyes.'",
+        "🦊 A tiny fox peeks out from its den, tail flicking curiously."
+    ]
+    "seaform": [
+        "🌊 The waves hum in endless rhythm.",
+        "🐚 Shells glisten beneath shallow pools of light.",
+        "🪸 Whisperling listens to secrets carried deep beneath the surface.",
+        "🌊 Foam dances upon the rocks like playful whispers.",
+        "🐠 Tiny fish dart like scattered sparks of color.",
+        "🌊 'The sea is patient. The sea is vast.'",
+        "🦑 Gentle currents curl around roots stretching into the shallows.",
+        "🌙 The moon pulls softly at the tides, like a lullaby.",
+        "🌊 'Even the deepest silence holds voices waiting to rise.'",
+        "🌊 Salt spray clings to leaves swaying by the shore.",
+        "🐬 Distant splashes echo like laughter in the waves.",
+        "🧜‍♀️ The sea breeze carries stories whispered across endless waters.",
+        "🌊 Tides shift beneath starlit skies without end.",
+        "🦞 Tiny crabs scuttle beneath the shelter of smooth stones.",
+        "🐋 The sea remembers everything."
+    ]
+    "hadesform": [
+        "🔥 Mischief sparks beneath the roots.",
+        "💥 Whisperling twirls a glowing ember between her fingers.",
+        "🔥 The grove crackles with quiet defiance.",
+        "😈 'Rules? Pfft. The flames don’t care for them.'",
+        "🌪️ Smoke curls like playful ribbons through the leaves.",
+        "⚡ Sparks scatter like fireflies escaping into the night.",
+        "🔥 'I might accidentally burn something... but only a little.'",
+        "💣 The heat pulses like a heartbeat beneath the soil.",
+        "👀 Glowing eyes peer out from deep within the shadows.",
+        "🍓 'Chaos smells like roasted moss and toasted berries.'",
+        "🔥 Flickering tongues of flame lick at the cool night air.",
+        "🌀 Ash dances in spirals before settling softly.",
+        "😈 'Let’s not call it destruction — call it... creative rearrangement.'",
+        "🔥 The grove feels wild, hungry for change.",
+        "👹 A mischievous grin flashes beneath glowing embers."
+    ]
+    "auroraform": [
+        "❄️ Light dances across the grove like falling ribbons.",
+        "🌌 Whisperling watches shimmering waves ripple through the sky.",
+        "✨ The cold hums softly beneath the glow.",
+        "🌠 Stars reflect in the frozen ponds like scattered jewels.",
+        "🌙 'The sky writes poetry in light tonight,' she murmurs.",
+        "💫 Faint glitter drifts in the chilled breeze.",
+        "🌨️ The air tingles with quiet magic as snowflakes twirl.",
+        "🧊 Crystals form delicate patterns along the edges of leaves.",
+        "🌟 'Frozen stillness isn’t empty — it’s brimming with quiet wonder.'",
+        "❄️ A soft breeze carries frosty breath through the branches.",
+        "🌈 The colors shift like whispers caught between worlds.",
+        "🌒 'Even winter sings its quiet melody.'",
+        "🕯️ Pale lights flicker like distant memories.",
+        "🌌 The grove glows under swirling northern veils.",
+        "❄️ Frost settles lightly on Whisperling's wings as she smiles."
+    ]
+    "cosmosform": [
+        "🌌 The stars hum softly beyond the grove's edge.",
+        "✨ Whisperling gazes upward, tracing forgotten constellations.",
+        "🌠 Shooting stars dash like playful spirits across the void.",
+        "🌙 'The universe breathes in slow, endless rhythm.'",
+        "🪐 Distant planets shimmer like marbles resting on velvet.",
+        "🌟 The air feels thin, as if floating between worlds.",
+        "💫 Nebulous mists swirl in slow, graceful arcs.",
+        "🌌 'Everything connects, even across impossible distances,' she whispers.",
+        "🧭 Time feels weightless beneath the eternal sky.",
+        "🔭 Stars blink like countless eyes peeking through infinity.",
+        "🌒 Whisperling traces glowing arcs with her fingertips.",
+        "🌀 The cosmos hums with ancient, unseen patterns.",
+        "✨ 'You are made of stars, little one.'",
+        "🌌 Galaxies spin far beyond reach — yet somehow close.",
+        "💖 The grove feels like a dream stitched into the sky."
+    ]
+    "vernalglint": [
+        "🌸 The grove bursts with impossible blossoms.",
+        "🌷 Soft petals spin and tumble like a playful storm.",
+        "🦋 Butterflies flit wildly as if drunk on the season.",
+        "🐝 The bees are terribly busy today.",
+        "🌞 The air feels sticky-sweet with new life.",
+        "🌱 Buds explode open as if in a race against time.",
+        "💮 'Growth is such a lovely kind of chaos,' she smiles.",
+        "🍓 Tiny fruits peek from flowering vines already heavy with promise.",
+        "🌿 The ground practically hums with bursting roots.",
+        "🎋 'Spring is *aggressively nurturing,* after all.'",
+        "🌷 Petals rain gently, coating the pathways like soft confetti.",
+        "🌸 'There is no such thing as too much bloom.'",
+        "🐦 Baby birds chirp in tiny chaotic choirs above.",
+        "🌞 Sunshine glitters through tangled flowers stretching high.",
+        "🌼 Whisperling claps: 'Everything is growing! Faster!'"
+    ]
+    "sunfracture": [
+        "🔆 The grove crackles under intense golden light.",
+        "✨ Whisperling’s wings refract in blinding fragments.",
+        "🌞 The sun burns so brilliantly today it *breaks.*",
+        "💥 Heat distortions ripple like liquid fire through the air.",
+        "🌿 The leaves shimmer almost violently beneath the sky.",
+        "🔥 Growth has no patience under this sun.",
+        "🌻 Blossoms burst open as though commanded by flame.",
+        "🌪️ Heatwaves swirl like invisible whirlpools above the ground.",
+        "⚡ Even shadows twitch in the oppressive brightness.",
+        "☀️ 'Fracture or flourish — the sun cares not which.'",
+        "🌾 The grasses sway in chaotic ripples of gold.",
+        "🧨 Bursts of pollen flash like glitter bombs among petals.",
+        "🔆 The world feels electric and barely contained.",
+        "🌞 'It’s beautiful, isn’t it? Right before it breaks apart.'",
+        "🔥 Whisperling laughs as sparks dance from her fingertips."
+    ]
+    "fallveil": [
+        "🍁 Leaves drift like soft embers through the air.",
+        "🕯️ Whisperling lights a tiny lantern and hums softly.",
+        "🍂 The world asks us to rest now.",
+        "🍎 The scent of ripe fruit thickens the cool breeze.",
+        "🦊 A small fox curls beneath golden ferns.",
+        "🍵 'Warm tea. Cozy blankets. That’s the magic of now.'",
+        "🍃 The grove glows in fading amber light.",
+        "🌾 Grasses bow gently beneath heavy seed heads.",
+        "🌙 'The sun lingers shorter. Let us savor each moment.'",
+        "🍂 Acorns tumble like tiny drums upon the ground.",
+        "🧣 Whisperling wraps herself in threads of golden mist.",
+        "🌅 Dusk paints the horizon with rich honeyed hues.",
+        "🕯️ The grove feels still, as if exhaling.",
+        "🍁 Rest is not weakness. It’s a gift.",
+        "🔥 A low fire crackles somewhere unseen beneath the trees."
+    ]
+    "yuleshard": [
+        "❄️ The grove locks itself in perfect stillness.",
+        "🧊 *Softly exhaling* — the breath freezes mid-air.",
+        "🌨️ Everything slows. Everything fractures into silence.",
+        "🔷 Ice crystals grow sharp and intricate along every branch.",
+        "🌙 The moonlight reflects like shattered glass across the snow.",
+        "✨ 'Frozen moments — delicate and absolute.'",
+        "🪞 Even sound seems to shatter softly in the cold.",
+        "🧣 *Wrapping herself tighter against the crystalline air.*",
+        "❄️ The trees stand frozen like statues of white marble.",
+        "💠 'The world pauses to admire its own perfection.'",
+        "🧊 The pond beneath her feet gleams like polished stone.",
+        "🌬️ Wind sings thin, haunting notes through the bare branches.",
+        "❄️ Each flake lands with precision, unhurried, like clockwork.",
+        "🕯️ Tiny blue flames flicker against the void of snow.",
+        "🔷 'Nothing moves. Nothing breaks. Nothing heals... yet.'"
+    ]
+    "echovoid": [
+        "🕳️ The grove feels... distant. Thin.",
+        "💭 *Drifting — barely present, barely remembered.*",
+        "... ... ... (the silence folds inward)",
+        "🌫️ Shadows stretch into places that should not exist.",
+        "🕳️ 'I am... still here. I think.'",
+        "📡 Faint static crackles somewhere unseen.",
+        "🌑 The stars blink out for just a moment — then return.",
+        "🔇 No wind. No sound. Only waiting.",
+        "⚫ *Flickering like unfinished memory.*",
+        "🕳️ 'I can hear the echoes of echoes… of echoes.'",
+        "🔻 The edges of reality ripple like thin cloth under strain.",
+        "🌫️ Forgotten names whisper, unheard.",
+        "🕳️ The void hums, hungry but patient.",
+        "💤 'Don’t forget me,' *whispering — uncertain who she's speaking to.*",
+        "🪞 The reflections no longer match the shapes."
+    ]
+    "glitchspire": [
+        "🧬 Code fragments flicker between leaves like unstable fireflies.",
+        "📉 'Data integrity... compromised,' *humming mechanically.*",
+        "🪲 Strange patterns scroll across the sky — not meant for eyes.",
+        "🧩 Petals fracture into square shards, endlessly rearranging.",
+        "💾 'Reality buffer overflow. Rolling back perception... maybe.'",
+        "📶 The grove flickers like broken transmission.",
+        "🔣 *Voice distorted:* 'T̵h̴e̴ s̶y̸s̶t̵e̵m̷ s̴t̵i̶l̵l̸ ̶b̵r̴e̶a̸t̵h̸e̷s̶.'",
+        "⚠️ Trees render in jagged polygons before smoothing again.",
+        "🖥️ The air feels digital — too clean, too sharp.",
+        "📛 'Stability nominal... for now.'",
+        "🧬 Random symbols float briefly before dissolving.",
+        "🔧 The ground warps into impossible tessellations — then snaps back.",
+        "🔲 'I remember more than I should. I forget more than I want.'",
+        "🕳️ The stars pixelate, reforming with a soft mechanical chirp.",
+        "📊 Static bleeds into the edges of vision."
+    ]
+    "crepusca": [
+        "💫 The stars soften, fading gently into mist.",
+        "🌌 'The day is gone… but not yet lost.'",
+        "🌙 Faint lights drift like forgotten wishes above the grove.",
+        "🕯️ Tiny lanterns float softly, chasing away nothing.",
+        "🛏️ 'Sleep walks beside us.'",
+        "🌠 Falling stars vanish before they are ever seen.",
+        "🌑 'Shadows here are kind, Keeper. They only watch.'",
+        "💤 The grove sways, as if already dreaming.",
+        "🌫️ Mist curls through the trees, wrapping roots like silk.",
+        "🌒 'The space between night and memory feels thin here.'",
+        "🕯️ 'Hush. Let everything drift.'",
+        "🌌 A soft hush blankets every heartbeat beneath the stars.",
+        "🌙 The grove seems weightless, untethered and still.",
+        "💫 'This is not the end. This is where endings sleep.'",
+        "🛏️ The world pauses, wrapped inside its own quiet dreaming."
+    ]
+    "flutterkin": [
+        "🤫 heehee~ soft glowy petals everywhere~",
+        "🌸 bloomy bloom go *poof!* teehee~",
+        "🐝 buzzy buzz buzz! they go spinny~",
+        "🍓 berry snacksies for meee~",
+        "🦋 floaty floaty wings go wiggle wiggle~",
+        "🌈 colors colors colors! sparkle time yay~",
+        "✨ 'hi hi hi! you see me? i see you!'",
+        "🌼 flowers pop up like bouncy boops!",
+        "🐇 bunny bun hopsies in da grass~",
+        "🍯 honey sticky yummy tummy hehe~",
+        "🎀 spinny spin spin spin spin!!",
+        "🎉 confetti rain wheeee~!!",
+        "🌿 'lookit! i made tiny tree babies!'",
+        "🧁 snacky cakes make me happy happy~",
+        "💖 'so much love!! too much love!! never too much!! yay!!'",
+        "🦊 baby fox friend says peekaboo~",
+        "🎠 spin the sparkly spinny ride!!",
+        "🧸 cuddles and wiggles and wiggles and cuddles~",
+        "🍭 'sugar sugar sugar sparkles!'",
+        "🤫 'shhh. but also yay.'"
+    ]
+
+import random
+
+def get_flavor_text(mode: str) -> str:
+    flavor_options = FLAVOR_TEXTS.get(mode, [])
+    if not flavor_options:
+        return ""
+    return random.choice(flavor_options)
+
+# Heartbeat flavor drop loop
+async def grove_heartbeat(bot):
+    await bot.wait_until_ready()
+
+    while not bot.is_closed():
+        for guild in bot.guilds:
+            guild_id = str(guild.id)
+            activity_level = get_activity_level(guild_id)
+
+            # Threshold for cozy activity
+            if activity_level >= 30 and random.random() < 0.20:
+                mode = guild_modes[guild_id]
+                flavor = get_flavor_text(mode)
+
+                # First, try to send into most recently active channel
+                channel_id = last_active_channel_by_guild.get(guild_id)
+                channel = guild.get_channel(int(channel_id)) if channel_id else None
+
+                # If no recent channel found, fall back safely
+                if not channel:
+                    channel = (
+                        guild.system_channel 
+                        or next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
+                    )
+
+                if channel and flavor:
+                    await channel.send(flavor)
+
+        await asyncio.sleep(600)  # Check every 10 minutes
+
 # ================= UTIL FUNCTION =================
 def style_text(guild_id, text):
     mode = guild_modes[str(guild_id)]
@@ -815,6 +1136,51 @@ async def update_avatar_for_mode(mode: str):
                 print(f"❗ Failed to update avatar: {e}")
     else:
         print(f"⚠️ No avatar found for mode: {avatar_key}")
+
+# ================= ACTIVITY TRACKER =================
+
+
+# Core activity storage
+activity_score_by_guild = defaultdict(int)
+last_decay_by_guild = defaultdict(lambda: datetime.utcnow())
+last_active_channel_by_guild = {}
+
+# Tuning parameters
+MESSAGE_WEIGHT = 5
+VOICE_WEIGHT = 10
+DECAY_AMOUNT = 1
+DECAY_INTERVAL = timedelta(minutes=2)
+MAX_ACTIVITY_SCORE = 100
+
+# Called whenever a message is sent
+def register_message_activity(guild_id: str, channel_id: str):
+    activity_score_by_guild[guild_id] = min(
+        activity_score_by_guild[guild_id] + MESSAGE_WEIGHT, MAX_ACTIVITY_SCORE
+    )
+    last_active_channel_by_guild[guild_id] = channel_id
+
+# Called whenever someone joins voice
+def register_voice_activity(guild_id: str):
+    activity_score_by_guild[guild_id] = min(
+        activity_score_by_guild[guild_id] + VOICE_WEIGHT, MAX_ACTIVITY_SCORE
+    )
+
+# Activity decay loop
+async def decay_activity_loop():
+    while True:
+        now = datetime.utcnow()
+        for guild_id in list(activity_score_by_guild.keys()):
+            last_decay = last_decay_by_guild[guild_id]
+            if now - last_decay >= DECAY_INTERVAL:
+                activity_score_by_guild[guild_id] = max(
+                    activity_score_by_guild[guild_id] - DECAY_AMOUNT, 0
+                )
+                last_decay_by_guild[guild_id] = now
+        await asyncio.sleep(60)
+
+# Called by grove heartbeat to read current activity
+def get_activity_level(guild_id: str) -> int:
+    return activity_score_by_guild[guild_id]
 
 # ================= ADMIN CONTROLS =================
 
