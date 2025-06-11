@@ -44,17 +44,6 @@ def get_user_language(guild_id: str, user_id: str):
 
 # ========== EVENTS ==========
 
-@bot.event
-async def on_ready():
-    print(f"✨ Whisperling has fluttered to life as {bot.user}!")
-    try:
-        synced = await tree.sync()
-        print(f"🧚 Synced {len(synced)} fairy commands.")
-    except Exception as e:
-        print(f"❗ Failed to sync spells: {e}")
-
-    bot.loop.create_task(glitch_reversion_loop())
-
 async def glitch_reversion_loop():
     await bot.wait_until_ready()
     while not bot.is_closed():
@@ -63,11 +52,11 @@ async def glitch_reversion_loop():
         for guild_id, timestamp in list(glitch_timestamps_by_guild.items()):
             mode = guild_modes[guild_id]
 
-            # Skip if not a glitched form
-            if mode not in GLITCHED_MODES:
+            # Skip if not a glitched or seasonal form
+            if mode not in GLITCHED_MODES + SEASONAL_MODES:
                 continue
 
-            # ⏳ Handle timed-out glitches (non-solstice)
+            # 🍼 Flutterkin temporary glitch
             if mode == "flutterkin":
                 if timestamp and (now - timestamp > timedelta(minutes=30)):
                     previous = previous_standard_mode_by_guild[guild_id]
@@ -75,6 +64,8 @@ async def glitch_reversion_loop():
                     guild_modes[guild_id] = previous
                     glitch_timestamps_by_guild[guild_id] = None
                     await update_avatar_for_mode(previous)
+
+            # ⏳ Timed-out standard glitches
             elif mode in ["echovoid", "glitchspire", "crepusca"]:
                 if timestamp and (now - timestamp > timedelta(minutes=30)):
                     previous = previous_standard_mode_by_guild[guild_id]
@@ -83,18 +74,10 @@ async def glitch_reversion_loop():
                     glitch_timestamps_by_guild[guild_id] = None
                     await update_avatar_for_mode(previous)
 
-            # ☀️ Summer solstice ended
-            elif mode == "sunfracture" and not is_summer_solstice():
+            # 🗓️ Seasonal forms no longer valid
+            elif mode in SEASONAL_MODES and not is_current_season_mode(mode):
                 previous = previous_standard_mode_by_guild[guild_id]
-                print(f"🌞 Solstice ended for {guild_id}. Reverting from sunfracture to {previous}.")
-                guild_modes[guild_id] = previous
-                glitch_timestamps_by_guild[guild_id] = None
-                await update_avatar_for_mode(previous)
-
-            # ❄️ Winter solstice ended
-            elif mode == "yuleshard" and not is_winter_solstice():
-                previous = previous_standard_mode_by_guild[guild_id]
-                print(f"❄️ Solstice ended for {guild_id}. Reverting from yuleshard to {previous}.")
+                print(f"⏳ {mode} expired for {guild_id}. Reverting to {previous}.")
                 guild_modes[guild_id] = previous
                 glitch_timestamps_by_guild[guild_id] = None
                 await update_avatar_for_mode(previous)
@@ -127,12 +110,15 @@ async def on_member_join(member):
 # ================= MODE CONFIG =================
 STANDARD_MODES = [
     "dayform", "nightform", "cosmosform", "seaform",
-    "hadesform", "forestform", "auroraform"
+    "hadesform", "forestform", "auroraform",
 ]
 
 GLITCHED_MODES = [
-    "sunfracture", "yuleshard", "echovoid",
-    "glitchspire", "flutterkin", "crepusca"
+    "echovoid", "glitchspire", "flutterkin", "crepusca"
+]
+
+SEASONAL_MODES = [
+    "vernalglint", "fallveil", "sunfracture", "yuleshard"
 ]
 
 MODE_DESCRIPTIONS = {
@@ -143,8 +129,12 @@ MODE_DESCRIPTIONS = {
     "hadesform": "🔥 Mischievous with glowing heat",
     "forestform": "🍃 Grounded and natural",
     "auroraform": "❄️ Dreamlike and glimmering",
+
+    "vernalglint": "🌸 Aggressively nurturing; a pastel gale of joy",
+    "fallveil": "🍁 Cozy intensity; demands your rest and self-worth",
     "sunfracture": "🔆 A radiant glitch of golden fractals",
     "yuleshard": "❄️ A frozen stutter of blue static",
+
     "echovoid": "🕳️ Pale, transparent, almost forgotten",
     "glitchspire": "🧬 Digital noise, pixel flicker",
     "flutterkin": "🤫 Soft pastel glow, childlike magic",
@@ -164,6 +154,12 @@ def flutter_baby_speak(text):
 
 def echo_void_style(text):
     return f"...{text}... ({text})..."
+
+def vernalglint_style(text):
+    return f"🌸 {text}! 🌱"
+
+def fallveil_style(text):
+    return f"🍁 {text}. 🕯️"
 
 def sunfracture_style(text):
     words = text.split()
@@ -192,6 +188,9 @@ MODE_TONE = {
 
     "sunfracture": sunfracture_style,
     "yuleshard": yuleshard_style,
+    "vernalglint": vernalglint_style,
+    "fallveil": fallveil_style,
+
     "echovoid": echo_void_style,
     "glitchspire": glitchspire_style,
     "flutterkin": flutter_baby_speak,
@@ -208,9 +207,13 @@ MODE_COLORS = {
     "forestform": discord.Color.green(),                # 🍃 Natural leafy green
     "auroraform": discord.Color.blurple(),              # ❄️ Magical aurora violet-blue
 
-    # GLITCHED FORMS
+    # SEASONAL FORMS
+    "vernalglint": discord.Color.from_str("#FFB6C1"),   # 🌸 Soft cherry blossom pink
+    "fallveil": discord.Color.from_str("#D2691E"),      # 🍁 Rich autumn burnt orange
     "sunfracture": discord.Color.yellow(),              # ☀️ Bursting golden chaos
     "yuleshard": discord.Color.from_str("#A8C4D9"),     # ❄️ Icy pale blue
+
+    # GLITCHED FORMS
     "echovoid": discord.Color.dark_grey(),              # 🕳️ Faded grey void
     "glitchspire": discord.Color.from_str("#00FFFF"),   # 🧬 Neon cyan glitch
     "flutterkin": discord.Color.from_str("#FFB6E1"),    # 🤫 Pastel baby pink
@@ -226,13 +229,19 @@ MODE_FOOTERS = {
     "forestform": "🍃 The trees murmur in leafy language.",
     "auroraform": "❄️ Glistening lights ripple with wonder.",
 
+    "vernalglint": "🌸 Blossoms burst with unstoppable joy.",
+    "fallveil": "🍁 The leaves fall, but the heart remains full.",
     "sunfracture": "🔆 The sun breaks — too bright to hold.",
     "yuleshard": "❄️ Time freezes in a crystalline breath.",
+
     "echovoid": "🕳️ Echoes linger where no voice remains.",
     "glitchspire": "🧬 Code twists beneath the petals.",
     "flutterkin": "🤫 A tiny voice giggles in the bloom.",
     "crepusca": "🌒 Dreams shimmer at the edge of waking."
 }
+
+# ================= EMOJI AND AVATAR REFERENCES =================
+
 
 MODE_TEXTS_ENGLISH = {}
 
@@ -469,6 +478,39 @@ MODE_TEXTS_ENGLISH["cosmosform"] = {
     "timeout_cosmetic": "⏳ {user}, no shimmer found its orbit — but you still hum softly in the dark."
 }
 
+MODE_TEXTS_ENGLISH["vernalglint"] = {
+    # 🌸 Language selection
+    "language_intro_title": "🌸 Pick Your Bloom-Speak",
+    "language_intro_desc": "{user}, the grove is awake and caffeinated.\nChoose the voice that'll cheer you on (whether you like it or not).",
+    "language_confirm_title": "🌱 You’ve Sprouted a Sound!",
+    "language_confirm_desc": "Your voice blooms bright. The grove hums approvingly. You're *doing amazing, sweetie.*",
+
+    # 📜 Rules confirmation
+    "rules_confirm_title": "🌼 The Grove Has Standards",
+    "rules_confirm_desc": "You've agreed to play nice. That’s the spirit! Now water your manners and let’s go.",
+
+    # 🌿 Role selection
+    "role_intro_title": "🌷 Pick Your Petal-sona",
+    "role_intro_desc": "Choose your role like it’s your favorite flower crown. No pressure—but I *am* watching.",
+    "role_granted": "🌸 The role of **{role}** settles on you like a butterfly. *Gorgeous. Stunning. No notes.*",
+
+    # ✨ Cosmetic Role Selection
+    "cosmetic_intro_title": "🌟 Accessorize Your Aura?",
+    "cosmetic_intro_desc": "Pick a **cosmetic role** to add sparkle to your already thriving self.\nOr skip it—if you’re going for the ~mysterious seedling~ aesthetic.",
+    "cosmetic_granted": "🌼 You chose **{role}** — *chef’s kiss.* You’re practically pollinating style.",
+    "cosmetic_skipped": "🍃 No frills? That’s okay. Still a ten. Nature chic.",
+
+    # 💐 Final welcome
+    "welcome_title": "💐 You Made It!",
+    "welcome_desc": "Welcome, {user}!\nThe grove is proud of you. I’m proud of you. That tree over there is sobbing gently with pride. Let's grow.",
+
+    # ⏳ Timeout Texts
+    "timeout_language": "⏳ {user}, the sun waited, but your sproutling self stayed buried. Come back when you’re ready to rise and shine.",
+    "timeout_rules": "⏳ {user}, the grove sat politely, but your oath got stuck in the roots. Water it and try again later.",
+    "timeout_role": "⏳ {user}, you stared at the garden path too long and now a squirrel has taken your spot. Try again soon!",
+    "timeout_cosmetic": "⏳ {user}, no sparkle today. But that’s okay. Some petals take longer to open. 🌱"
+}
+
 MODE_TEXTS_ENGLISH["sunfracture"] = {
     # 🔆 Language selection
     "language_intro_title": "☀️ CHOOSE YOUR TONGUE!",
@@ -502,6 +544,39 @@ MODE_TEXTS_ENGLISH["sunfracture"] = {
     "timeout_rules": "⏳ {user}, rules were GLOWING, pages were TURNING… but you MISSED THEM!! No worries!! COME BACK SOON OKAY?! 🌞🔥📜",
     "timeout_role": "⏳ {user}!!! NO ROLE?! NO GLOW-UP?? 😱😱 okay okay breathe... YOU CAN STILL SHINE LATER!!! 🌟💫",
     "timeout_cosmetic": "⏳ {user}!!! YOU DIDN’T SPARKLE!!! but like... YOU’RE STILL FABULOUS!!! 😘✨✨✨"
+}
+
+MODE_TEXTS_ENGLISH["fallveil"] = {
+    # 🍁 Language selection
+    "language_intro_title": "🍁 Pick Your Language — Then Exhale",
+    "language_intro_desc": "{user}, hush. Let the leaves fall. Choose the voice that won’t rush you, but won’t let you flee, either.",
+    "language_confirm_title": "🕯️ The hush holds you now.",
+    "language_confirm_desc": "Your voice settles into dusk. The grove nods. You're allowed to be soft and still. *Finally.*",
+
+    # 📜 Rules confirmation
+    "rules_confirm_title": "🌒 The Pact of Rest is Made",
+    "rules_confirm_desc": "You agreed to stay kind. That includes being kind to *yourself.* The grove approves. And has tea ready.",
+
+    # 🍂 Role selection
+    "role_intro_title": "🧣 Choose Your Identity — Shed the Old Skin",
+    "role_intro_desc": "Pick a role like you’re letting go of expectations. You don’t have to carry what doesn’t fit anymore.",
+    "role_granted": "🍁 The role of **{role}** cloaks you like dusk. It's not a costume — it's who you were always becoming.",
+
+    # ✨ Cosmetic Role Selection
+    "cosmetic_intro_title": "🕯️ Want a Little Extra Magic?",
+    "cosmetic_intro_desc": "Choose a **cosmetic role** if your soul needs a little glitter today.\nOr skip it — some starlight is better kept in pockets.",
+    "cosmetic_granted": "🌟 You picked **{role}** — cozy, radiant, and absolutely earned.",
+    "cosmetic_skipped": "🌫️ No shimmer needed. Still stunning. Still sacred.",
+
+    # 🧡 Final welcome
+    "welcome_title": "🧡 You're Home Now.",
+    "welcome_desc": "Welcome, {user}.\nUnclench. Exhale. You’ve been running too long. The grove has been waiting to hold you. Let it.",
+
+    # ⏳ Timeout Texts
+    "timeout_language": "⏳ {user}, the trees waited. The dusk waited. But you weren’t ready. That’s okay. You don’t owe anyone urgency.",
+    "timeout_rules": "⏳ {user}, you didn’t make the vow. Maybe you forgot. Or maybe you were scared. The grove is patient. Try again when you’re brave enough to rest.",
+    "timeout_role": "⏳ {user}, no path chosen. Maybe today wasn’t a path day. That’s alright. The leaves will still fall without your permission.",
+    "timeout_cosmetic": "⏳ {user}, no sparkle today. No mask. Just you — and that's never been a lesser thing. 🍂"
 }
 
 MODE_TEXTS_ENGLISH["yuleshard"] = {
@@ -702,58 +777,44 @@ def style_text(guild_id, text):
     mode = guild_modes[str(guild_id)]
     return MODE_TONE.get(mode, lambda t: t)(text)
 
+def is_spring_equinox():
+    today = datetime.now(timezone.utc)
+    return today.month == 3 and 17 <= today.day <= 23
+
+def is_autumn_equinox():
+    today = datetime.now(timezone.utc)
+    return today.month == 9 and 19 <= today.day <= 25
+
 def is_summer_solstice():
     today = datetime.now(timezone.utc)
-    return today.month == 6 and 20 <= today.day <= 22
+    return today.month == 6 and 18 <= today.day <= 24
 
 def is_winter_solstice():
     today = datetime.now(timezone.utc)
-    return today.month == 12 and 20 <= today.day <= 22
-
-# ================= RANDOM GLITCH MODE TRIGGER =================
-def maybe_trigger_glitch(guild_id):
-    now = datetime.now(timezone.utc)
-    last_seen = last_interaction_by_guild[str(guild_id)]
-    silent_days = (now - last_seen).days
-
-    if is_summer_solstice():
-        return "sunfracture"
-    elif is_winter_solstice():
-        return "yuleshard"
-    elif silent_days >= 14:
-        return "echovoid"
-    elif random.random() < 0.01:
-        return "glitchspire"
-    return None
+    return today.month == 12 and 18 <= today.day <= 24
 
 async def update_avatar_for_mode(mode: str):
     avatar_paths = {
-        "dayform": "avatars/dayform.png",
-        "nightform": "avatars/nightform.png",
-        "forestform": "avatars/forestform.png",
-        "seaform": "avatars/seaform.png",
-        "hadesform": "avatars/hadesform.png",
-        "auroraform": "avatars/auroraform.png",
-        "cosmosform": "avatars/cosmosform.png",
-
         "sunfracture": "avatars/sunfracture.png",
         "yuleshard": "avatars/yuleshard.png",
-        "echovoid": "avatars/echovoid.png",
-        "glitchspire": "avatars/glitchspire.png",
-        "flutterkin": "avatars/flutterkin.png",
-        "crepusca": "avatars/crepusca.png",
+        "vernalglint": "avatars/vernalglint.png",
+        "fallveil": "avatars/fallveil.png",
+        "basic": "avatars/basic_whisperling.png"
     }
 
-    path = avatar_paths.get(mode)
+    # 👀 Use SEASONAL_MODES instead of hardcoded list
+    avatar_key = mode if mode in SEASONAL_MODES else "basic"
+    path = avatar_paths.get(avatar_key)
+
     if path and os.path.exists(path):
         with open(path, 'rb') as f:
             try:
                 await bot.user.edit(avatar=f.read())
-                print(f"✨ Avatar updated for mode: {mode}")
+                print(f"✨ Avatar updated for mode: {avatar_key}")
             except discord.HTTPException as e:
                 print(f"❗ Failed to update avatar: {e}")
     else:
-        print(f"⚠️ No avatar found for mode: {mode}")
+        print(f"⚠️ No avatar found for mode: {avatar_key}")
 
 # ================= ADMIN CONTROLS =================
 

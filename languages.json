@@ -10,11 +10,21 @@
         "de": {
           "name": "Deutsch",
           "welcome": "Herzlich willkommen bei Sanctuary, fühl dich wie zu Hause aber bitte behalte deine Sachen an. Im Kühlschrank stehen kalte Getränke, das Buffet sollte auch gleich öffnen. Dieser Server wird geleitet von unser einzigartigen Amaya, sie bemüht sich sehr um es hier für uns schön kuschelig zu machen. Bei Fragen und Anregungen bitte eine Nummer ziehen und hinten anstellen. Halte schon mal 10€ Bearbeitungsgebühr bereit.\nKeine Fragen? Perfekt dann viel Spaß beim durch stöbern der channels."
+        },
+        "bg": {
+          "name": "български",
+          "welcome": "Добре дошъл в Sanctuary — мястото, където реалността леко се разхлабва. Тук винаги има топла напитка, странен разговор и нещо, което май беше бисквитка (провери срока на годност на своя отговорност).\nСървърът се ръководи от хора с добри намерения и лошо чувство за време. Очаквай странности, уют и понякога — спонтанен танц.\nСъбуй обувките, но остави егото си на входа. Наслади се на хаоса."
+        },
+        "fr": {
+          "name": "Français",
+          "welcome": "Bienvenue chez Sanctuary, votre coin douillet loin du chaos. Le café est brûlant, le thé zen, et les conversations… imprévisibles (mais jamais ennuyeuses). Nos dirigeants veillent avec amour  — ou menace passive, selon l’heure. Des cookies traînent quelque part, servez-vous… si les lutins ne les ont pas pris. Installez-vous, respirez, et surtout : ne touchez pas au bouton rouge."
         }
       },
       "rules": {
-        "de": "🐍 1. Ruhig bleiben: Kein Drama, kein Gezeter. Wir bleiben ganz entspannt.\n\n🍃 2. Positivität ist das A und O: Wir sind hier, um Spaß zu haben – nicht zum Meckern. Sanctuary lebt von guter Stimmung.\n\n💬 3. Wer nicht fragt, bleibt dumm: Du brauchst was? Frag einfach! Wenn du nichts sagst, wissen wir’s nicht – unsere Kristallkugel ist leider kaputt. 🔮\n\n🎮 4. Spiel mit Herz: Hab Spaß am Spiel, genieße den Weg – und sei immer respektvoll.",
-        "en": "🐍  1. Stay Calm: No fits, no fuss. We’re all about keeping it cool.\n\n🍃  2. Positivity is Key: We’re here to have fun, not to complain. Sanctuary thrives on good vibes.\n\n💬  3. Ask, and You Shall Receive: Need something? Ask away, and we’ll help if we can. If you don’t tell us, we don’t know. Our crystal ball broke.  🔮 \n\n 🎮 4. Play Hard, Have Fun: Enjoy the game, enjoy the journey, and always be respectful."
+        "de": "🐍 1. Ruhig bleiben: Kein Drama, kein Gezeter. Wir bleiben ganz entspannt.\n\n🍃 2. Positivität ist das A und O: Wir sind hier, um Spaß zu haben – nicht zum Meckern. Sanctuary lebt von guter Stimmung.\n\n💬 3. Wer nicht fragt, bleibt dumm: Du brauchst was? Frag einfach! Wenn du nichts sagst, wissen wir’s nicht – unsere Kristallkugel ist leider kaputt. 🔮\n\n🎮 4. Spiel mit Herz: Hab Spaß am Spiel, genieße den Weg – und sei immer respektvoll.\n\n💸 5. Admin-Gebühr (psst, inoffiziell): Bestechungen in Form von Keksen, Memes oder liebevollen Worten sind jederzeit willkommen. Gold ist auch okay. Nur kein Stress, bitte.",
+        "en": "🐍  1. Stay Calm: No fits, no fuss. We’re all about keeping it cool.\n\n🍃  2. Positivity is Key: We’re here to have fun, not to complain. Sanctuary thrives on good vibes.\n\n💬  3. Ask, and You Shall Receive: Need something? Ask away, and we’ll help if we can. If you don’t tell us, we don’t know. Our crystal ball broke.  🔮 \n\n 🎮 4. Play Hard, Have Fun: Enjoy the game, enjoy the journey, and always be respectful.\n\n💸 5. Admin Bribe Fee (totally legit): Bribes in cookies, compliments, memes, or good vibes accepted. Gold coins optional, but highly encouraged.",
+        "bg": "🐍 1. Спокойствие и само спокойствие: Без драми, без сцени. Тук сме да си починем, не да си късаме нервите.\n\n🍃 2. Позитивното мислене е закон: Оплакванията ги оставяме на входа (до егото ти). Sanctuary вирее на добри вибрации.\n\n💬 3. Питай и ще получиш: Трябва ти нещо? Просто питай — ще помогнем, ако можем. Ако не кажеш, няма как да знаем. Кристалната ни топка даде на късо. 🔮\n\n🎮 4. Играй здраво, забавлявай се още повече: Наслаждавай се на играта, на пътуването, и най-вече — бъди уважителен.\n\n💸 5. Админска такса (шшш, неофициална): За да угодиш на админите, остави шоколад, мемета или виртуални прегръдки. Пари също се приемат, но само ако са в злато или бисквитки.",
+        "fr": "🐍 1. Restez zen : Pas de crises, pas de drames. On est ici pour garder la tête froide.\n\n🍃 2. La bonne humeur avant tout : Sanctuary fonctionne à l’énergie positive. Les râleurs seront recyclés en compost.\n\n💬 3. Demande, et tu recevras : Besoin d’un coup de main ? Il suffit de demander. On aide si on peut — mais notre boule de cristal est en panne. 🔮\n\n🎮 4. Joue à fond, amuse-toi bien : Kiffe le jeu, savoure le voyage, et respecte toujours les autres.\n\n💸 5. Taxe d'administration (on ne dira rien): Biscuits, mèmes, compliments ou pot-de-vin en bonne humeur sont acceptés. L’or aussi, évidemment. Mais pas de stress, hein."
       },
       "role_options": {
         "1367144725257125888": {
@@ -87,7 +97,8 @@
         "1291396569068863488": "en",
         "555137532803678256": "en",
         "1228472472320475236": "en",
-        "938539765739978813": "de"
+        "938539765739978813": "de",
+        "474049414755778561": "en"
       }
     }
   }
