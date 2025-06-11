@@ -1054,6 +1054,7 @@ FLAVOR_TEXTS = {
         "🍭 'sugar sugar sugar sparkles!'",
         "🤫 'shhh. but also yay.'"
     ]
+}
 
 import random
 
