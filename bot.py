@@ -810,7 +810,7 @@ FLAVOR_TEXTS = {
         "☀️ The grove is wide awake, stretching toward the sun.",
         "🌼 Flowers bloom with quiet determination.",
         "🧚‍♀️ 'I could listen to the morning songs forever.'"
-    ]
+    ],
     "nightform": [
         "🌙 The grove hums beneath a silver moon.",
         "✨ Starlight drips through the branches like glittering rain.",
@@ -827,7 +827,7 @@ FLAVOR_TEXTS = {
         "🌙 The grove slows its heartbeat beneath the constellations.",
         "🕊️ Cool air carries forgotten lullabies.",
         "🌿 'Even in silence, there is song.'"
-    ]
+    ],
     "forestform": [
         "🍃 The trees murmur ancient songs in the wind.",
         "🌿 Moss blankets the roots like a patient embrace.",
@@ -844,7 +844,7 @@ FLAVOR_TEXTS = {
         "🪺 Birds weave homes among high branches, safe and unseen.",
         "🌳 'All paths here are watched by quiet eyes.'",
         "🦊 A tiny fox peeks out from its den, tail flicking curiously."
-    ]
+    ],
     "seaform": [
         "🌊 The waves hum in endless rhythm.",
         "🐚 Shells glisten beneath shallow pools of light.",
@@ -861,7 +861,7 @@ FLAVOR_TEXTS = {
         "🌊 Tides shift beneath starlit skies without end.",
         "🦞 Tiny crabs scuttle beneath the shelter of smooth stones.",
         "🐋 The sea remembers everything."
-    ]
+    ],
     "hadesform": [
         "🔥 Mischief sparks beneath the roots.",
         "💥 Whisperling twirls a glowing ember between her fingers.",
@@ -878,7 +878,7 @@ FLAVOR_TEXTS = {
         "😈 'Let’s not call it destruction — call it... creative rearrangement.'",
         "🔥 The grove feels wild, hungry for change.",
         "👹 A mischievous grin flashes beneath glowing embers."
-    ]
+    ],
     "auroraform": [
         "❄️ Light dances across the grove like falling ribbons.",
         "🌌 Whisperling watches shimmering waves ripple through the sky.",
@@ -895,7 +895,7 @@ FLAVOR_TEXTS = {
         "🕯️ Pale lights flicker like distant memories.",
         "🌌 The grove glows under swirling northern veils.",
         "❄️ Frost settles lightly on Whisperling's wings as she smiles."
-    ]
+    ],
     "cosmosform": [
         "🌌 The stars hum softly beyond the grove's edge.",
         "✨ Whisperling gazes upward, tracing forgotten constellations.",
@@ -912,7 +912,7 @@ FLAVOR_TEXTS = {
         "✨ 'You are made of stars, little one.'",
         "🌌 Galaxies spin far beyond reach — yet somehow close.",
         "💖 The grove feels like a dream stitched into the sky."
-    ]
+    ],
     "vernalglint": [
         "🌸 The grove bursts with impossible blossoms.",
         "🌷 Soft petals spin and tumble like a playful storm.",
@@ -929,7 +929,7 @@ FLAVOR_TEXTS = {
         "🐦 Baby birds chirp in tiny chaotic choirs above.",
         "🌞 Sunshine glitters through tangled flowers stretching high.",
         "🌼 Whisperling claps: 'Everything is growing! Faster!'"
-    ]
+    ],
     "sunfracture": [
         "🔆 The grove crackles under intense golden light.",
         "✨ Whisperling’s wings refract in blinding fragments.",
@@ -946,7 +946,7 @@ FLAVOR_TEXTS = {
         "🔆 The world feels electric and barely contained.",
         "🌞 'It’s beautiful, isn’t it? Right before it breaks apart.'",
         "🔥 Whisperling laughs as sparks dance from her fingertips."
-    ]
+    ],
     "fallveil": [
         "🍁 Leaves drift like soft embers through the air.",
         "🕯️ Whisperling lights a tiny lantern and hums softly.",
@@ -963,7 +963,7 @@ FLAVOR_TEXTS = {
         "🕯️ The grove feels still, as if exhaling.",
         "🍁 Rest is not weakness. It’s a gift.",
         "🔥 A low fire crackles somewhere unseen beneath the trees."
-    ]
+    ],
     "yuleshard": [
         "❄️ The grove locks itself in perfect stillness.",
         "🧊 *Softly exhaling* — the breath freezes mid-air.",
@@ -980,7 +980,7 @@ FLAVOR_TEXTS = {
         "❄️ Each flake lands with precision, unhurried, like clockwork.",
         "🕯️ Tiny blue flames flicker against the void of snow.",
         "🔷 'Nothing moves. Nothing breaks. Nothing heals... yet.'"
-    ]
+    ],
     "echovoid": [
         "🕳️ The grove feels... distant. Thin.",
         "💭 *Drifting — barely present, barely remembered.*",
@@ -997,7 +997,7 @@ FLAVOR_TEXTS = {
         "🕳️ The void hums, hungry but patient.",
         "💤 'Don’t forget me,' *whispering — uncertain who she's speaking to.*",
         "🪞 The reflections no longer match the shapes."
-    ]
+    ],
     "glitchspire": [
         "🧬 Code fragments flicker between leaves like unstable fireflies.",
         "📉 'Data integrity... compromised,' *humming mechanically.*",
@@ -1014,7 +1014,7 @@ FLAVOR_TEXTS = {
         "🔲 'I remember more than I should. I forget more than I want.'",
         "🕳️ The stars pixelate, reforming with a soft mechanical chirp.",
         "📊 Static bleeds into the edges of vision."
-    ]
+    ],
     "crepusca": [
         "💫 The stars soften, fading gently into mist.",
         "🌌 'The day is gone… but not yet lost.'",
@@ -1031,7 +1031,7 @@ FLAVOR_TEXTS = {
         "🌙 The grove seems weightless, untethered and still.",
         "💫 'This is not the end. This is where endings sleep.'",
         "🛏️ The world pauses, wrapped inside its own quiet dreaming."
-    ]
+    ],
     "flutterkin": [
         "🤫 heehee~ soft glowy petals everywhere~",
         "🌸 bloomy bloom go *poof!* teehee~",
