@@ -2020,10 +2020,10 @@ async def softly_remove_member(member, action="kick", interaction=None):
 # SLASH KICK
 @tree.command(
     name="kick",
-    description="Politely remove someone from the grove.",
-    default_permissions=discord.Permissions(kick_members=True)
+    description="Politely remove someone from the grove."
 )
 @app_commands.describe(member="The member to kick")
+@app_commands.default_permissions(kick_members=True)
 async def kick(interaction: discord.Interaction, member: discord.Member):
     await softly_remove_member(member, action="kick", interaction=interaction)
     await interaction.response.send_message(f"🪶 {member.mention} has been politely shown the door.")
@@ -2031,10 +2031,10 @@ async def kick(interaction: discord.Interaction, member: discord.Member):
 # SLASH BAN
 @tree.command(
     name="ban",
-    description="Permanently remove someone from the grove.",
-    default_permissions=discord.Permissions(ban_members=True)
+    description="Permanently remove someone from the grove."
 )
 @app_commands.describe(member="The member to ban")
+@app_commands.default_permissions(ban_members=True)
 async def ban(interaction: discord.Interaction, member: discord.Member):
     await softly_remove_member(member, action="ban", interaction=interaction)
     await interaction.response.send_message(f"🪶 {member.mention} has been permanently banished from the grove.")
