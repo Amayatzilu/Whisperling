@@ -66,29 +66,29 @@ async def glitch_reversion_loop():
             mode = guild_modes[guild_id]
             guild = bot.get_guild(int(guild_id))
 
-            # Skip if not a glitched or seasonal form
             if mode not in GLITCHED_MODES + SEASONAL_MODES:
                 continue
 
-            # 🍼 Flutterkin temporary glitch
-            if mode == "flutterkin":
-                if timestamp and (now - timestamp > timedelta(minutes=30)):
-                    previous = previous_standard_mode_by_guild[guild_id]
-                    print(f"🍼 Flutterkin nap time for {guild_id}. Reverting to {previous}.")
-                    await apply_mode_change(guild, previous)
+            # Flutterkin expiry
+            if mode == "flutterkin" and timestamp and (now - timestamp > timedelta(minutes=30)):
+                previous = previous_standard_mode_by_guild[guild_id]
+                print(f"🍼 Flutterkin nap time for {guild_id}. Reverting to {previous}.")
+                await apply_mode_change(guild, previous)
+                glitch_timestamps_by_guild[guild_id] = None
 
-            # ⏳ Timed-out standard glitches
-            elif mode in ["echovoid", "glitchspire", "crepusca"]:
-                if timestamp and (now - timestamp > timedelta(minutes=30)):
-                    previous = previous_standard_mode_by_guild[guild_id]
-                    print(f"⏳ Glitch expired for {guild_id}. Reverting to {previous}.")
-                    await apply_mode_change(guild, previous)
+            # Other glitched modes expiry
+            elif mode in ["echovoid", "glitchspire", "crepusca"] and timestamp and (now - timestamp > timedelta(minutes=30)):
+                previous = previous_standard_mode_by_guild[guild_id]
+                print(f"⏳ Glitch expired for {guild_id}. Reverting to {previous}.")
+                await apply_mode_change(guild, previous)
+                glitch_timestamps_by_guild[guild_id] = None
 
-            # 🗓️ Seasonal forms no longer valid
+            # Seasonal mode expired out-of-season
             elif mode in SEASONAL_MODES and not is_current_season_mode(mode):
                 previous = previous_standard_mode_by_guild[guild_id]
-                print(f"⏳ {mode} expired for {guild_id}. Reverting to {previous}.")
+                print(f"🗓️ {mode} expired for {guild_id}. Reverting to {previous}.")
                 await apply_mode_change(guild, previous)
+                glitch_timestamps_by_guild[guild_id] = None
 
         await asyncio.sleep(60)
 
@@ -1069,33 +1069,42 @@ async def grove_heartbeat(bot):
             mode = guild_modes.get(guild_id, "dayform")
             activity_level = get_activity_level(guild_id)
 
-            # 🍵 1️⃣ Flavor drops with multilingual twist
-            if activity_level >= 30 and random.random() < 0.20:
+            # 🍵 Flavor drops with adjusted activity weighting
+            base_flavor_chance = 0.25
+            weighted_chance = base_flavor_chance + (activity_level / 200)
+            flavor_chance = min(weighted_chance, 0.5)
+
+            if random.random() < flavor_chance:
                 flavor = get_flavor_text(mode)
-
-                # 🎯 Pull languages for this guild
-                lang_map = all_languages["guilds"].get(guild_id, {}).get("languages", {})
-
-                # 🧮 Translation chance weighted by language count, capped at 50%
-                translation_chance = min(0.25 + (len(lang_map) * 0.03), 0.50)
-
-                if lang_map and random.random() < translation_chance:
-                    random_lang_code = random.choice(list(lang_map.keys()))
-                    try:
-                        translated = translator.translate(flavor, dest=random_lang_code).text
-                        flavor = f"{translated} *(in {lang_map[random_lang_code]['name']})*"
-                    except Exception:
-                        pass  # Failsafe fallback to original flavor if translation fails
-
                 channel = (
                     guild.system_channel
                     or next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
                 )
 
                 if channel and flavor:
-                    await channel.send(flavor)
+                    lang_map = all_languages["guilds"].get(guild_id, {}).get("languages", {})
 
-            # 🌿 2️⃣ Mood drift check
+                    # Translation chance increases as more languages exist
+                    if lang_map:
+                        num_langs = len(lang_map)
+                        translate_chance = min(0.15 + (num_langs * 0.05), 0.5)  # Max 50% translation chance
+                        
+                        if random.random() < translate_chance:
+                            possible_langs = list(lang_map.keys())
+                            chosen_lang = random.choice(possible_langs)
+                            try:
+                                translated = translator.translate(flavor, dest=chosen_lang).text
+                                flavor_to_send = f"{translated} 🌐"
+                            except Exception:
+                                flavor_to_send = flavor
+                        else:
+                            flavor_to_send = flavor
+                    else:
+                        flavor_to_send = flavor
+
+                    await channel.send(flavor_to_send)
+
+            # 🌿 Mood drift still checks after long idle
             if mode in STANDARD_MODES:
                 last_seen = last_interaction_by_guild.get(guild_id, now)
                 days_idle = (now - last_seen).days
@@ -1103,11 +1112,10 @@ async def grove_heartbeat(bot):
                 if days_idle >= 30 and random.random() < 0.25:
                     possible_modes = [m for m in STANDARD_MODES if m != mode]
                     new_mode = random.choice(possible_modes)
-
                     print(f"🌿 Mood drift for {guild.name} -> {new_mode}")
                     await apply_mode_change(guild, new_mode)
 
-        await asyncio.sleep(600)  # Still checking every 10 minutes
+        await asyncio.sleep(600)  # 10 min heartbeat loop
 
 # ================= UTIL FUNCTION =================
 def style_text(guild_id, text):
