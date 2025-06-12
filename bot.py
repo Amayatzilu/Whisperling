@@ -164,6 +164,17 @@ previous_standard_mode_by_guild = defaultdict(lambda: "dayform")
 glitch_timestamps_by_guild = defaultdict(lambda: None)
 flutterkin_usage_count_by_guild = {}
 
+def maybe_trigger_glitch(guild_id: str):
+    """
+    Occasionally trigger a glitched mode.
+    """
+    chance = random.random()
+
+    # Base ~3% chance per interaction
+    if chance < 0.03:
+        return random.choice(GLITCHED_MODES)
+    return None
+
 # ================= TEXT STYLE BY MODE =================
 def flutter_baby_speak(text):
     return f"✨ {text} yay~ ✨"
