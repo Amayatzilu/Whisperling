@@ -1051,7 +1051,6 @@ FLAVOR_TEXTS = {
     ]
 }
 
-import random
 
 def get_flavor_text(mode: str) -> str:
     flavor_options = FLAVOR_TEXTS.get(mode, [])
@@ -1070,9 +1069,23 @@ async def grove_heartbeat(bot):
             mode = guild_modes.get(guild_id, "dayform")
             activity_level = get_activity_level(guild_id)
 
-            # 🍵 1️⃣ Flavor drops
+            # 🍵 1️⃣ Flavor drops with multilingual twist
             if activity_level >= 30 and random.random() < 0.20:
                 flavor = get_flavor_text(mode)
+
+                # 🎯 Pull languages for this guild
+                lang_map = all_languages["guilds"].get(guild_id, {}).get("languages", {})
+
+                # 🧮 Translation chance weighted by language count, capped at 50%
+                translation_chance = min(0.25 + (len(lang_map) * 0.03), 0.50)
+
+                if lang_map and random.random() < translation_chance:
+                    random_lang_code = random.choice(list(lang_map.keys()))
+                    try:
+                        translated = translator.translate(flavor, dest=random_lang_code).text
+                        flavor = f"{translated} *(in {lang_map[random_lang_code]['name']})*"
+                    except Exception:
+                        pass  # Failsafe fallback to original flavor if translation fails
 
                 channel = (
                     guild.system_channel
@@ -1904,20 +1917,20 @@ async def softly_remove_member(member, action="kick", interaction=None):
 
 @tree.command(
     name="kick",
-    description="Politely remove someone from the grove.",
-    default_permissions=discord.Permissions(kick_members=True)
+    description="Politely remove someone from the grove."
 )
 @app_commands.describe(member="The member to kick")
+@app_commands.default_permissions(kick_members=True)
 async def kick(interaction: discord.Interaction, member: discord.Member):
     await softly_remove_member(member, action="kick", interaction=interaction)
     await interaction.response.send_message(f"🪶 {member.mention} has been politely shown the door.")
 
 @tree.command(
     name="ban",
-    description="Permanently remove someone from the grove.",
-    default_permissions=discord.Permissions(ban_members=True)
+    description="Permanently remove someone from the grove."
 )
 @app_commands.describe(member="The member to ban")
+@app_commands.default_permissions(ban_members=True)
 async def ban(interaction: discord.Interaction, member: discord.Member):
     await softly_remove_member(member, action="ban", interaction=interaction)
     await interaction.response.send_message(f"🪶 {member.mention} has been permanently banished from the grove.")
