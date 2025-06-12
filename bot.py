@@ -1090,21 +1090,14 @@ async def grove_heartbeat(bot):
                     guild_config = all_languages["guilds"].get(guild_id, {})
                     lang_map = guild_config.get("languages", {})
 
-                    # Translation chance increases as more languages exist
-                    if lang_map:
-                        num_langs = len(lang_map)
-                        translate_chance = min(0.15 + (num_langs * 0.05), 0.5)  # Max 50% translation chance
-
-                        if random.random() < translate_chance:
-                            possible_langs = list(lang_map.keys())
-                            chosen_lang = random.choice(possible_langs)
-                            try:
-                                translated = translator.translate(flavor, dest=chosen_lang).text
-                                flavor_to_send = f"{translated} 🌐 ({chosen_lang})"
-                            except Exception as e:
-                                print(f"🌐 Translation failed: {e}")
-                                flavor_to_send = flavor
-                        else:
+                    if lang_map and random.random() < 0.5:  # flat 50% chance
+                        possible_langs = list(lang_map.keys())
+                        chosen_lang = random.choice(possible_langs)
+                        try:
+                            translated = translator.translate(flavor, dest=chosen_lang).text
+                            flavor_to_send = f"{translated} ({chosen_lang})"
+                        except Exception as e:
+                            print(f"🌐 Translation failed: {e}")
                             flavor_to_send = flavor
                     else:
                         flavor_to_send = flavor
@@ -1122,7 +1115,7 @@ async def grove_heartbeat(bot):
                     print(f"🌿 Mood drift for {guild.name} -> {new_mode}")
                     await apply_mode_change(guild, new_mode)
 
-        await asyncio.sleep(600)  # 10 min heartbeat loop
+        await asyncio.sleep(600)
 
 # ================= UTIL FUNCTION =================
 def style_text(guild_id, text):
@@ -1177,7 +1170,7 @@ async def apply_mode_change(guild, mode):
     guild_id = str(guild.id)
     now = datetime.now(timezone.utc)
 
-    previous_standard_mode_by_guild[guild_id] = guild_modes[guild_id]
+    previous_standard_mode_by_guild[guild_id] = guild_modes.get(guild_id, "dayform")
     guild_modes[guild_id] = mode
 
     if mode in GLITCHED_MODES or mode in SEASONAL_MODES:
@@ -1192,16 +1185,10 @@ async def apply_mode_change(guild, mode):
 # --- Build embed correctly ---
 
 def build_whisperling_embed(guild_id, title: str, description: str):
-    mode = guild_modes.get(str(guild_id), "dayform")
-    avatar_paths = {
-        "sunfracture": "avatars/sunfracture.png",
-        "yuleshard": "avatars/yuleshard.png",
-        "vernalglint": "avatars/vernalglint.png",
-        "fallveil": "avatars/fallveil.png",
-        "basic": "avatars/basic_whisperling.png"
-    }
-    avatar_key = mode if mode in SEASONAL_MODES else "basic"
-    avatar_path = avatar_paths.get(avatar_key)
+    mode = guild_modes.get(str(guild_id), "dayform")  # Pull mode cleanly
+
+    # Build path directly — because you *do* have every file
+    avatar_path = f"avatars/{mode}.png"
 
     embed = discord.Embed(
         title=title,
@@ -1209,23 +1196,29 @@ def build_whisperling_embed(guild_id, title: str, description: str):
         color=MODE_COLORS.get(mode, discord.Color.green())
     )
 
-    if avatar_path and os.path.exists(avatar_path):
+    if os.path.exists(avatar_path):
         file = discord.File(avatar_path, filename="avatar.png")
         embed.set_thumbnail(url="attachment://avatar.png")
         return embed, file
     else:
+        # Fallback only if file missing
         return embed, None
 
 async def announce_mode_change(guild, mode):
     embed, file = build_whisperling_embed(
-        guild.id,
+        str(guild.id),  # always cast to string for consistency
         f"✨ Whisperling shifts into {mode.title()}",
-        MODE_DESCRIPTIONS[mode]
+        MODE_DESCRIPTIONS.get(mode, "Whisperling gently shifts.")
     )
+
     channel = (
         guild.system_channel
         or next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
     )
+
+    if not channel:
+        print(f"⚠️ No writable channel found in {guild.name} for mode announcement.")
+        return
 
     if file:
         await channel.send(embed=embed, file=file)
