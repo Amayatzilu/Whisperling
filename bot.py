@@ -64,6 +64,7 @@ async def glitch_reversion_loop():
 
         for guild_id, timestamp in list(glitch_timestamps_by_guild.items()):
             mode = guild_modes[guild_id]
+            guild = bot.get_guild(int(guild_id))
 
             # Skip if not a glitched or seasonal form
             if mode not in GLITCHED_MODES + SEASONAL_MODES:
@@ -74,26 +75,20 @@ async def glitch_reversion_loop():
                 if timestamp and (now - timestamp > timedelta(minutes=30)):
                     previous = previous_standard_mode_by_guild[guild_id]
                     print(f"🍼 Flutterkin nap time for {guild_id}. Reverting to {previous}.")
-                    guild_modes[guild_id] = previous
-                    glitch_timestamps_by_guild[guild_id] = None
-                    await update_avatar_for_mode(previous)
+                    await apply_mode_change(guild, previous)
 
             # ⏳ Timed-out standard glitches
             elif mode in ["echovoid", "glitchspire", "crepusca"]:
                 if timestamp and (now - timestamp > timedelta(minutes=30)):
                     previous = previous_standard_mode_by_guild[guild_id]
                     print(f"⏳ Glitch expired for {guild_id}. Reverting to {previous}.")
-                    guild_modes[guild_id] = previous
-                    glitch_timestamps_by_guild[guild_id] = None
-                    await update_avatar_for_mode(previous)
+                    await apply_mode_change(guild, previous)
 
             # 🗓️ Seasonal forms no longer valid
             elif mode in SEASONAL_MODES and not is_current_season_mode(mode):
                 previous = previous_standard_mode_by_guild[guild_id]
                 print(f"⏳ {mode} expired for {guild_id}. Reverting to {previous}.")
-                guild_modes[guild_id] = previous
-                glitch_timestamps_by_guild[guild_id] = None
-                await update_avatar_for_mode(previous)
+                await apply_mode_change(guild, previous)
 
         await asyncio.sleep(60)
 
@@ -1064,35 +1059,42 @@ def get_flavor_text(mode: str) -> str:
         return ""
     return random.choice(flavor_options)
 
-# Heartbeat flavor drop loop
 async def grove_heartbeat(bot):
     await bot.wait_until_ready()
 
     while not bot.is_closed():
+        now = datetime.now(timezone.utc)
+
         for guild in bot.guilds:
             guild_id = str(guild.id)
+            mode = guild_modes.get(guild_id, "dayform")
             activity_level = get_activity_level(guild_id)
 
-            # Threshold for cozy activity
+            # 🍵 1️⃣ Flavor drops
             if activity_level >= 30 and random.random() < 0.20:
-                mode = guild_modes[guild_id]
                 flavor = get_flavor_text(mode)
 
-                # First, try to send into most recently active channel
-                channel_id = last_active_channel_by_guild.get(guild_id)
-                channel = guild.get_channel(int(channel_id)) if channel_id else None
-
-                # If no recent channel found, fall back safely
-                if not channel:
-                    channel = (
-                        guild.system_channel 
-                        or next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
-                    )
+                channel = (
+                    guild.system_channel
+                    or next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
+                )
 
                 if channel and flavor:
                     await channel.send(flavor)
 
-        await asyncio.sleep(600)  # Check every 10 minutes
+            # 🌿 2️⃣ Mood drift check
+            if mode in STANDARD_MODES:
+                last_seen = last_interaction_by_guild.get(guild_id, now)
+                days_idle = (now - last_seen).days
+
+                if days_idle >= 30 and random.random() < 0.25:
+                    possible_modes = [m for m in STANDARD_MODES if m != mode]
+                    new_mode = random.choice(possible_modes)
+
+                    print(f"🌿 Mood drift for {guild.name} -> {new_mode}")
+                    await apply_mode_change(guild, new_mode)
+
+        await asyncio.sleep(600)  # Still checking every 10 minutes
 
 # ================= UTIL FUNCTION =================
 def style_text(guild_id, text):
@@ -1137,6 +1139,54 @@ async def update_avatar_for_mode(mode: str):
                 print(f"❗ Failed to update avatar: {e}")
     else:
         print(f"⚠️ No avatar found for mode: {avatar_key}")
+
+async def apply_mode_change(guild, mode):
+    guild_id = str(guild.id)
+    now = datetime.now(timezone.utc)
+
+    previous_standard_mode_by_guild[guild_id] = guild_modes[guild_id]
+    guild_modes[guild_id] = mode
+
+    if mode in GLITCHED_MODES or mode in SEASONAL_MODES:
+        glitch_timestamps_by_guild[guild_id] = now
+    else:
+        glitch_timestamps_by_guild[guild_id] = None
+
+    last_interaction_by_guild[guild_id] = now
+
+    await apply_mode_change(guild, mode)
+    await announce_mmode_change(guild, mode)
+
+def build_whisperling_embed(guild_id, title: str, description: str):
+    mode = guild_modes.get(str(guild_id), "dayform")
+    avatar_path = f"avatars/{mode}.png"
+    
+    embed = discord.Embed(
+        title=title,
+        description=description,
+        color=MODE_COLORS.get(mode, discord.Color.green())
+    )
+    
+    # Add avatar as thumbnail if file exists
+    if os.path.exists(avatar_path):
+        file = discord.File(avatar_path, filename="avatar.png")
+        embed.set_thumbnail(url="attachment://avatar.png")
+        return embed, file
+    else:
+        return embed, None
+
+async def announce_mode_change(guild, mode):
+    embed, file = build_whisperling_embed(
+        guild.id,
+        f"✨ Whisperling shifts into {mode.title()}",
+        MODE_DESCRIPTIONS[mode]
+    )
+    channel = guild.system_channel or first_writable_channel()
+    
+    if file:
+        await channel.send(embed=embed, file=file)
+    else:
+        await channel.send(embed=embed)
 
 # ================= ACTIVITY TRACKER =================
 
@@ -1330,53 +1380,39 @@ async def setmode(ctx, mode: str):
         previous_standard_mode_by_guild[guild_id] = guild_modes[guild_id]
         guild_modes[guild_id] = chosen
         last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
-        await update_avatar_for_mode(chosen)
-
-        description = MODE_DESCRIPTIONS.get(chosen, "A new form awakens...")
-        await ctx.send(
-            f"🎲 Whisperling closed her eyes and chose...\n**{chosen}**!\n{description}"
-        )
+        await apply_mode_change(guild, mode)
+        await ctx.send(f"🎲 Whisperling closed her eyes and chose **{chosen}**!")
         return
 
-    if mode in GLITCHED_MODES:
-        await ctx.send(
-            "❗ Glitched forms are unstable and cannot be chosen directly. They appear on their own..."
-        )
+    if mode in GLITCHED_MODES + SEASONAL_MODES:
+        await ctx.send("❗ This form cannot be chosen directly. It arrives only when the Grove wills it...")
         return
 
     if mode not in STANDARD_MODES:
         valid = ", ".join(STANDARD_MODES + ["random"])
-        await ctx.send(
-            f"❗ Unknown form. Choose from: {valid}"
-        )
+        await ctx.send(f"❗ Unknown form. Choose from: {valid}")
         return
 
     previous_standard_mode_by_guild[guild_id] = guild_modes[guild_id]
     guild_modes[guild_id] = mode
     last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
-    await update_avatar_for_mode(mode)
-
-    description = MODE_DESCRIPTIONS.get(mode, "A new form awakens...")
-    await ctx.send(
-        f"🧚 Whisperling now shifts into **{mode}**\n{description}"
-    )
+    await apply_mode_change(guild, mode)
+    await ctx.send(f"🧚 Whisperling now shifts into **{mode}**!")
 
 @bot.command(aliases=["stimmungsprüfung", "humeure", "estadodeanimo"])
 async def moodcheck(ctx):
     guild_id = str(ctx.guild.id)
     mode = guild_modes.get(guild_id, "dayform")
-    color = MODE_COLORS.get(mode, discord.Color.green())
     description = MODE_DESCRIPTIONS.get(mode, "A gentle presence stirs in the grove...")
     footer = MODE_FOOTERS.get(mode, "")
 
-    embed = discord.Embed(
-        title=f"🌿 Whisperling’s Current Mood: **{mode}**",
-        description=description,
-        color=color
-    )
+    embed, file = build_whisperling_embed(guild_id, f"🌿 Whisperling’s Current Mood: **{mode}**", description)
     embed.set_footer(text=footer)
 
-    await ctx.send(embed=embed)
+    if file:
+        await ctx.send(embed=embed, file=file)
+    else:
+        await ctx.send(embed=embed)
 
 @bot.command(aliases=["sprachenvorladen", "prélangues", "precargaridiomas"])
 @commands.has_permissions(administrator=True)
@@ -1759,6 +1795,133 @@ async def startwelcome(ctx, member: discord.Member):
     await send_language_selector(member, channel, lang_map, guild_config)
     await ctx.send(f"🌿 Manually started the welcome flow for {member.mention}.")
 
+async def softly_remove_member(member, action="kick", interaction=None):
+    guild = member.guild
+    guild_id = str(guild.id)
+    mode = guild_modes.get(guild_id, "dayform")
+
+    mode_messages = {
+        "dayform": {
+            "kick": f":sunny: You have been removed from **{guild.name}**. Get some tea, and take your crackers elsewhere.",
+            "ban": f":sunny: You have been permanently removed from **{guild.name}**. The Grove will not open to you again."
+        },
+        "nightform": {
+            "kick": f":crescent_moon: The night whispers you away from **{guild.name}**.",
+            "ban": f":crescent_moon: The stars forget your name. You are sealed away from **{guild.name}**."
+        },
+        "cosmosform": {
+            "kick": f":milky_way: You’ve drifted too far from **{guild.name}**.",
+            "ban": f":milky_way: You are lost beyond the furthest stars. **{guild.name}** will not call you back."
+        },
+        "seaform": {
+            "kick": f":ocean: You’ve been swept from **{guild.name}** to calmer tides.",
+            "ban": f":ocean: The depths close. **{guild.name}** will not see you resurface."
+        },
+        "hadesform": {
+            "kick": f":fire: You have been *politely yeeted* from **{guild.name}**.",
+            "ban": f":fire: The flames consume your path. **{guild.name}** is no longer yours to enter."
+        },
+        "forestform": {
+            "kick": f":leaves: The Grove gently closes its branches around **{guild.name}**.",
+            "ban": f":leaves: The roots reject you fully. You shall not return to **{guild.name}**."
+        },
+        "auroraform": {
+            "kick": f":snowflake: Your light fades softly from **{guild.name}**.",
+            "ban": f":snowflake: The aurora no longer glows for you. You are frozen outside **{guild.name}**."
+        },
+        "vernalglint": {
+            "kick": f":cherry_blossom: Shoo shoo! You’ve been brushed from **{guild.name}**.",
+            "ban": f":cherry_blossom: Spring blooms without you. **{guild.name}** will not open its petals again."
+        },
+        "fallveil": {
+            "kick": f":maple_leaf: You are gently sent away from **{guild.name}** to rest elsewhere.",
+            "ban": f":maple_leaf: The veil falls completely. **{guild.name}** will not reopen its warmth to you."
+        },
+        "sunfracture": {
+            "kick": f":high_brightness: You’ve fractured from **{guild.name}**.",
+            "ban": f":high_brightness: The Grove's light shatters and seals behind you. **{guild.name}** is closed."
+        },
+        "yuleshard": {
+            "kick": f":snowflake: You are frozen out of **{guild.name}**.",
+            "ban": f":snowflake: The crystalline breath seals you entirely. No thaw awaits you in **{guild.name}**."
+        },
+        "echovoid": {
+            "kick": f":hole: You vanish quietly from **{guild.name}**.",
+            "ban": f":hole: Even the echoes release you. **{guild.name}** forgets your shape entirely."
+        },
+        "glitchspire": {
+            "kick": f":dna: Your fragment was rejected from **{guild.name}**.",
+            "ban": f":dna: Your data is corrupted and purged. You are locked from **{guild.name}**."
+        },
+        "crepusca": {
+            "kick": f":dizzy: You fade quietly from **{guild.name}** into dusk.",
+            "ban": f":dizzy: The dusk seals behind you. The Grove no longer dreams of you in **{guild.name}**."
+        },
+        "flutterkin": {
+            "kick": f":shushing_face: No more bouncy time in **{guild.name}** — bye bye now!",
+            "ban": f":shushing_face: All the giggles stop. You can't come back to play in **{guild.name}**."
+        }
+    }
+
+    public_messages = {
+        "dayform": f"☀️ {member.mention} has been escorted gently from the Grove.",
+        "nightform": f"🌙 A hush falls. {member.mention} is no longer among us.",
+        "cosmosform": f"🌌 {member.mention} drifts into the distant void.",
+        "seaform": f"🌊 {member.mention} has been swept beyond the Grove's tides.",
+        "hadesform": f"🔥 The embers flash — {member.mention} is gone.",
+        "forestform": f"🍃 The Grove closes around {member.mention}.",
+        "auroraform": f"❄️ The lights dim for {member.mention}.",
+        "vernalglint": f"🌸 {member.mention} has been shooed away from the Grove.",
+        "fallveil": f"🍁 {member.mention} now rests far beyond the Grove's reach.",
+        "sunfracture": f"🔆 {member.mention} fractures from the Grove.",
+        "yuleshard": f"❄️ {member.mention} is frozen out of the Grove entirely.",
+        "echovoid": f"🕳️ The echoes fade as {member.mention} vanishes.",
+        "glitchspire": f"🧬 The code purges {member.mention} from existence.",
+        "crepusca": f"💫 {member.mention} dissolves into the dreaming dusk.",
+        "flutterkin": f"🤫 No more bouncy play for {member.mention} — bye bye~",
+    }
+
+    try:
+        if action == "ban":
+            await guild.ban(member, reason="Whisperling’s grove remains peaceful.")
+        else:
+            await guild.kick(member, reason="Whisperling’s grove remains peaceful.")
+
+        # Send DM
+        try:
+            message = mode_messages.get(mode, {}).get(action, f"🍃 You have been removed from **{guild.name}**.")
+            await member.send(message)
+        except discord.Forbidden:
+            print(f"DM failed for {member}.")
+
+        # Public announcement (optional)
+        if interaction:
+            public_notice = public_messages.get(mode, f"🍃 {member.mention} has been removed.")
+            await interaction.channel.send(public_notice)
+
+    except discord.Forbidden:
+        print(f"❗ Whisperling lacked permission to remove {member}.")
+
+@tree.command(
+    name="kick",
+    description="Politely remove someone from the grove.",
+    default_permissions=discord.Permissions(kick_members=True)
+)
+@app_commands.describe(member="The member to kick")
+async def kick(interaction: discord.Interaction, member: discord.Member):
+    await softly_remove_member(member, action="kick", interaction=interaction)
+    await interaction.response.send_message(f"🪶 {member.mention} has been politely shown the door.")
+
+@tree.command(
+    name="ban",
+    description="Permanently remove someone from the grove.",
+    default_permissions=discord.Permissions(ban_members=True)
+)
+@app_commands.describe(member="The member to ban")
+async def ban(interaction: discord.Interaction, member: discord.Member):
+    await softly_remove_member(member, action="ban", interaction=interaction)
+    await interaction.response.send_message(f"🪶 {member.mention} has been permanently banished from the grove.")
+
 # ========== FLOW HELPERS ==========
 
 async def send_language_selector(member, channel, lang_map, guild_config):
@@ -2046,7 +2209,6 @@ async def send_final_welcome(member, channel, lang_code, lang_map):
     guild_id = str(member.guild.id)
     user_id = str(member.id)
     mode = guild_modes.get(guild_id, "dayform")
-    embed_color = MODE_COLORS.get(mode, discord.Color.green())
 
     # ✨ Get translated mode-specific title
     welcome_title = get_translated_mode_text(guild_id, user_id, mode, "welcome_title")
@@ -2056,24 +2218,28 @@ async def send_final_welcome(member, channel, lang_code, lang_map):
     if admin_welcome:
         welcome_desc = admin_welcome.replace("{user}", member.mention)
     else:
-        # 🧚 Fallback to translated mode-specific welcome
         raw_welcome_desc = get_translated_mode_text(
             guild_id, user_id, mode, "welcome_desc", fallback="Welcome, {user}!", user=member.mention
         )
         welcome_desc = raw_welcome_desc
 
-    embed = discord.Embed(
-        title=welcome_title,
-        description=welcome_desc,
-        color=embed_color
-    )
-    await channel.send(embed=embed)
+    # Build embed using your embed engine
+    embed, file = build_whisperling_embed(guild_id, welcome_title, welcome_desc)
+
+    if file:
+        await channel.send(embed=embed, file=file)
+    else:
+        await channel.send(embed=embed)
 
 # ========== FLUTTERKIN ==========
 
 flutterkin_last_triggered = {}  # guild_id -> datetime
 
-@bot.command(aliases=["babywish", "sparkleshift", "fluttertime", "snacktime", "glitterpuff", "bloop", "peekaboo", "glitzerfee", "petitpapillon", "chispa", "nibnib", "piccolina", "snugglezap", "twinkleflit" "pünktchen", "shirokuma", "cocotín", "cucciolotta", "snuzzlepuff", "sparkleboop", "miniblossom"])
+@bot.command(aliases=[
+    "babywish", "sparkleshift", "fluttertime", "snacktime", "glitterpuff", "bloop", "peekaboo",
+    "glitzerfee", "petitpapillon", "chispa", "nibnib", "piccolina", "snugglezap", "twinkleflit",
+    "pünktchen", "shirokuma", "cocotín", "cucciolotta", "snuzzlepuff", "sparkleboop", "miniblossom"
+])
 async def whisper(ctx):
     guild_id = str(ctx.guild.id)
     user_id = str(ctx.author.id)
@@ -2103,9 +2269,14 @@ async def whisper(ctx):
     flutterkin_last_triggered[guild_id] = now
     last_interaction_by_guild[guild_id] = now
 
-    # 🌼 Sparkly intro message
+    # 🌼 Sparkly intro message (now with embed!!)
     intro = get_translated_mode_text(guild_id, user_id, "flutterkin", "language_confirm_desc", user=ctx.author.mention)
-    await ctx.send(style_text(guild_id, intro))
+    embed, file = build_whisperling_embed(guild_id, "✨ Bouncy Bloom Activated!", intro)
+
+    if file:
+        await ctx.send(embed=embed, file=file)
+    else:
+        await ctx.send(embed=embed)
 
     # 🗨️ If used on a reply, do translation!
     if ctx.message.reference:
@@ -2139,11 +2310,7 @@ async def help(interaction: discord.Interaction):
     current_mode = guild_modes.get(guild_id, "dayform")
 
     if maybe_glitch and current_mode in STANDARD_MODES:
-        previous_standard_mode_by_guild[guild_id] = current_mode
-        guild_modes[guild_id] = maybe_glitch
-        glitch_timestamps_by_guild[guild_id] = datetime.now(timezone.utc)
-        await update_avatar_for_mode(maybe_glitch)
-        current_mode = maybe_glitch
+        await apply_mode_change(guild, maybe_glitch)
 
     # 🕰️ Update interaction timestamp
     last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
@@ -2224,15 +2391,12 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
             pass
         return
 
-    # ✨ Optional glitch trigger
+    # 🌒 Handle potential glitch trigger
     maybe_glitch = maybe_trigger_glitch(guild_id)
     current_mode = guild_modes.get(guild_id, "dayform")
+
     if maybe_glitch and current_mode in STANDARD_MODES:
-        previous_standard_mode_by_guild[guild_id] = current_mode
-        guild_modes[guild_id] = maybe_glitch
-        glitch_timestamps_by_guild[guild_id] = datetime.now(timezone.utc)
-        await update_avatar_for_mode(maybe_glitch)
-        current_mode = maybe_glitch
+        await apply_mode_change(guild, maybe_glitch)
 
     last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
 
@@ -2293,15 +2457,12 @@ async def translate(ctx):
         await ctx.send("🕊️ You haven’t chosen a language yet, gentle one.", delete_after=10)
         return
 
-    # 🌒 Trigger potential glitch form
+    # 🌒 Handle potential glitch trigger
     maybe_glitch = maybe_trigger_glitch(guild_id)
-    current_mode = guild_modes[guild_id]
+    current_mode = guild_modes.get(guild_id, "dayform")
 
     if maybe_glitch and current_mode in STANDARD_MODES:
-        previous_standard_mode_by_guild[guild_id] = current_mode
-        guild_modes[guild_id] = maybe_glitch
-        glitch_timestamps_by_guild[guild_id] = datetime.now(timezone.utc)
-        await update_avatar_for_mode(maybe_glitch)
+        await apply_mode_change(guild, maybe_glitch)
 
     # Update last interaction
     last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
@@ -2334,16 +2495,12 @@ async def chooselanguage(ctx):
     member = ctx.author
     guild_config = all_languages["guilds"].get(guild_id)
 
-    # 🌒 Trigger potential glitch form
+    # 🌒 Handle potential glitch trigger
     maybe_glitch = maybe_trigger_glitch(guild_id)
     current_mode = guild_modes.get(guild_id, "dayform")
 
     if maybe_glitch and current_mode in STANDARD_MODES:
-        previous_standard_mode_by_guild[guild_id] = current_mode
-        guild_modes[guild_id] = maybe_glitch
-        glitch_timestamps_by_guild[guild_id] = datetime.now(timezone.utc)
-        await update_avatar_for_mode(maybe_glitch)
-        current_mode = maybe_glitch
+        await apply_mode_change(guild, maybe_glitch)
 
     # 🌿 Update last interaction timestamp
     last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
