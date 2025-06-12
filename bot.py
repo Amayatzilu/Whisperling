@@ -1052,12 +1052,6 @@ FLAVOR_TEXTS = {
 }
 
 
-def get_flavor_text(mode: str) -> str:
-    flavor_options = FLAVOR_TEXTS.get(mode, [])
-    if not flavor_options:
-        return ""
-    return random.choice(flavor_options)
-
 async def grove_heartbeat(bot):
     await bot.wait_until_ready()
 
@@ -1070,9 +1064,9 @@ async def grove_heartbeat(bot):
             activity_level = get_activity_level(guild_id)
 
             # 🍵 Flavor drops with adjusted activity weighting
-            base_flavor_chance = 0.25
+            base_flavor_chance = 0.10
             weighted_chance = base_flavor_chance + (activity_level / 200)
-            flavor_chance = min(weighted_chance, 0.5)
+            flavor_chance = min(weighted_chance, 0.3)
 
             if random.random() < flavor_chance:
                 flavor = get_flavor_text(mode)
@@ -1082,20 +1076,22 @@ async def grove_heartbeat(bot):
                 )
 
                 if channel and flavor:
-                    lang_map = all_languages["guilds"].get(guild_id, {}).get("languages", {})
+                    guild_config = all_languages["guilds"].get(guild_id, {})
+                    lang_map = guild_config.get("languages", {})
 
                     # Translation chance increases as more languages exist
                     if lang_map:
                         num_langs = len(lang_map)
                         translate_chance = min(0.15 + (num_langs * 0.05), 0.5)  # Max 50% translation chance
-                        
+
                         if random.random() < translate_chance:
                             possible_langs = list(lang_map.keys())
                             chosen_lang = random.choice(possible_langs)
                             try:
                                 translated = translator.translate(flavor, dest=chosen_lang).text
-                                flavor_to_send = f"{translated} 🌐"
-                            except Exception:
+                                flavor_to_send = f"{translated} 🌐 ({chosen_lang})"
+                            except Exception as e:
+                                print(f"🌐 Translation failed: {e}")
                                 flavor_to_send = flavor
                         else:
                             flavor_to_send = flavor
@@ -1122,6 +1118,8 @@ def style_text(guild_id, text):
     mode = guild_modes[str(guild_id)]
     return MODE_TONE.get(mode, lambda t: t)(text)
 
+# --- (Season triggers — keep if still used!) ---
+
 def is_spring_equinox():
     today = datetime.now(timezone.utc)
     return today.month == 3 and 17 <= today.day <= 23
@@ -1138,6 +1136,8 @@ def is_winter_solstice():
     today = datetime.now(timezone.utc)
     return today.month == 12 and 18 <= today.day <= 24
 
+# --- Avatar updates ---
+
 async def update_avatar_for_mode(mode: str):
     avatar_paths = {
         "sunfracture": "avatars/sunfracture.png",
@@ -1147,7 +1147,6 @@ async def update_avatar_for_mode(mode: str):
         "basic": "avatars/basic_whisperling.png"
     }
 
-    # 👀 Use SEASONAL_MODES instead of hardcoded list
     avatar_key = mode if mode in SEASONAL_MODES else "basic"
     path = avatar_paths.get(avatar_key)
 
@@ -1160,6 +1159,8 @@ async def update_avatar_for_mode(mode: str):
                 print(f"❗ Failed to update avatar: {e}")
     else:
         print(f"⚠️ No avatar found for mode: {avatar_key}")
+
+# --- Apply mode change safely ---
 
 async def apply_mode_change(guild, mode):
     guild_id = str(guild.id)
@@ -1175,21 +1176,29 @@ async def apply_mode_change(guild, mode):
 
     last_interaction_by_guild[guild_id] = now
 
-    await apply_mode_change(guild, mode)
-    await announce_mmode_change(guild, mode)
+    await announce_mode_change(guild, mode)
+
+# --- Build embed correctly ---
 
 def build_whisperling_embed(guild_id, title: str, description: str):
     mode = guild_modes.get(str(guild_id), "dayform")
-    avatar_path = f"avatars/{mode}.png"
-    
+    avatar_paths = {
+        "sunfracture": "avatars/sunfracture.png",
+        "yuleshard": "avatars/yuleshard.png",
+        "vernalglint": "avatars/vernalglint.png",
+        "fallveil": "avatars/fallveil.png",
+        "basic": "avatars/basic_whisperling.png"
+    }
+    avatar_key = mode if mode in SEASONAL_MODES else "basic"
+    avatar_path = avatar_paths.get(avatar_key)
+
     embed = discord.Embed(
         title=title,
         description=description,
         color=MODE_COLORS.get(mode, discord.Color.green())
     )
-    
-    # Add avatar as thumbnail if file exists
-    if os.path.exists(avatar_path):
+
+    if avatar_path and os.path.exists(avatar_path):
         file = discord.File(avatar_path, filename="avatar.png")
         embed.set_thumbnail(url="attachment://avatar.png")
         return embed, file
@@ -1202,15 +1211,17 @@ async def announce_mode_change(guild, mode):
         f"✨ Whisperling shifts into {mode.title()}",
         MODE_DESCRIPTIONS[mode]
     )
-    channel = guild.system_channel or first_writable_channel()
-    
+    channel = (
+        guild.system_channel
+        or next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
+    )
+
     if file:
         await channel.send(embed=embed, file=file)
     else:
         await channel.send(embed=embed)
 
 # ================= ACTIVITY TRACKER =================
-
 
 # Core activity storage
 activity_score_by_guild = defaultdict(int)
@@ -1387,6 +1398,15 @@ async def adminhelp(interaction: discord.Interaction):
         inline=False
     )
 
+    embed.add_field(
+        name="🚪 Moderation Commands",
+        value=(
+            "`/kick @member` – Politely remove someone from the grove.\n"
+            "`/ban @member` – Permanently banish someone from the grove."
+        ),
+        inline=False
+    )
+
     embed.set_footer(text=footer)
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -1394,14 +1414,15 @@ async def adminhelp(interaction: discord.Interaction):
 @commands.has_permissions(administrator=True)
 async def setmode(ctx, mode: str):
     mode = mode.lower()
-    guild_id = str(ctx.guild.id)
+    guild = ctx.guild
+    guild_id = str(guild.id)
 
     if mode == "random":
         chosen = random.choice(STANDARD_MODES)
         previous_standard_mode_by_guild[guild_id] = guild_modes[guild_id]
         guild_modes[guild_id] = chosen
         last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
-        await apply_mode_change(guild, mode)
+        await apply_mode_change(guild, chosen)
         await ctx.send(f"🎲 Whisperling closed her eyes and chose **{chosen}**!")
         return
 
@@ -1419,6 +1440,8 @@ async def setmode(ctx, mode: str):
     last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
     await apply_mode_change(guild, mode)
     await ctx.send(f"🧚 Whisperling now shifts into **{mode}**!")
+
+# =========================
 
 @bot.command(aliases=["stimmungsprüfung", "humeure", "estadodeanimo"])
 async def moodcheck(ctx):
@@ -1440,9 +1463,11 @@ async def moodcheck(ctx):
 async def preloadlanguages(ctx):
     guild_id = str(ctx.guild.id)
 
+    # Make sure guild config exists
     if guild_id not in all_languages["guilds"]:
         all_languages["guilds"][guild_id] = {}
 
+    # Create 'languages' if missing
     all_languages["guilds"][guild_id]["languages"] = {
         "en": {"name": "English", "welcome": "Welcome, {user}!"},
         "de": {"name": "Deutsch", "welcome": "Willkommen, {user}!"},
@@ -1450,17 +1475,22 @@ async def preloadlanguages(ctx):
         "fr": {"name": "Français", "welcome": "Bienvenue, {user}!"}
     }
 
+    # Also make sure 'users' exists (for smoother translation system later)
+    if "users" not in all_languages["guilds"][guild_id]:
+        all_languages["guilds"][guild_id]["users"] = {}
+
     save_languages()
 
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+    footer = MODE_FOOTERS.get(mode, "Whisperling tends the grove 🌱")
 
     embed = discord.Embed(
         title="🦋 Languages Preloaded",
         description="English, German, Spanish, and French have been added for your grove.",
         color=embed_color
     )
-    embed.set_footer(text=MODE_FOOTERS.get(mode, ""))
+    embed.set_footer(text=footer)
 
     await ctx.send(embed=embed)
 
@@ -1469,16 +1499,22 @@ async def preloadlanguages(ctx):
 async def setwelcomechannel(ctx, channel: discord.TextChannel):
     guild_id = str(ctx.guild.id)
 
+    # Make sure guild config exists
     if guild_id not in all_languages["guilds"]:
         all_languages["guilds"][guild_id] = {}
+
+    # Safeguard nested structures
+    if "languages" not in all_languages["guilds"][guild_id]:
+        all_languages["guilds"][guild_id]["languages"] = {}
+    if "users" not in all_languages["guilds"][guild_id]:
+        all_languages["guilds"][guild_id]["users"] = {}
 
     all_languages["guilds"][guild_id]["welcome_channel_id"] = channel.id
     save_languages()
 
-    # 🌿 Mood styling
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
-    footer = MODE_FOOTERS.get(mode, "")
+    footer = MODE_FOOTERS.get(mode, "Whisperling tends the grove 🌱")
 
     embed = discord.Embed(
         title="🕊️ Whisper Channel Chosen",
@@ -1499,6 +1535,8 @@ async def addlanguage(ctx, code: str, *, name: str):
 
     if "languages" not in all_languages["guilds"][guild_id]:
         all_languages["guilds"][guild_id]["languages"] = {}
+    if "users" not in all_languages["guilds"][guild_id]:
+        all_languages["guilds"][guild_id]["users"] = {}
 
     languages = all_languages["guilds"][guild_id]["languages"]
 
@@ -1514,13 +1552,18 @@ async def addlanguage(ctx, code: str, *, name: str):
     save_languages()
     await ctx.send(f"🦋 Added language: `{name}` with code `{code}`.")
 
+
 @bot.command(aliases=["sprachentfernen", "supprimerlangue", "eliminaridioma"])
 @commands.has_permissions(administrator=True)
 async def removelanguage(ctx, code: str):
     guild_id = str(ctx.guild.id)
     guild_config = all_languages["guilds"].get(guild_id)
-    
-    if not guild_config or "languages" not in guild_config or code not in guild_config["languages"]:
+
+    if not guild_config:
+        await ctx.send(f"❗ No languages found for this server.")
+        return
+
+    if "languages" not in guild_config or code not in guild_config["languages"]:
         await ctx.send(f"❗ Language `{code}` not found for this server.")
         return
 
@@ -1529,12 +1572,14 @@ async def removelanguage(ctx, code: str):
 
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+    footer = MODE_FOOTERS.get(mode, "Whisperling watches over the grove 🌿")
 
     embed = discord.Embed(
         title="🗑️ Language Removed",
         description=f"The language with code `{code}` has been successfully removed.",
         color=embed_color
     )
+    embed.set_footer(text=footer)
 
     await ctx.send(embed=embed)
 
@@ -1544,9 +1589,18 @@ async def assignlanguage(ctx, member: discord.Member, lang_code: str):
     guild_id = str(ctx.guild.id)
     user_id = str(member.id)
 
-    # Check if the guild has languages configured
-    guild_config = all_languages["guilds"].get(guild_id, {})
-    lang_map = guild_config.get("languages", {})
+    # Defensive: Ensure full guild structure always exists
+    if guild_id not in all_languages["guilds"]:
+        all_languages["guilds"][guild_id] = {"languages": {}, "users": {}}
+
+    guild_config = all_languages["guilds"][guild_id]
+
+    if "languages" not in guild_config:
+        guild_config["languages"] = {}
+    if "users" not in guild_config:
+        guild_config["users"] = {}
+
+    lang_map = guild_config["languages"]
 
     if not lang_map:
         return await ctx.send("❗ This server has no languages configured yet.")
@@ -1555,16 +1609,14 @@ async def assignlanguage(ctx, member: discord.Member, lang_code: str):
         available = ", ".join(lang_map.keys())
         return await ctx.send(f"❗ Invalid language code. Available codes: `{available}`")
 
-    if "users" not in guild_config:
-        guild_config["users"] = {}
-
+    # Actually assign language
     guild_config["users"][user_id] = lang_code
     save_languages()
 
-    # 🌿 Theming and response
+    # 🌿 Mood-flavored embed
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.green())
-    footer = MODE_FOOTERS.get(mode, "")
+    footer = MODE_FOOTERS.get(mode, "Whisperling watches over the grove 🌿")
 
     lang_name = lang_map[lang_code].get("name", lang_code)
     embed = discord.Embed(
@@ -1572,8 +1624,7 @@ async def assignlanguage(ctx, member: discord.Member, lang_code: str):
         description=f"{member.mention}'s language has been set to **{lang_name}**.",
         color=embed_color
     )
-    if footer:
-        embed.set_footer(text=footer)
+    embed.set_footer(text=footer)
 
     await ctx.send(embed=embed)
 
@@ -1581,15 +1632,21 @@ async def assignlanguage(ctx, member: discord.Member, lang_code: str):
 @commands.has_permissions(administrator=True)
 async def setwelcome(ctx, code: str, *, message: str):
     guild_id = str(ctx.guild.id)
-    guild_config = all_languages["guilds"].get(guild_id)
-    if not guild_config or "languages" not in guild_config or code not in guild_config["languages"]:
+
+    # Ensure full guild structure exists
+    if guild_id not in all_languages["guilds"]:
+        all_languages["guilds"][guild_id] = {"languages": {}, "users": {}}
+
+    guild_config = all_languages["guilds"][guild_id]
+    languages = guild_config.get("languages", {})
+
+    if code not in languages:
         await ctx.send(f"❗ Language `{code}` is not set up for this server.")
         return
 
-    all_languages["guilds"][guild_id]["languages"][code]["welcome"] = message
+    languages[code]["welcome"] = message
     save_languages()
 
-    # 🌸 Mood styling
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
     footer = MODE_FOOTERS.get(mode, "")
@@ -1609,23 +1666,25 @@ async def setrules(ctx, lang_code: str, *, rules: str):
     guild_id = str(ctx.guild.id)
 
     if guild_id not in all_languages["guilds"]:
-        all_languages["guilds"][guild_id] = {}
+        all_languages["guilds"][guild_id] = {"languages": {}, "rules": {}, "users": {}}
 
-    # 🌿 Initialize rules structure if not present
     if "rules" not in all_languages["guilds"][guild_id]:
         all_languages["guilds"][guild_id]["rules"] = {}
 
     all_languages["guilds"][guild_id]["rules"][lang_code] = rules
     save_languages()
 
-    # 🌿 Themed embed confirmation
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.green())
+    footer = MODE_FOOTERS.get(mode, "")
+
     embed = discord.Embed(
         title="📜 Grove Rules Updated",
         description=f"The rules for `{lang_code}` have been etched into the grove’s stones.",
         color=embed_color
     )
+    embed.set_footer(text=footer)
+
     await ctx.send(embed=embed)
 
 @bot.command(aliases=["rollehinzufügen", "ajouterrôle", "agregarrol"])
@@ -1633,29 +1692,28 @@ async def setrules(ctx, lang_code: str, *, rules: str):
 async def addroleoption(ctx, role: discord.Role, emoji: str, *, label: str):
     guild_id = str(ctx.guild.id)
 
+    # Ensure proper structure exists
     if guild_id not in all_languages["guilds"]:
-        all_languages["guilds"][guild_id] = {}
+        all_languages["guilds"][guild_id] = {"languages": {}, "role_options": {}, "users": {}}
 
-    if "role_options" not in all_languages["guilds"][guild_id]:
-        all_languages["guilds"][guild_id]["role_options"] = {}
-
-    all_languages["guilds"][guild_id]["role_options"][str(role.id)] = {
-        "emoji": emoji,
-        "label": label
-    }
+    role_options = all_languages["guilds"][guild_id].setdefault("role_options", {})
+    role_options[str(role.id)] = {"emoji": emoji, "label": label}
 
     save_languages()
 
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+    footer = MODE_FOOTERS.get(mode, "")
 
     embed = discord.Embed(
         title="🌸 Role Added",
         description=f"Role `{label}` with emoji {emoji} is now selectable by newcomers.",
         color=embed_color
     )
+    embed.set_footer(text=footer)
 
     await ctx.send(embed=embed)
+
 
 @bot.command(aliases=["rollentfernen", "supprimerrôle", "eliminarrol"])
 @commands.has_permissions(administrator=True)
@@ -1667,19 +1725,22 @@ async def removeroleoption(ctx, role: discord.Role):
         await ctx.send("❗ That role is not in the current selection list.")
         return
 
-    del all_languages["guilds"][guild_id]["role_options"][str(role.id)]
+    del role_options[str(role.id)]
     save_languages()
 
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+    footer = MODE_FOOTERS.get(mode, "")
 
     embed = discord.Embed(
         title="🗑️ Role Removed",
         description=f"Role `{role.name}` has been removed from the selection list.",
         color=embed_color
     )
+    embed.set_footer(text=footer)
 
     await ctx.send(embed=embed)
+
 
 @bot.command(aliases=["rollenliste", "listerôles", "listarroles"])
 @commands.has_permissions(administrator=True)
@@ -1693,12 +1754,14 @@ async def listroleoptions(ctx):
 
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
+    footer = MODE_FOOTERS.get(mode, "")
 
     embed = discord.Embed(
         title="🌸 Selectable Roles",
         description="These are the roles members can choose after joining:",
         color=embed_color
     )
+    embed.set_footer(text=footer)
 
     for role_id, data in role_options.items():
         role = ctx.guild.get_role(int(role_id))
@@ -1711,13 +1774,26 @@ async def listroleoptions(ctx):
 @commands.has_permissions(administrator=True)
 async def addcosmetic(ctx, role: discord.Role, emoji: str, *, label: str):
     guild_id = str(ctx.guild.id)
-    config = all_languages["guilds"].setdefault(guild_id, {})
-    config.setdefault("cosmetic_role_options", {})[str(role.id)] = {
-        "emoji": emoji,
-        "label": label
-    }
+
+    config = all_languages["guilds"].setdefault(guild_id, {"languages": {}, "cosmetic_role_options": {}, "users": {}})
+    cosmetic_roles = config.setdefault("cosmetic_role_options", {})
+    cosmetic_roles[str(role.id)] = {"emoji": emoji, "label": label}
+
     save_languages()
-    await ctx.send(f"✨ Added cosmetic role `{label}` with emoji {emoji}.")
+
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.purple())
+    footer = MODE_FOOTERS.get(mode, "")
+
+    embed = discord.Embed(
+        title="✨ Cosmetic Role Added",
+        description=f"Role `{label}` with emoji {emoji} is now a sparkly option.",
+        color=embed_color
+    )
+    embed.set_footer(text=footer)
+
+    await ctx.send(embed=embed)
+
 
 @bot.command(aliases=["Kosmetikentfernen", "supprimerrolecosmetique", "eliminarrolcosmetico"])
 @commands.has_permissions(administrator=True)
@@ -1729,9 +1805,22 @@ async def removecosmetic(ctx, role: discord.Role):
         await ctx.send("❗ That cosmetic role is not currently configured.")
         return
 
-    del all_languages["guilds"][guild_id]["cosmetic_role_options"][str(role.id)]
+    del cosmetic_roles[str(role.id)]
     save_languages()
-    await ctx.send(f"🗑️ Removed cosmetic role `{role.name}`.")
+
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.purple())
+    footer = MODE_FOOTERS.get(mode, "")
+
+    embed = discord.Embed(
+        title="🗑️ Cosmetic Role Removed",
+        description=f"The role `{role.name}` has been removed from cosmetic options.",
+        color=embed_color
+    )
+    embed.set_footer(text=footer)
+
+    await ctx.send(embed=embed)
+
 
 @bot.command(aliases=["Kosmetikliste", "listerolescosmetiques", "listarrolescosmeticos"])
 @commands.has_permissions(administrator=True)
@@ -1743,11 +1832,16 @@ async def listcosmetics(ctx):
         await ctx.send("📭 No cosmetic roles are currently configured.")
         return
 
+    mode = guild_modes.get(guild_id, "dayform")
+    embed_color = MODE_COLORS.get(mode, discord.Color.purple())
+    footer = MODE_FOOTERS.get(mode, "")
+
     embed = discord.Embed(
         title="✨ Cosmetic Roles",
         description="These roles add flair without affecting permissions:",
-        color=discord.Color.purple()
+        color=embed_color
     )
+    embed.set_footer(text=footer)
 
     for role_id, data in cosmetic_roles.items():
         role = ctx.guild.get_role(int(role_id))
@@ -1773,14 +1867,14 @@ async def listlanguages(ctx):
 
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
-    footer_text = MODE_FOOTERS.get(mode, "🧚 Whisperling watches over the languages of the grove...")
+    footer = MODE_FOOTERS.get(mode, "")
 
     embed = discord.Embed(
         title="🌍 Configured Languages",
-        description="These are the currently available whispering tongues in this server:",
+        description="These are the whispering tongues your grove understands:",
         color=embed_color
     )
-    embed.set_footer(text=footer_text)
+    embed.set_footer(text=footer)
 
     for code, data in languages.items():
         name = data.get("name", f"Unknown ({code})")
@@ -1823,64 +1917,64 @@ async def softly_remove_member(member, action="kick", interaction=None):
 
     mode_messages = {
         "dayform": {
-            "kick": f":sunny: You have been removed from **{guild.name}**. Get some tea, and take your crackers elsewhere.",
-            "ban": f":sunny: You have been permanently removed from **{guild.name}**. The Grove will not open to you again."
+            "kick": f"☀️ You have been removed from **{guild.name}**. Get some tea, and take your crackers elsewhere.",
+            "ban": f"☀️ You have been permanently removed from **{guild.name}**. The Grove will not open to you again."
         },
         "nightform": {
-            "kick": f":crescent_moon: The night whispers you away from **{guild.name}**.",
-            "ban": f":crescent_moon: The stars forget your name. You are sealed away from **{guild.name}**."
+            "kick": f"🌙 The night whispers you away from **{guild.name}**.",
+            "ban": f"🌙 The stars forget your name. You are sealed away from **{guild.name}**."
         },
         "cosmosform": {
-            "kick": f":milky_way: You’ve drifted too far from **{guild.name}**.",
-            "ban": f":milky_way: You are lost beyond the furthest stars. **{guild.name}** will not call you back."
+            "kick": f"🌌 You’ve drifted too far from **{guild.name}**.",
+            "ban": f"🌌 You are lost beyond the furthest stars. **{guild.name}** will not call you back."
         },
         "seaform": {
-            "kick": f":ocean: You’ve been swept from **{guild.name}** to calmer tides.",
-            "ban": f":ocean: The depths close. **{guild.name}** will not see you resurface."
+            "kick": f"🌊 You’ve been swept from **{guild.name}** to calmer tides.",
+            "ban": f"🌊 The depths close. **{guild.name}** will not see you resurface."
         },
         "hadesform": {
-            "kick": f":fire: You have been *politely yeeted* from **{guild.name}**.",
-            "ban": f":fire: The flames consume your path. **{guild.name}** is no longer yours to enter."
+            "kick": f"🔥 You have been *politely yeeted* from **{guild.name}**.",
+            "ban": f"🔥 The flames consume your path. **{guild.name}** is no longer yours to enter."
         },
         "forestform": {
-            "kick": f":leaves: The Grove gently closes its branches around **{guild.name}**.",
-            "ban": f":leaves: The roots reject you fully. You shall not return to **{guild.name}**."
+            "kick": f"🍃 The Grove gently closes its branches around **{guild.name}**.",
+            "ban": f"🍃 The roots reject you fully. You shall not return to **{guild.name}**."
         },
         "auroraform": {
-            "kick": f":snowflake: Your light fades softly from **{guild.name}**.",
-            "ban": f":snowflake: The aurora no longer glows for you. You are frozen outside **{guild.name}**."
+            "kick": f"❄️ Your light fades softly from **{guild.name}**.",
+            "ban": f"❄️ The aurora no longer glows for you. You are frozen outside **{guild.name}**."
         },
         "vernalglint": {
-            "kick": f":cherry_blossom: Shoo shoo! You’ve been brushed from **{guild.name}**.",
-            "ban": f":cherry_blossom: Spring blooms without you. **{guild.name}** will not open its petals again."
+            "kick": f"🌸 Shoo shoo! You’ve been brushed from **{guild.name}**.",
+            "ban": f"🌸 Spring blooms without you. **{guild.name}** will not open its petals again."
         },
         "fallveil": {
-            "kick": f":maple_leaf: You are gently sent away from **{guild.name}** to rest elsewhere.",
-            "ban": f":maple_leaf: The veil falls completely. **{guild.name}** will not reopen its warmth to you."
+            "kick": f"🍁 You are gently sent away from **{guild.name}** to rest elsewhere.",
+            "ban": f"🍁 The veil falls completely. **{guild.name}** will not reopen its warmth to you."
         },
         "sunfracture": {
-            "kick": f":high_brightness: You’ve fractured from **{guild.name}**.",
-            "ban": f":high_brightness: The Grove's light shatters and seals behind you. **{guild.name}** is closed."
+            "kick": f"🔆 You’ve fractured from **{guild.name}**.",
+            "ban": f"🔆 The Grove's light shatters and seals behind you. **{guild.name}** is closed."
         },
         "yuleshard": {
-            "kick": f":snowflake: You are frozen out of **{guild.name}**.",
-            "ban": f":snowflake: The crystalline breath seals you entirely. No thaw awaits you in **{guild.name}**."
+            "kick": f"❄️ You are frozen out of **{guild.name}**.",
+            "ban": f"❄️ The crystalline breath seals you entirely. No thaw awaits you in **{guild.name}**."
         },
         "echovoid": {
-            "kick": f":hole: You vanish quietly from **{guild.name}**.",
-            "ban": f":hole: Even the echoes release you. **{guild.name}** forgets your shape entirely."
+            "kick": f"🕳️ You vanish quietly from **{guild.name}**.",
+            "ban": f"🕳️ Even the echoes release you. **{guild.name}** forgets your shape entirely."
         },
         "glitchspire": {
-            "kick": f":dna: Your fragment was rejected from **{guild.name}**.",
-            "ban": f":dna: Your data is corrupted and purged. You are locked from **{guild.name}**."
+            "kick": f"🧬 Your fragment was rejected from **{guild.name}**.",
+            "ban": f"🧬 Your data is corrupted and purged. You are locked from **{guild.name}**."
         },
         "crepusca": {
-            "kick": f":dizzy: You fade quietly from **{guild.name}** into dusk.",
-            "ban": f":dizzy: The dusk seals behind you. The Grove no longer dreams of you in **{guild.name}**."
+            "kick": f"💫 You fade quietly from **{guild.name}** into dusk.",
+            "ban": f"💫 The dusk seals behind you. The Grove no longer dreams of you in **{guild.name}**."
         },
         "flutterkin": {
-            "kick": f":shushing_face: No more bouncy time in **{guild.name}** — bye bye now!",
-            "ban": f":shushing_face: All the giggles stop. You can't come back to play in **{guild.name}**."
+            "kick": f"🤫 No more bouncy time in **{guild.name}** — bye bye now!",
+            "ban": f"🤫 All the giggles stop. You can't come back to play in **{guild.name}**."
         }
     }
 
@@ -1899,7 +1993,7 @@ async def softly_remove_member(member, action="kick", interaction=None):
         "echovoid": f"🕳️ The echoes fade as {member.mention} vanishes.",
         "glitchspire": f"🧬 The code purges {member.mention} from existence.",
         "crepusca": f"💫 {member.mention} dissolves into the dreaming dusk.",
-        "flutterkin": f"🤫 No more bouncy play for {member.mention} — bye bye~",
+        "flutterkin": f"🤫 No more bouncy play for {member.mention} — bye bye~"
     }
 
     try:
@@ -1908,14 +2002,14 @@ async def softly_remove_member(member, action="kick", interaction=None):
         else:
             await guild.kick(member, reason="Whisperling’s grove remains peaceful.")
 
-        # Send DM
+        # DM the user
         try:
             message = mode_messages.get(mode, {}).get(action, f"🍃 You have been removed from **{guild.name}**.")
             await member.send(message)
         except discord.Forbidden:
             print(f"DM failed for {member}.")
 
-        # Public announcement (optional)
+        # Public message (if slash interaction provided)
         if interaction:
             public_notice = public_messages.get(mode, f"🍃 {member.mention} has been removed.")
             await interaction.channel.send(public_notice)
@@ -1923,22 +2017,24 @@ async def softly_remove_member(member, action="kick", interaction=None):
     except discord.Forbidden:
         print(f"❗ Whisperling lacked permission to remove {member}.")
 
+# SLASH KICK
 @tree.command(
     name="kick",
-    description="Politely remove someone from the grove."
+    description="Politely remove someone from the grove.",
+    default_permissions=discord.Permissions(kick_members=True)
 )
 @app_commands.describe(member="The member to kick")
-@app_commands.default_permissions(kick_members=True)
 async def kick(interaction: discord.Interaction, member: discord.Member):
     await softly_remove_member(member, action="kick", interaction=interaction)
     await interaction.response.send_message(f"🪶 {member.mention} has been politely shown the door.")
 
+# SLASH BAN
 @tree.command(
     name="ban",
-    description="Permanently remove someone from the grove."
+    description="Permanently remove someone from the grove.",
+    default_permissions=discord.Permissions(ban_members=True)
 )
 @app_commands.describe(member="The member to ban")
-@app_commands.default_permissions(ban_members=True)
 async def ban(interaction: discord.Interaction, member: discord.Member):
     await softly_remove_member(member, action="ban", interaction=interaction)
     await interaction.response.send_message(f"🪶 {member.mention} has been permanently banished from the grove.")
@@ -1966,15 +2062,15 @@ async def send_language_selector(member, channel, lang_map, guild_config):
     class LanguageView(View):
         def __init__(self):
             super().__init__(timeout=60)
-            button_styles = [
-                discord.ButtonStyle.primary,
-                discord.ButtonStyle.success,
-                discord.ButtonStyle.secondary,
-            ]
-            for idx, (code, data) in enumerate(lang_map.items()):
-                style = button_styles[idx % len(button_styles)]
-                self.add_item(Button(label=data['name'], style=style, custom_id=code))
-            self.add_item(Button(label="❌ Cancel", style=discord.ButtonStyle.danger, custom_id="cancel"))
+
+            for code, data in lang_map.items():
+                button = Button(label=data['name'], style=discord.ButtonStyle.primary, custom_id=code)
+                button.callback = self.button_callback
+                self.add_item(button)
+
+            cancel_button = Button(label="❌ Cancel", style=discord.ButtonStyle.danger, custom_id="cancel")
+            cancel_button.callback = self.button_callback
+            self.add_item(cancel_button)
 
         async def interaction_check(self, interaction):
             return interaction.user.id == member.id
@@ -1987,47 +2083,42 @@ async def send_language_selector(member, channel, lang_map, guild_config):
                     user=member.mention
                 )
                 await channel.send(timeout_msg)
-            except:
-                pass
+            except Exception as e:
+                print(f"Timeout error: {e}")
 
-    async def button_callback(inter):
-        selected_code = inter.data['custom_id']
-        if selected_code == "cancel":
-            await inter.response.send_message("❌ Cancelled language selection.", ephemeral=True)
-            return
+        async def button_callback(self, interaction):
+            selected_code = interaction.data['custom_id']
+            if selected_code == "cancel":
+                await interaction.response.send_message("❌ Cancelled language selection.", ephemeral=True)
+                self.stop()
+                return
 
-        if selected_code not in lang_map:
-            return
+            if selected_code not in lang_map:
+                await interaction.response.send_message("❗ Invalid language code.", ephemeral=True)
+                return
 
-        if "users" not in guild_config:
-            guild_config["users"] = {}
-        guild_config["users"][user_id] = selected_code
-        save_languages()
+            if "users" not in guild_config:
+                guild_config["users"] = {}
+            guild_config["users"][user_id] = selected_code
+            save_languages()
 
-        view.stop()
+            self.stop()
 
-        # 🌸 Pull confirmation
-        confirm_title = get_translated_mode_text(guild_id, user_id, mode, "language_confirm_title", user=member.mention)
-        confirm_desc = get_translated_mode_text(guild_id, user_id, mode, "language_confirm_desc", user=member.mention)
+            confirm_title = get_translated_mode_text(guild_id, user_id, mode, "language_confirm_title", user=member.mention)
+            confirm_desc = get_translated_mode_text(guild_id, user_id, mode, "language_confirm_desc", user=member.mention)
 
-        confirm_embed = discord.Embed(title=confirm_title, description=confirm_desc, color=embed_color)
-        await channel.send(content=member.mention, embed=confirm_embed)
+            confirm_embed = discord.Embed(title=confirm_title, description=confirm_desc, color=embed_color)
+            await channel.send(content=member.mention, embed=confirm_embed)
 
-        await asyncio.sleep(2)
+            await asyncio.sleep(2)
 
-        # 🌿 Continue journey
-        if guild_config.get("rules"):
-            await send_rules_embed(member, channel, selected_code, lang_map, guild_config)
-        else:
-            await send_role_selector(member, channel, guild_config)
-            await send_cosmetic_selector(member, channel, guild_config)
+            if guild_config.get("rules"):
+                await send_rules_embed(member, channel, selected_code, lang_map, guild_config)
+            else:
+                await send_role_selector(member, channel, guild_config)
+                await send_cosmetic_selector(member, channel, guild_config)
 
-    # 🔘 Assign callbacks to each button
     view = LanguageView()
-    for item in view.children:
-        if isinstance(item, Button):
-            item.callback = button_callback
-
     embed = discord.Embed(title=intro_title, description=intro_desc, color=embed_color)
     await channel.send(content=member.mention, embed=embed, view=view)
 
@@ -2040,7 +2131,13 @@ async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
     class AcceptRulesView(View):
         def __init__(self):
             super().__init__(timeout=90)
-            self.add_item(Button(label="✅ I Accept the Rules", style=discord.ButtonStyle.success, custom_id="accept_rules"))
+            accept_button = Button(
+                label="✅ I Accept the Rules",
+                style=discord.ButtonStyle.success,
+                custom_id="accept_rules"
+            )
+            accept_button.callback = self.accept_callback
+            self.add_item(accept_button)
 
         async def interaction_check(self, interaction):
             return interaction.user.id == member.id
@@ -2053,26 +2150,27 @@ async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
                     user=member.mention
                 )
                 await channel.send(timeout_msg)
-            except:
-                pass
+            except Exception as e:
+                print(f"Timeout error on rules: {e}")
 
-    async def accept_callback(interaction):
-        confirm_title = get_translated_mode_text(guild_id, user_id, mode, "rules_confirm_title", user=member.mention)
-        confirm_desc = get_translated_mode_text(guild_id, user_id, mode, "rules_confirm_desc", user=member.mention)
+        async def accept_callback(self, interaction):
+            confirm_title = get_translated_mode_text(
+                guild_id, user_id, mode, "rules_confirm_title", user=member.mention
+            )
+            confirm_desc = get_translated_mode_text(
+                guild_id, user_id, mode, "rules_confirm_desc", user=member.mention
+            )
 
-        confirm_embed = discord.Embed(title=confirm_title, description=confirm_desc, color=embed_color)
-        await channel.send(content=member.mention, embed=confirm_embed)
+            confirm_embed = discord.Embed(title=confirm_title, description=confirm_desc, color=embed_color)
+            await channel.send(content=member.mention, embed=confirm_embed)
 
-        view.stop()  # ✅ Stop the timeout here on successful press
+            self.stop()
 
-        await asyncio.sleep(2)
-        await send_role_selector(member, channel, guild_config)
-        await send_cosmetic_selector(member, channel, guild_config)
+            await asyncio.sleep(2)
+            await send_role_selector(member, channel, guild_config)
+            await send_cosmetic_selector(member, channel, guild_config)
 
     view = AcceptRulesView()
-    for item in view.children:
-        if isinstance(item, Button):
-            item.callback = accept_callback
 
     embed = discord.Embed(
         title="📜 Grove Guidelines",
@@ -2096,7 +2194,14 @@ async def send_role_selector(member, channel, guild_config):
         def __init__(self):
             super().__init__(timeout=60)
             for role_id, data in role_options.items():
-                self.add_item(Button(label=data['label'], emoji=data['emoji'], custom_id=role_id))
+                role_button = Button(
+                    label=data['label'],
+                    emoji=data['emoji'],
+                    style=discord.ButtonStyle.primary,
+                    custom_id=role_id
+                )
+                role_button.callback = self.role_button_callback
+                self.add_item(role_button)
 
         async def interaction_check(self, interaction: discord.Interaction):
             return interaction.user.id == member.id
@@ -2112,39 +2217,36 @@ async def send_role_selector(member, channel, guild_config):
             except Exception as e:
                 print("⚠️ Timeout error (role selector):", e)
 
-    async def role_button_callback(interaction: discord.Interaction):
-        role_id = interaction.data['custom_id']
-        role = member.guild.get_role(int(role_id))
-        if role:
-            try:
-                await member.add_roles(role)
-                role_msg = get_translated_mode_text(
-                    guild_id, user_id, mode, "role_granted",
-                    role=role.name, user=member.mention
-                )
-                await interaction.response.send_message(role_msg, ephemeral=True)
+        async def role_button_callback(self, interaction: discord.Interaction):
+            role_id = interaction.data['custom_id']
+            role = member.guild.get_role(int(role_id))
+            if role:
+                try:
+                    await member.add_roles(role)
+                    role_msg = get_translated_mode_text(
+                        guild_id, user_id, mode, "role_granted",
+                        role=role.name, user=member.mention
+                    )
+                    await interaction.response.send_message(role_msg, ephemeral=True)
+                    self.stop()
 
-                # Stop the view after selection
-                view.stop()
+                    await asyncio.sleep(1)
+                    
+                    # 🌸 Trigger cosmetic selector after assigning role
+                    cosmetic_shown = await send_cosmetic_selector(member, channel, guild_config)
+                    if not cosmetic_shown:
+                        lang_code = all_languages["guilds"][guild_id]["users"].get(user_id, "en")
+                        lang_map = all_languages["guilds"][guild_id]["languages"]
+                        await send_final_welcome(member, channel, lang_code, lang_map)
 
-                # Wait a moment before showing the next
-                await asyncio.sleep(1)
-
-                # 🌸 Now trigger cosmetic selection AFTER view has ended
-                cosmetic_shown = await send_cosmetic_selector(member, channel, guild_config)
-                if not cosmetic_shown:
-                    lang_code = all_languages["guilds"][guild_id]["users"].get(user_id, "en")
-                    lang_map = all_languages["guilds"][guild_id]["languages"]
-                    await send_final_welcome(member, channel, lang_code, lang_map)
-
-            except Exception as e:
-                print("⚠️ Role assign error:", e)
-                await interaction.response.send_message("❗ I couldn’t assign that role. Please contact a mod.", ephemeral=True)
+                except Exception as e:
+                    print("⚠️ Role assign error:", e)
+                    await interaction.response.send_message(
+                        "❗ I couldn’t assign that role. Please contact a mod.",
+                        ephemeral=True
+                    )
 
     view = RoleSelectView()
-    for item in view.children:
-        if isinstance(item, Button):
-            item.callback = role_button_callback
 
     embed = discord.Embed(
         title=get_translated_mode_text(guild_id, user_id, mode, "role_intro_title", user=member.mention),
@@ -2170,8 +2272,20 @@ async def send_cosmetic_selector(member, channel, guild_config):
         def __init__(self):
             super().__init__(timeout=60)
             for role_id, data in cosmetic_options.items():
-                self.add_item(Button(label=data['label'], emoji=data['emoji'], custom_id=role_id))
-            self.add_item(Button(label="Skip", style=discord.ButtonStyle.secondary, custom_id="skip_cosmetic"))
+                role_button = Button(
+                    label=data['label'],
+                    emoji=data['emoji'],
+                    style=discord.ButtonStyle.primary,  # 🌿 Consistent button style
+                    custom_id=role_id
+                )
+                role_button.callback = self.cosmetic_button_callback
+                self.add_item(role_button)
+
+            self.add_item(Button(
+                label="Skip",
+                style=discord.ButtonStyle.secondary,
+                custom_id="skip_cosmetic"
+            ))
 
         async def interaction_check(self, interaction):
             return interaction.user.id == member.id
@@ -2184,38 +2298,36 @@ async def send_cosmetic_selector(member, channel, guild_config):
                     user=member.mention
                 )
                 await channel.send(timeout_msg)
-            except:
-                pass
+            except Exception as e:
+                print("⚠️ Timeout error (cosmetic selector):", e)
 
-    async def button_callback(interaction):
-        selected = interaction.data["custom_id"]
+        async def cosmetic_button_callback(self, interaction):
+            selected = interaction.data["custom_id"]
 
-        if selected == "skip_cosmetic":
-            skip_msg = get_translated_mode_text(guild_id, user_id, mode, "cosmetic_skipped", user=member.mention)
-            await interaction.response.send_message(skip_msg, ephemeral=True)
-        else:
-            role = member.guild.get_role(int(selected))
-            if role:
-                try:
-                    await member.add_roles(role)
-                    grant_msg = get_translated_mode_text(
-                        guild_id, user_id, mode, "cosmetic_granted", role=role.name, user=member.mention
-                    )
-                    await interaction.response.send_message(grant_msg, ephemeral=True)
-                except Exception as e:
-                    await interaction.response.send_message("❗ Couldn’t assign that sparkle.", ephemeral=True)
-                    print("Cosmetic role error:", e)
+            if selected == "skip_cosmetic":
+                skip_msg = get_translated_mode_text(
+                    guild_id, user_id, mode, "cosmetic_skipped", user=member.mention
+                )
+                await interaction.response.send_message(skip_msg, ephemeral=True)
+            else:
+                role = member.guild.get_role(int(selected))
+                if role:
+                    try:
+                        await member.add_roles(role)
+                        grant_msg = get_translated_mode_text(
+                            guild_id, user_id, mode, "cosmetic_granted", role=role.name, user=member.mention
+                        )
+                        await interaction.response.send_message(grant_msg, ephemeral=True)
+                    except Exception as e:
+                        await interaction.response.send_message("❗ Couldn’t assign that sparkle.", ephemeral=True)
+                        print("⚠️ Cosmetic role assign error:", e)
 
-        # ✅ Stop the view so the timeout doesn't fire
-        view.stop()
+            self.stop()
 
-        # 🎉 Final welcome
-        await send_final_welcome(member, channel, lang_code, lang_map)
+            # 🌸 Final welcome after cosmetics
+            await send_final_welcome(member, channel, lang_code, lang_map)
 
     view = CosmeticRoleView()
-    for item in view.children:
-        if isinstance(item, Button):
-            item.callback = button_callback
 
     embed = discord.Embed(
         title=get_translated_mode_text(guild_id, user_id, mode, "cosmetic_intro_title", user=member.mention),
@@ -2231,26 +2343,28 @@ async def send_final_welcome(member, channel, lang_code, lang_map):
     user_id = str(member.id)
     mode = guild_modes.get(guild_id, "dayform")
 
-    # ✨ Get translated mode-specific title
-    welcome_title = get_translated_mode_text(guild_id, user_id, mode, "welcome_title")
+    # ✨ Pull translated welcome title
+    welcome_title = get_translated_mode_text(
+        guild_id, user_id, mode, "welcome_title", fallback="🌿 Welcome!"
+    )
 
-    # 💬 Fallback to guild-configured welcome if mode text missing
+    # 💬 Fallback to guild-configured welcome text, else pull from mode-based translation
     admin_welcome = lang_map.get(lang_code, {}).get("welcome")
     if admin_welcome:
         welcome_desc = admin_welcome.replace("{user}", member.mention)
     else:
-        raw_welcome_desc = get_translated_mode_text(
-            guild_id, user_id, mode, "welcome_desc", fallback="Welcome, {user}!", user=member.mention
+        welcome_desc = get_translated_mode_text(
+            guild_id, user_id, mode, "welcome_desc",
+            fallback="Welcome, {user}!", user=member.mention
         )
-        welcome_desc = raw_welcome_desc
 
-    # Build embed using your embed engine
+    # 🌿 Build embed using full system embed builder
     embed, file = build_whisperling_embed(guild_id, welcome_title, welcome_desc)
 
     if file:
-        await channel.send(embed=embed, file=file)
+        await channel.send(content=member.mention, embed=embed, file=file)
     else:
-        await channel.send(embed=embed)
+        await channel.send(content=member.mention, embed=embed)
 
 # ========== FLUTTERKIN ==========
 
@@ -2267,7 +2381,7 @@ async def whisper(ctx):
     now = datetime.now(timezone.utc)
     current_mode = guild_modes.get(guild_id, "dayform")
 
-    # ⏳ Check and reset daily usage count
+    # ⏳ Check/reset daily limit
     usage_data = flutterkin_usage_count_by_guild.get(guild_id)
     if not usage_data or now >= usage_data["reset_time"]:
         flutterkin_usage_count_by_guild[guild_id] = {
@@ -2275,10 +2389,10 @@ async def whisper(ctx):
             "reset_time": now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
         }
     elif usage_data["count"] >= 3 and current_mode != "flutterkin":
-        await ctx.send("🍼 Flutterkin is too tired for more wishes today... come back tomorrow! 🌙")
+        await ctx.send("🍼 Flutterkin is all tuckered out... try again tomorrow!")
         return
 
-    # 🌸 If not already flutter, activate Flutterkin
+    # 🌸 Activate Flutterkin mode
     if current_mode != "flutterkin":
         previous_standard_mode_by_guild[guild_id] = current_mode
         guild_modes[guild_id] = "flutterkin"
@@ -2286,45 +2400,54 @@ async def whisper(ctx):
         await update_avatar_for_mode("flutterkin")
         flutterkin_usage_count_by_guild[guild_id]["count"] += 1
 
-    # ✨ Log time
+    # 🗓️ Update interaction trackers
     flutterkin_last_triggered[guild_id] = now
     last_interaction_by_guild[guild_id] = now
 
-    # 🌼 Sparkly intro message (now with embed!!)
-    intro = get_translated_mode_text(guild_id, user_id, "flutterkin", "language_confirm_desc", user=ctx.author.mention)
-    embed, file = build_whisperling_embed(guild_id, "✨ Bouncy Bloom Activated!", intro)
+    # 🌼 Sparkle intro
+    intro = get_translated_mode_text(
+        guild_id, user_id, "flutterkin", "language_confirm_desc",
+        user=ctx.author.mention
+    )
+    embed, file = build_whisperling_embed(
+        guild_id, "✨ Bouncy Bloom Activated!", intro
+    )
 
     if file:
         await ctx.send(embed=embed, file=file)
     else:
         await ctx.send(embed=embed)
 
-    # 🗨️ If used on a reply, do translation!
+    # 🌈 Translation if used as reply
     if ctx.message.reference:
         try:
             replied_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
             content = replied_msg.content
+
             if not content:
-                return await ctx.send("🧺 that message has no words to sparkle~ ✨")
+                await ctx.send("🧺 That message is empty... no words to sparkle~ ✨")
+                return
 
             user_lang = get_user_language(guild_id, user_id)
             if not user_lang:
-                return await ctx.send("🤔 you don’t got a chosen tongue yet!! go pick one!! 🐞")
+                await ctx.send("🤔 You haven’t chosen a language yet! Pick one first~ 🐞")
+                return
 
             translated = translator.translate(content, dest=user_lang).text
             styled_translated = style_text(guild_id, translated)
 
-            await ctx.send(f"💫 translated!! look!!:\n> {styled_translated}")
+            await ctx.send(f"💫 Sparkled up for you:\n> {styled_translated}")
 
         except Exception as e:
-            print("whisper translate error:", e)
-            await ctx.send("😥 uh oh... i tried and it broke. no sparkle... try again?")
+            print("⚠️ Flutterkin translation error:", e)
+            await ctx.send("😥 Uh oh... Flutterkin stumbled. Try again in a moment?")
 
 # ========== GENERAL COMMANDS ==========
 
 @tree.command(name="help", description="📖 See the magical things Whisperling can do (for all users).")
 async def help(interaction: discord.Interaction):
     guild_id = str(interaction.guild_id)
+    guild = interaction.guild  # ⬅ you need this for mode switching!
 
     # 🌒 Handle potential glitch trigger
     maybe_glitch = maybe_trigger_glitch(guild_id)
@@ -2332,6 +2455,7 @@ async def help(interaction: discord.Interaction):
 
     if maybe_glitch and current_mode in STANDARD_MODES:
         await apply_mode_change(guild, maybe_glitch)
+        current_mode = maybe_glitch  # Refresh current mode after glitch switch
 
     # 🕰️ Update interaction timestamp
     last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
@@ -2376,7 +2500,6 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     if str(payload.emoji) != "❓":
         return  # Only respond to the ❓ emoji
 
-    # Fetch full message and context
     guild = bot.get_guild(payload.guild_id)
     if not guild:
         return
@@ -2418,7 +2541,9 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
 
     if maybe_glitch and current_mode in STANDARD_MODES:
         await apply_mode_change(guild, maybe_glitch)
+        current_mode = maybe_glitch  # <-- Refresh mode after glitch
 
+    # 🕰️ Update interaction timestamp
     last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
 
     try:
@@ -2454,7 +2579,6 @@ async def translate(ctx):
     except discord.Forbidden:
         print("❗ Missing permission to delete the user's !translate command.")
 
-    # Check for replied message
     if not ctx.message.reference:
         await ctx.send("🌸 Please reply to the message you want translated.", delete_after=10)
         return
@@ -2483,17 +2607,17 @@ async def translate(ctx):
     current_mode = guild_modes.get(guild_id, "dayform")
 
     if maybe_glitch and current_mode in STANDARD_MODES:
-        await apply_mode_change(guild, maybe_glitch)
+        await apply_mode_change(ctx.guild, maybe_glitch)
+        current_mode = maybe_glitch  # <-- Update after glitch
 
-    # Update last interaction
     last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
 
     try:
         result = translator.translate(content, dest=user_lang)
         styled_output = style_text(guild_id, result.text)
 
-        embed_color = MODE_COLORS.get(guild_modes[guild_id], discord.Color.blurple())
-        footer = MODE_FOOTERS.get(guild_modes[guild_id], "")
+        embed_color = MODE_COLORS.get(current_mode, discord.Color.blurple())
+        footer = MODE_FOOTERS.get(current_mode, "")
 
         embed = discord.Embed(
             title=f"✨ Whispered Translation to `{user_lang}`",
@@ -2521,7 +2645,8 @@ async def chooselanguage(ctx):
     current_mode = guild_modes.get(guild_id, "dayform")
 
     if maybe_glitch and current_mode in STANDARD_MODES:
-        await apply_mode_change(guild, maybe_glitch)
+        await apply_mode_change(ctx.guild, maybe_glitch)
+        current_mode = maybe_glitch  # update mode for embed theming
 
     # 🌿 Update last interaction timestamp
     last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
@@ -2542,9 +2667,8 @@ async def chooselanguage(ctx):
     if not lang_map:
         return await ctx.send("❗ No languages are configured yet.")
 
-    mode = guild_modes.get(guild_id, "dayform")
-    embed_color = MODE_COLORS.get(mode, discord.Color.purple())
-    voice = MODE_TEXTS_ENGLISH.get(mode, {})
+    embed_color = MODE_COLORS.get(current_mode, discord.Color.purple())
+    voice = MODE_TEXTS_ENGLISH.get(current_mode, {})
 
     embed = discord.Embed(
         title=voice.get("language_intro_title", "🧚 Choose Your Whispering Tongue"),
@@ -2555,18 +2679,8 @@ async def chooselanguage(ctx):
     class LanguageView(View):
         def __init__(self):
             super().__init__(timeout=60)
-            i = 0
             for code, data in lang_map.items():
-                # Alternate styles for a prettier layout
-                style = [
-                    discord.ButtonStyle.primary,
-                    discord.ButtonStyle.success,
-                    discord.ButtonStyle.secondary,
-                    discord.ButtonStyle.danger
-                ][i % 4]
-                self.add_item(Button(label=data['name'], custom_id=code, style=style))
-                i += 1
-
+                self.add_item(Button(label=data['name'], custom_id=code, style=discord.ButtonStyle.primary))
             self.add_item(Button(label="❌ Cancel", style=discord.ButtonStyle.danger, custom_id="cancel"))
 
         async def interaction_check(self, interaction):
