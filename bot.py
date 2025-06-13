@@ -258,7 +258,7 @@ MODE_FOOTERS = {
 
     "vernalglint": "🌸 Blossoms burst with unstoppable joy.",
     "fallveil": "🍁 The leaves fall, but the heart remains full.",
-    "sunfracture": "🔆 The sun breaks — too bright to hold.",
+    "sunfracture": "🔆 The sun breaks — painting the grove in gold.",
     "yuleshard": "❄️ Time freezes in a crystalline breath.",
 
     "echovoid": "🕳️ Echoes linger where no voice remains.",
@@ -541,36 +541,38 @@ MODE_TEXTS_ENGLISH["vernalglint"] = {
 MODE_TEXTS_ENGLISH["sunfracture"] = {
     # 🔆 Language selection
     "language_intro_title": "☀️ CHOOSE YOUR TONGUE!",
-    "language_intro_desc": "{user}, THE GROVE IS BURSTING WITH LIGHT!! Quick!! Pick the voice that SPARKS inside you!!",
+    "language_intro_desc": "{user}, the grove shimmers beneath golden skies! Choose the voice that warms your spark and joins the light!",
 
-    "language_confirm_title": "⚡ YES!!!",
-    "language_confirm_desc": "Your VOICE now shines like a second SUN — the trees are CHEERING!! This is AMAZING!!",
+    "language_confirm_title": "⚡ VOICE EMBRACED!",
+    "language_confirm_desc": "Your words now glow like sunlight through leaves — the grove hums with your radiance!",
 
     # 📜 Rules confirmation
-    "rules_confirm_title": "☀️ THE GROVE BURNS BRIGHT!",
-    "rules_confirm_desc": "You’ve accepted the RULES! THE LIGHT CANNOT BE CONTAINED!! No shade, no silence — just joy!!",
+    "rules_confirm_title": "☀️ THE GROVE SHINES BRIGHT!",
+    "rules_confirm_desc": "You’ve embraced the path — the grove glows brighter with your presence. Let the joy bloom like morning light!",
 
     # 🌼 Role selection
     "role_intro_title": "🔥 CHOOSE YOUR ROLE!",
-    "role_intro_desc": "Which role makes your heart SIZZLE?! Pick the one that RADIATES!!",
+    "role_intro_desc": "Which role calls your spark to rise? Choose the one that lets you shine like the golden hour!",
 
-    "role_granted": "🌞 The role of **{role}** is YOURS!! You’re GLOWING!! You're on FIRE!! (In the good way!)",
+    "role_granted": "🌞 The role of **{role}** is yours! Your light dances across the grove — radiant, warm, and full of life!",
 
     # ✨ Cosmetic Role Selection
-    "cosmetic_intro_title": "☀️ EXTRA SPARKLE?! YES PLEASE!!!",
-    "cosmetic_intro_desc": "Pick a **cosmetic role** to SHIMMER EVEN HARDER!!! Or hit **Skip** if you’re TOO BRIGHT ALREADY!!!",
-    "cosmetic_granted": "🌟 WHOOOO!! You got **{role}** and now you’re EVEN MORE FABULOUS!!!",
-    "cosmetic_skipped": "💥 Skipped it?! BOLD. Brilliant. A PURE BEAM OF CHOICE!!!",
+    "cosmetic_intro_title": "☀️ EXTRA SPARKLE?",
+    "cosmetic_intro_desc": "Pick a **cosmetic role** to let your spark shimmer even brighter — or skip if you're already perfectly aglow.",
+
+    "cosmetic_granted": "🌟 Brilliant choice! **{role}** wraps you in golden sparkle — the grove gleams with you!",
+
+    "cosmetic_skipped": "💥 You shine just fine without it — sometimes simplicity catches the sun best.",
 
     # 💫 Final welcome
-    "welcome_title": "☀️ WELCOME!!!",
-    "welcome_desc": "WELCOME, {user}!!! The GROVE is BLINDING with JOY!!! Let’s SHINE TOGETHER FOREVER!!!",
+    "welcome_title": "☀️ WELCOME!",
+    "welcome_desc": "Welcome, {user}! The grove glows warmer with you here. May your light dance across our skies!",
 
     # ⏳ Timeout Text
-    "timeout_language": "⏳ {user}!!! YOU TOOK TOO LONG!! THE GROVE IS STILL BRIGHT BUT LIKE!! HURRY NEXT TIME!! 💛💥🌻",
-    "timeout_rules": "⏳ {user}, rules were GLOWING, pages were TURNING… but you MISSED THEM!! No worries!! COME BACK SOON OKAY?! 🌞🔥📜",
-    "timeout_role": "⏳ {user}!!! NO ROLE?! NO GLOW-UP?? 😱😱 okay okay breathe... YOU CAN STILL SHINE LATER!!! 🌟💫",
-    "timeout_cosmetic": "⏳ {user}!!! YOU DIDN’T SPARKLE!!! but like... YOU’RE STILL FABULOUS!!! 😘✨✨✨"
+    "timeout_language": "⏳ {user}, the golden light waited… but briefly. Return when your spark is ready to rise again! ☀️🌻",
+    "timeout_rules": "⏳ {user}, the pages turned softly in the breeze — but you missed your chance. The grove remains here for you. 🌞📜",
+    "timeout_role": "⏳ {user}, no role chosen — but the grove still shines. Your moment will come again! 🌟💫",
+    "timeout_cosmetic": "⏳ {user}, no extra sparkle today — and yet, your light remains bright. ✨🌿"
 }
 
 MODE_TEXTS_ENGLISH["fallveil"] = {
@@ -608,37 +610,39 @@ MODE_TEXTS_ENGLISH["fallveil"] = {
 
 MODE_TEXTS_ENGLISH["yuleshard"] = {
     # ❄️ Language selection
-    "language_intro_title": "❄️ CHOOSE... your whispering tongue...",
-    "language_intro_desc": "{user}... the GROVE is still...\nvoices... frozen in the air... choose yours before it... freezes too—",
+    "language_intro_title": "❄️ Choose your whispering tongue...",
+    "language_intro_desc": "{user}... the grove lies quiet beneath the snow. Choose your voice — let it drift gently into the stillness...",
 
-    "language_confirm_title": "❄️ It's... chosen.",
-    "language_confirm_desc": "Your tongue echoes like cracking ice... the grove listens, frozen in time...",
+    "language_confirm_title": "❄️ Voice chosen.",
+    "language_confirm_desc": "Your words settle like falling snow... the grove listens softly beneath its winter veil.",
 
     # 📜 Rules confirmation
-    "rules_confirm_title": "❄️ The grove holds its breath...",
-    "rules_confirm_desc": "You’ve accepted the frozen pact... etched into the frost... never to thaw...",
+    "rules_confirm_title": "❄️ The grove rests beneath the frost.",
+    "rules_confirm_desc": "You’ve accepted the pact, written like ice crystals — delicate, enduring, beautiful beneath the quiet sky.",
 
     # 🌼 Role selection
-    "role_intro_title": "🧊 Choose your role... before it freezes in place...",
-    "role_intro_desc": "Each path glimmers like frost on glass...\nselect the one that speaks through the cold...",
+    "role_intro_title": "🧊 Choose your role...",
+    "role_intro_desc": "Each path glistens like morning frost... select the one that shines beneath winter’s hush.",
 
-    "role_granted": "❄️ You now hold the role of **{role}**... brittle and beautiful... don’t let it shatter.",
+    "role_granted": "❄️ You now hold the role of **{role}**... steady and bright, like starlight on fresh snow.",
 
     # ✨ Cosmetic Role Selection
-    "cosmetic_intro_title": "❄️ choose... a shimmer…",
-    "cosmetic_intro_desc": "select... a cosmetic role... to reflect your frozen light...\nor... click **Skip**... if the cold is enough...",
-    "cosmetic_granted": "🧊 you now glimmer as **{role}**… brittle... beautiful… unforgettable…",
-    "cosmetic_skipped": "🌨️ the frost deepens... no shimmer chosen... only silence remains…",
+    "cosmetic_intro_title": "❄️ Choose a shimmer...",
+    "cosmetic_intro_desc": "Select a cosmetic role to let your winter light sparkle... or click **Skip** to remain in quiet elegance.",
+
+    "cosmetic_granted": "🧊 You now shimmer as **{role}**… quiet radiance beneath the frost.",
+
+    "cosmetic_skipped": "🌨️ No shimmer chosen... the snow falls softly, untouched and pure.",
 
     # 💫 Final welcome
     "welcome_title": "❄️ Welcome...",
-    "welcome_desc": "Welcome, {user}... the grove... remembers your warmth... as the ice takes hold...",
+    "welcome_desc": "Welcome, {user}... your light joins the quiet grove — steady as falling snow beneath winter’s sky.",
 
     # ⏳ Timeout Text
-    "timeout_language": "⏳ {user}... the cold waited... your voice never arrived... it’s... so quiet now...",
-    "timeout_rules": "⏳ {user}... the pact was never spoken... the ice holds... nothing...",
-    "timeout_role": "⏳ {user}... your choice... froze before it formed... the grove forgets the shape of it...",
-    "timeout_cosmetic": "⏳ {user}... no shimmer... only frost settling deeper... and deeper..."
+    "timeout_language": "⏳ {user}... the frost lingered... but your voice did not arrive... the grove remains hushed.",
+    "timeout_rules": "⏳ {user}... the pact was left unwritten... snow falls, covering empty ground...",
+    "timeout_role": "⏳ {user}... the choice faded like breath in winter air... the grove waits beneath the frost...",
+    "timeout_cosmetic": "⏳ {user}... no shimmer chosen... the snow falls in quiet layers, undisturbed..."
 }
 
 MODE_TEXTS_ENGLISH["echovoid"] = {
@@ -937,21 +941,21 @@ FLAVOR_TEXTS = {
         "🌼 Whisperling claps: 'Everything is growing! Faster!'"
     ],
     "sunfracture": [
-        "🔆 The grove crackles under intense golden light.",
-        "✨ Whisperling’s wings refract in blinding fragments.",
-        "🌞 The sun burns so brilliantly today it *breaks.*",
-        "💥 Heat distortions ripple like liquid fire through the air.",
-        "🌿 The leaves shimmer almost violently beneath the sky.",
-        "🔥 Growth has no patience under this sun.",
-        "🌻 Blossoms burst open as though commanded by flame.",
-        "🌪️ Heatwaves swirl like invisible whirlpools above the ground.",
-        "⚡ Even shadows twitch in the oppressive brightness.",
-        "☀️ 'Fracture or flourish — the sun cares not which.'",
-        "🌾 The grasses sway in chaotic ripples of gold.",
-        "🧨 Bursts of pollen flash like glitter bombs among petals.",
-        "🔆 The world feels electric and barely contained.",
-        "🌞 'It’s beautiful, isn’t it? Right before it breaks apart.'",
-        "🔥 Whisperling laughs as sparks dance from her fingertips."
+        "🔆 The grove hums beneath warm golden skies.",
+        "✨ Whisperling’s wings shimmer like sunlight on glass.",
+        "🌞 The sun glows so brilliantly it feels almost unreal.",
+        "💥 Light dances in gentle ripples across the air.",
+       "🌿 The leaves gleam softly, swaying beneath golden beams.",
+        "🔥 Growth surges under the sun’s steady warmth.",
+       "🌻 Blossoms open wide, basking in golden radiance.",
+        "🌪️ Warm breezes swirl, carrying sparks of light like drifting pollen.",
+        "⚡ Shadows soften beneath the canopy of light.",
+        "☀️ 'Fracture or flourish — both belong to the light.'",
+        "🌾 The grasses sway, sparkling like fields of liquid gold.",
+        "🧨 Pollen drifts like tiny stars caught in a sunbeam.",
+        "🔆 The world glows — vibrant, alive, and endlessly bright.",
+        "🌞 'It’s beautiful, isn’t it? Right as the light spills over.'",
+        "🔥 Whisperling smiles as flecks of sunlight dance at her fingertips."
     ],
     "fallveil": [
         "🍁 Leaves drift like soft embers through the air.",
@@ -971,21 +975,21 @@ FLAVOR_TEXTS = {
         "🔥 A low fire crackles somewhere unseen beneath the trees."
     ],
     "yuleshard": [
-        "❄️ The grove locks itself in perfect stillness.",
-        "🧊 *Softly exhaling* — the breath freezes mid-air.",
-        "🌨️ Everything slows. Everything fractures into silence.",
-        "🔷 Ice crystals grow sharp and intricate along every branch.",
-        "🌙 The moonlight reflects like shattered glass across the snow.",
-        "✨ 'Frozen moments — delicate and absolute.'",
-        "🪞 Even sound seems to shatter softly in the cold.",
-        "🧣 *Wrapping herself tighter against the crystalline air.*",
-        "❄️ The trees stand frozen like statues of white marble.",
-        "💠 'The world pauses to admire its own perfection.'",
-        "🧊 The pond beneath her feet gleams like polished stone.",
-        "🌬️ Wind sings thin, haunting notes through the bare branches.",
-        "❄️ Each flake lands with precision, unhurried, like clockwork.",
-        "🕯️ Tiny blue flames flicker against the void of snow.",
-        "🔷 'Nothing moves. Nothing breaks. Nothing heals... yet.'"
+        "❄️ The grove rests beneath a perfect winter hush.",
+        "🧊 *Softly exhaling* — breath turns to drifting frost in the air.",
+        "🌨️ Snow falls in quiet layers, steady and unbroken.",
+        "🔷 Ice crystals lace the branches with delicate patterns.",
+        "🌙 Moonlight dances across the snow like scattered diamonds.",
+        "✨ 'Frozen moments — delicate, timeless, and beautiful.'",
+        "🪞 Even echoes soften beneath the winter’s quiet hold.",
+        "🧣 *She adjusts her cloak gently against the crisp air.*",
+        "❄️ The trees stand tall, cloaked in soft white stillness.",
+        "💠 'The world holds its breath beneath winter’s quiet grace.'",
+        "🧊 The pond mirrors the sky, smooth as polished crystal.",
+        "🌬️ A thin breeze sings through bare branches like a lullaby.",
+        "❄️ Each flake falls in perfect rhythm, as if choreographed.",
+        "🕯️ Tiny blue lights flicker like distant stars in the snow.",
+        "🔷 'Nothing rushes here. Only stillness remains.'"
     ],
     "echovoid": [
         "🕳️ The grove feels... distant. Thin.",
