@@ -1066,6 +1066,8 @@ FLAVOR_TEXTS = {
     ]
 }
 
+def get_flavor_text(mode):
+    return random.choice(FLAVOR_TEXTS[mode])
 
 async def grove_heartbeat(bot):
     await bot.wait_until_ready()
