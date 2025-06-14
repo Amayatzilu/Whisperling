@@ -99,7 +99,8 @@
         "1228472472320475236": "en",
         "938539765739978813": "de",
         "474049414755778561": "en"
-      }
+      },
+      "whispers_enabled": false
     },
     "1249379265674477610": {
       "languages": {
@@ -114,7 +115,8 @@
       },
       "users": {
         "1021444045924479006": "de",
-        "810158790460571671": "en"
+        "810158790460571671": "en",
+        "755526916949147752": "en"
       },
       "rules": {
         "en": "🌸 Be kind.\nWe’re all here to relax, share, and enjoy. Respect each other.\n\n🌙 Keep it cozy.\nThis is a chill space — drama belongs outside the grove.\n\n✨ Have fun.\nWhether you're gaming, worldbuilding, or just hanging out — enjoy the magic.",
@@ -162,12 +164,86 @@
           "emoji": "<:yuleshard:1383083763344478279>",
           "label": "White"
         }
-      }
+      },
+      "whispers_enabled": true
     },
     "1383263489891635221": {
-      "languages": {},
-      "users": {},
-      "welcome_channel_id": 1383263490562588775
+      "languages": {
+        "en": {
+          "name": "English",
+          "welcome": "🌙 Welcome to the Den! 🐾\n\nYou've wandered beneath the moonlit trees and found your way to Howling Nexus — where the pack gathers, the stories flow, and the bonds grow strong.\n\nThe moon is high. The pack is strong. You're home."
+        },
+        "de": {
+          "name": "Deutsch",
+          "welcome": "🌙 Willkommen im Bau! 🐾\n\nDu bist unter den mondbeschienenen Bäumen umhergewandert und hast den Weg zum Heulenden Nexus gefunden – wo sich das Rudel versammelt, die Geschichten fließen und die Bande stark werden.\n\nDer Mond steht hoch. Das Rudel ist stark. Du bist zu Hause."
+        },
+        "fr": {
+          "name": "French",
+          "welcome": "🌙 Bienvenue à la Tanière ! 🐾\n\nVous avez erré sous les arbres éclairés par la lune et trouvé votre chemin vers le Nexus Hurlant, là où la meute se rassemble, où les histoires coulent à flots et où les liens se renforcent.\n\nLa lune est haute. La meute est forte. Vous êtes chez vous."
+        }
+      },
+      "users": {
+        "755526916949147752": "en"
+      },
+      "welcome_channel_id": 1383263490562588775,
+      "cosmetic_role_options": {
+        "1383299016133185576": {
+          "emoji": "<:fire:1383306959712686100>",
+          "label": "Red"
+        },
+        "1383299159674716240": {
+          "emoji": "<:harvest:1383306970252968098>",
+          "label": "Orange"
+        },
+        "1383299389631758439": {
+          "emoji": "<:light:1383306972438200514>",
+          "label": "Yellow"
+        },
+        "1383299484179628052": {
+          "emoji": "<:grove:1383306966998454322>",
+          "label": "Green"
+        },
+        "1383300400798634104": {
+          "emoji": "<:blossom:1383306957489967195>",
+          "label": "Pink"
+        },
+        "1383300301066338375": {
+          "emoji": "<:mist:1383306975210766426>",
+          "label": "Aqua"
+        },
+        "1383299644393656350": {
+          "emoji": "<:water:1383306979992272956>",
+          "label": "Blue"
+        },
+        "1383299760743645224": {
+          "emoji": "<:void:1383306977698119752>",
+          "label": "Purple"
+        },
+        "1383299958198767726": {
+          "emoji": "<:frost:1383306963328303225>",
+          "label": "White"
+        }
+      },
+      "role_options": {
+        "1383265219723268207": {
+          "emoji": "<:ally:1383310044912812032>",
+          "label": "Ally"
+        },
+        "1383265140559839403": {
+          "emoji": "<:packmates:1383310051254734909>",
+          "label": "R1-R3"
+        },
+        "1383265051678478337": {
+          "emoji": "<:moonkeeper:1383310048188698674>",
+          "label": "R4"
+        }
+      },
+      "rules": {
+        "en": "1️⃣ Respect the Pack.\nKindness is the heartbeat of our den. No harassment, hate, or drama.\n\n2️⃣ Keep it Safe.\nNo NSFW, illegal, or harmful content. This is a cozy space for everyone.\n\n3️⃣ Stay in Your Lane.\nUse channels for their intended purposes. It keeps the den tidy.\n\n4️⃣ Listen to the Moonkeepers.\nOur leadership is here to guide and protect the pack. Follow their directions.\n\n5️⃣ No Howling at the Bots.\nDon’t abuse bot commands or spam the channels.\n\n6️⃣ Allied Tails & Guests — Be Welcome.\nVisitors are treated as friends. Follow the same rules as packmates.\n\n7️⃣ Have Fun & Howl Together!\nThis is your den too — enjoy it, help it grow, and be awesome.",
+        "de": "1️⃣ Respektiere das Rudel.\nFreundlichkeit ist das Herzstück unserer Höhle. Keine Belästigung, kein Hass und kein Drama.\n\n2️⃣ Achte auf deine Sicherheit.\nKeine NSFW-, illegalen oder schädlichen Inhalte. Dies ist ein gemütlicher Ort für alle.\n\n3️⃣ Bleib in deiner Spur.\nNutze die Kanäle für ihren vorgesehenen Zweck. Das hält die Höhle sauber.\n\n4️⃣ Höre auf die Moonkeeper.\nUnsere Führung ist hier, um das Rudel zu führen und zu schützen. Folge ihren Anweisungen.\n\n5️⃣ Kein Heulen gegen die Bots.\nMissbrauche keine Bot-Befehle und spamme die Kanäle nicht.\n\n6️⃣ Verbündete Schwänze & Gäste – Seid willkommen.\nBesucher werden wie Freunde behandelt. Befolge die gleichen Regeln wie Rudelmitglieder.\n\n7️⃣ Habt Spaß und heult zusammen!\nDies ist auch Ihre Höhle – genießen Sie sie, helfen Sie ihr beim Wachsen und seien Sie großartig.",
+        "fr": "1️⃣ Respectez la meute.\nLa gentillesse est au cœur de notre tanière. Pas de harcèlement, de haine ni de drame.\n\n2️⃣ Assurez votre sécurité.\nPas de contenu NSFW, illégal ou préjudiciable. C'est un espace convivial pour tous.\n\n3️⃣ Restez dans votre voie.\nUtilisez les canaux à leur usage prévu. Cela permet de garder la tanière propre.\n\n4️⃣ Écoutez les Gardiens de la Lune.\nNos dirigeants sont là pour guider et protéger la meute. Suivez leurs instructions.\n\n5️⃣ Interdiction de hurler aux robots.\nN'abusez pas des commandes des robots et ne spammez pas les canaux.\n\n6️⃣ Queues alliées et invités : soyez les bienvenus.\nLes visiteurs sont traités comme des amis. Suivez les mêmes règles que les autres membres de la meute.\n\n7️⃣ Amusez-vous et hurlez ensemble ! C'est aussi votre tanière : profitez-en, aidez-la à grandir et soyez génial."
+      },
+      "whispers_enabled": false
     }
   }
 }

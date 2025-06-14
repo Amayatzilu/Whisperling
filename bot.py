@@ -1080,39 +1080,43 @@ async def grove_heartbeat(bot):
             mode = guild_modes.get(guild_id, "dayform")
             activity_level = get_activity_level(guild_id)
 
-            # Pull guild config (for whispers toggle)
             guild_config = all_languages["guilds"].get(guild_id, {})
             whispers_enabled = guild_config.get("whispers_enabled", True)
 
             # 🍵 Flavor drops (only if whispers are enabled)
             if whispers_enabled:
-                base_flavor_chance = 0.05 
-                weighted_chance = base_flavor_chance + (activity_level / 300)
-                flavor_chance = min(weighted_chance, 0.15)
+                time_since_last = (now - last_flavor_sent[guild_id]).total_seconds()
+                cooldown_seconds = 2 * 60 * 60  # 2 hours
 
-                if random.random() < flavor_chance:
-                    flavor = get_flavor_text(mode)
-                    channel = (
-                        guild.system_channel
-                        or next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
-                    )
+                if time_since_last >= cooldown_seconds:
+                    base_flavor_chance = 0.03
+                    weighted_chance = base_flavor_chance + (activity_level / 300)
+                    flavor_chance = min(weighted_chance, 0.15)
 
-                    if channel and flavor:
-                        lang_map = guild_config.get("languages", {})
+                    if random.random() < flavor_chance:
+                        flavor = get_flavor_text(mode)
+                        channel = (
+                            guild.system_channel
+                            or next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
+                        )
 
-                        if lang_map and random.random() < 0.5:  # flat 50% chance to translate
-                            possible_langs = list(lang_map.keys())
-                            chosen_lang = random.choice(possible_langs)
-                            try:
-                                translated = translator.translate(flavor, dest=chosen_lang).text
-                                flavor_to_send = f"{translated} ({chosen_lang})"
-                            except Exception as e:
-                                print(f"🌐 Translation failed: {e}")
+                        if channel and flavor:
+                            lang_map = guild_config.get("languages", {})
+
+                            if lang_map and random.random() < 0.5:
+                                possible_langs = list(lang_map.keys())
+                                chosen_lang = random.choice(possible_langs)
+                                try:
+                                    translated = translator.translate(flavor, dest=chosen_lang).text
+                                    flavor_to_send = f"{translated} ({chosen_lang})"
+                                except Exception as e:
+                                    print(f"🌐 Translation failed: {e}")
+                                    flavor_to_send = flavor
+                            else:
                                 flavor_to_send = flavor
-                        else:
-                            flavor_to_send = flavor
 
-                        await channel.send(flavor_to_send)
+                            await channel.send(flavor_to_send)
+                            last_flavor_sent[guild_id] = now  # <-- record the last time she spoke
 
             # 🌿 Mood drift still checks after long idle
             if mode in STANDARD_MODES:
@@ -1125,7 +1129,7 @@ async def grove_heartbeat(bot):
                     print(f"🌿 Mood drift for {guild.name} -> {new_mode}")
                     await apply_mode_change(guild, new_mode)
 
-        await asyncio.sleep(600)
+        await asyncio.sleep(600)  # 10 min loop still fine
 
 # ================= UTIL FUNCTION =================
 def style_text(guild_id, text):
@@ -1241,6 +1245,7 @@ async def announce_mode_change(guild, mode):
 activity_score_by_guild = defaultdict(int)
 last_decay_by_guild = defaultdict(lambda: datetime.utcnow())
 last_active_channel_by_guild = {}
+last_flavor_sent = defaultdict(lambda: datetime.min)
 
 # Tuning parameters
 MESSAGE_WEIGHT = 5
