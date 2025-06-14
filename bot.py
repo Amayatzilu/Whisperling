@@ -2089,22 +2089,16 @@ async def send_language_selector(member, channel, lang_map, guild_config):
         mode = "flutterkin"
 
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
-
-    # 🌟 Pull translated intro
     intro_title = get_translated_mode_text(guild_id, user_id, mode, "language_intro_title", user=member.mention)
     intro_desc = get_translated_mode_text(guild_id, user_id, mode, "language_intro_desc", user=member.mention)
 
     class LanguageView(View):
         def __init__(self):
             super().__init__(timeout=60)
-
             for code, data in lang_map.items():
                 button = Button(label=data['name'], style=discord.ButtonStyle.primary, custom_id=code)
-                button.callback = self.button_callback
                 self.add_item(button)
-
             cancel_button = Button(label="❌ Cancel", style=discord.ButtonStyle.danger, custom_id="cancel")
-            cancel_button.callback = self.button_callback
             self.add_item(cancel_button)
 
         async def interaction_check(self, interaction):
@@ -2121,39 +2115,42 @@ async def send_language_selector(member, channel, lang_map, guild_config):
             except Exception as e:
                 print(f"Timeout error: {e}")
 
-        async def button_callback(self, interaction):
-            selected_code = interaction.data['custom_id']
-            if selected_code == "cancel":
-                await interaction.response.send_message("❌ Cancelled language selection.", ephemeral=True)
-                self.stop()
-                return
+    async def handle_language(interaction: discord.Interaction):
+        selected_code = interaction.data['custom_id']
+        if selected_code == "cancel":
+            await interaction.response.send_message("❌ Cancelled language selection.", ephemeral=True)
+            view.stop()
+            return
 
-            if selected_code not in lang_map:
-                await interaction.response.send_message("❗ Invalid language code.", ephemeral=True)
-                return
+        if selected_code not in lang_map:
+            await interaction.response.send_message("❗ Invalid language code.", ephemeral=True)
+            return
 
-            if "users" not in guild_config:
-                guild_config["users"] = {}
-            guild_config["users"][user_id] = selected_code
-            save_languages()
+        guild_config.setdefault("users", {})[user_id] = selected_code
+        save_languages()
 
-            self.stop()
+        confirm_title = get_translated_mode_text(guild_id, user_id, mode, "language_confirm_title", user=member.mention)
+        confirm_desc = get_translated_mode_text(guild_id, user_id, mode, "language_confirm_desc", user=member.mention)
+        confirm_embed = discord.Embed(title=confirm_title, description=confirm_desc, color=embed_color)
+        await channel.send(content=member.mention, embed=confirm_embed)
 
-            confirm_title = get_translated_mode_text(guild_id, user_id, mode, "language_confirm_title", user=member.mention)
-            confirm_desc = get_translated_mode_text(guild_id, user_id, mode, "language_confirm_desc", user=member.mention)
+        view.stop()
 
-            confirm_embed = discord.Embed(title=confirm_title, description=confirm_desc, color=embed_color)
-            await channel.send(content=member.mention, embed=confirm_embed)
+        await asyncio.sleep(2)
 
-            await asyncio.sleep(2)
-
-            if guild_config.get("rules"):
-                await send_rules_embed(member, channel, selected_code, lang_map, guild_config)
-            else:
-                await send_role_selector(member, channel, guild_config)
-                await send_cosmetic_selector(member, channel, guild_config)
+        # 🧚 Continue flow
+        if guild_config.get("rules"):
+            await send_rules_embed(member, channel, selected_code, lang_map, guild_config)
+        else:
+            await send_role_selector(member, channel, guild_config)
 
     view = LanguageView()
+
+    # Assign callbacks after building view safely
+    for item in view.children:
+        if isinstance(item, Button):
+            item.callback = handle_language
+
     embed = discord.Embed(title=intro_title, description=intro_desc, color=embed_color)
     await channel.send(content=member.mention, embed=embed, view=view)
 
@@ -2166,13 +2163,12 @@ async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
     class AcceptRulesView(View):
         def __init__(self):
             super().__init__(timeout=90)
-            accept_button = Button(
+            button = Button(
                 label="✅ I Accept the Rules",
                 style=discord.ButtonStyle.success,
                 custom_id="accept_rules"
             )
-            accept_button.callback = self.accept_callback
-            self.add_item(accept_button)
+            self.add_item(button)
 
         async def interaction_check(self, interaction):
             return interaction.user.id == member.id
@@ -2188,24 +2184,28 @@ async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
             except Exception as e:
                 print(f"Timeout error on rules: {e}")
 
-        async def accept_callback(self, interaction):
-            confirm_title = get_translated_mode_text(
-                guild_id, user_id, mode, "rules_confirm_title", user=member.mention
-            )
-            confirm_desc = get_translated_mode_text(
-                guild_id, user_id, mode, "rules_confirm_desc", user=member.mention
-            )
+    async def handle_accept(interaction: discord.Interaction):
+        confirm_title = get_translated_mode_text(
+            guild_id, user_id, mode, "rules_confirm_title", user=member.mention
+        )
+        confirm_desc = get_translated_mode_text(
+            guild_id, user_id, mode, "rules_confirm_desc", user=member.mention
+        )
 
-            confirm_embed = discord.Embed(title=confirm_title, description=confirm_desc, color=embed_color)
-            await channel.send(content=member.mention, embed=confirm_embed)
+        confirm_embed = discord.Embed(title=confirm_title, description=confirm_desc, color=embed_color)
+        await channel.send(content=member.mention, embed=confirm_embed)
 
-            self.stop()
+        view.stop()
 
-            await asyncio.sleep(2)
-            await send_role_selector(member, channel, guild_config)
-            await send_cosmetic_selector(member, channel, guild_config)
+        await asyncio.sleep(2)
+        await send_role_selector(member, channel, guild_config)
 
     view = AcceptRulesView()
+
+    # Assign callback outside of init to avoid nested class/function spaghetti
+    for item in view.children:
+        if isinstance(item, Button):
+            item.callback = handle_accept
 
     embed = discord.Embed(
         title="📜 Grove Guidelines",
@@ -2229,14 +2229,13 @@ async def send_role_selector(member, channel, guild_config):
         def __init__(self):
             super().__init__(timeout=60)
             for role_id, data in role_options.items():
-                role_button = Button(
+                button = Button(
                     label=data['label'],
                     emoji=data['emoji'],
                     style=discord.ButtonStyle.primary,
                     custom_id=role_id
                 )
-                role_button.callback = self.role_button_callback
-                self.add_item(role_button)
+                self.add_item(button)
 
         async def interaction_check(self, interaction: discord.Interaction):
             return interaction.user.id == member.id
@@ -2252,36 +2251,39 @@ async def send_role_selector(member, channel, guild_config):
             except Exception as e:
                 print("⚠️ Timeout error (role selector):", e)
 
-        async def role_button_callback(self, interaction: discord.Interaction):
-            role_id = interaction.data['custom_id']
-            role = member.guild.get_role(int(role_id))
-            if role:
-                try:
-                    await member.add_roles(role)
-                    role_msg = get_translated_mode_text(
-                        guild_id, user_id, mode, "role_granted",
-                        role=role.name, user=member.mention
-                    )
-                    await interaction.response.send_message(role_msg, ephemeral=True)
-                    self.stop()
+    async def role_button_callback(interaction: discord.Interaction):
+        role_id = interaction.data['custom_id']
+        role = member.guild.get_role(int(role_id))
+        if role:
+            try:
+                await member.add_roles(role)
+                role_msg = get_translated_mode_text(
+                    guild_id, user_id, mode, "role_granted",
+                    role=role.name, user=member.mention
+                )
+                await interaction.response.send_message(role_msg, ephemeral=True)
+                view.stop()
 
-                    await asyncio.sleep(1)
-                    
-                    # 🌸 Trigger cosmetic selector after assigning role
-                    cosmetic_shown = await send_cosmetic_selector(member, channel, guild_config)
-                    if not cosmetic_shown:
-                        lang_code = all_languages["guilds"][guild_id]["users"].get(user_id, "en")
-                        lang_map = all_languages["guilds"][guild_id]["languages"]
-                        await send_final_welcome(member, channel, lang_code, lang_map)
+                await asyncio.sleep(1)
 
-                except Exception as e:
-                    print("⚠️ Role assign error:", e)
-                    await interaction.response.send_message(
-                        "❗ I couldn’t assign that role. Please contact a mod.",
-                        ephemeral=True
-                    )
+                # 🌸 After role, attempt cosmetic selector
+                cosmetic_shown = await send_cosmetic_selector(member, channel, guild_config)
+                if not cosmetic_shown:
+                    lang_code = all_languages["guilds"][guild_id]["users"].get(user_id, "en")
+                    lang_map = all_languages["guilds"][guild_id]["languages"]
+                    await send_final_welcome(member, channel, lang_code, lang_map)
+
+            except Exception as e:
+                print("⚠️ Role assign error:", e)
+                await interaction.response.send_message(
+                    "❗ I couldn’t assign that role. Please contact a mod.",
+                    ephemeral=True
+                )
 
     view = RoleSelectView()
+    for item in view.children:
+        if isinstance(item, Button):
+            item.callback = role_button_callback
 
     embed = discord.Embed(
         title=get_translated_mode_text(guild_id, user_id, mode, "role_intro_title", user=member.mention),
@@ -2307,20 +2309,20 @@ async def send_cosmetic_selector(member, channel, guild_config):
         def __init__(self):
             super().__init__(timeout=60)
             for role_id, data in cosmetic_options.items():
-                role_button = Button(
+                button = Button(
                     label=data['label'],
                     emoji=data['emoji'],
-                    style=discord.ButtonStyle.primary,  # 🌿 Consistent button style
+                    style=discord.ButtonStyle.primary,
                     custom_id=role_id
                 )
-                role_button.callback = self.cosmetic_button_callback
-                self.add_item(role_button)
+                self.add_item(button)
 
-            self.add_item(Button(
+            skip_button = Button(
                 label="Skip",
                 style=discord.ButtonStyle.secondary,
                 custom_id="skip_cosmetic"
-            ))
+            )
+            self.add_item(skip_button)
 
         async def interaction_check(self, interaction):
             return interaction.user.id == member.id
@@ -2336,33 +2338,37 @@ async def send_cosmetic_selector(member, channel, guild_config):
             except Exception as e:
                 print("⚠️ Timeout error (cosmetic selector):", e)
 
-        async def cosmetic_button_callback(self, interaction):
-            selected = interaction.data["custom_id"]
+    async def cosmetic_button_callback(interaction):
+        selected = interaction.data["custom_id"]
 
-            if selected == "skip_cosmetic":
-                skip_msg = get_translated_mode_text(
-                    guild_id, user_id, mode, "cosmetic_skipped", user=member.mention
-                )
-                await interaction.response.send_message(skip_msg, ephemeral=True)
-            else:
-                role = member.guild.get_role(int(selected))
-                if role:
-                    try:
-                        await member.add_roles(role)
-                        grant_msg = get_translated_mode_text(
-                            guild_id, user_id, mode, "cosmetic_granted", role=role.name, user=member.mention
-                        )
-                        await interaction.response.send_message(grant_msg, ephemeral=True)
-                    except Exception as e:
-                        await interaction.response.send_message("❗ Couldn’t assign that sparkle.", ephemeral=True)
-                        print("⚠️ Cosmetic role assign error:", e)
+        if selected == "skip_cosmetic":
+            skip_msg = get_translated_mode_text(
+                guild_id, user_id, mode, "cosmetic_skipped", user=member.mention
+            )
+            await interaction.response.send_message(skip_msg, ephemeral=True)
+        else:
+            role = member.guild.get_role(int(selected))
+            if role:
+                try:
+                    await member.add_roles(role)
+                    grant_msg = get_translated_mode_text(
+                        guild_id, user_id, mode, "cosmetic_granted", role=role.name, user=member.mention
+                    )
+                    await interaction.response.send_message(grant_msg, ephemeral=True)
+                except Exception as e:
+                    await interaction.response.send_message("❗ Couldn’t assign that sparkle.", ephemeral=True)
+                    print("⚠️ Cosmetic role assign error:", e)
 
-            self.stop()
+        view.stop()
 
-            # 🌸 Final welcome after cosmetics
-            await send_final_welcome(member, channel, lang_code, lang_map)
+        await asyncio.sleep(1)
+        await send_final_welcome(member, channel, lang_code, lang_map)
 
+    # Instantiate view & safely assign callbacks after init:
     view = CosmeticRoleView()
+    for item in view.children:
+        if isinstance(item, Button):
+            item.callback = cosmetic_button_callback
 
     embed = discord.Embed(
         title=get_translated_mode_text(guild_id, user_id, mode, "cosmetic_intro_title", user=member.mention),
@@ -2383,7 +2389,7 @@ async def send_final_welcome(member, channel, lang_code, lang_map):
         guild_id, user_id, mode, "welcome_title", fallback="🌿 Welcome!"
     )
 
-    # 💬 Fallback to guild-configured welcome text, else pull from mode-based translation
+    # 💬 Pull custom welcome (guild-defined), fallback to mode-translated default
     admin_welcome = lang_map.get(lang_code, {}).get("welcome")
     if admin_welcome:
         welcome_desc = admin_welcome.replace("{user}", member.mention)
@@ -2393,8 +2399,8 @@ async def send_final_welcome(member, channel, lang_code, lang_map):
             fallback="Welcome, {user}!", user=member.mention
         )
 
-    # 🌿 Build embed using full system embed builder
-    embed, file = build_whisperling_embed(guild_id, welcome_title, welcome_desc)
+    # 🌿 Build embed with proper ID cast
+    embed, file = build_whisperling_embed(str(guild_id), welcome_title, welcome_desc)
 
     if file:
         await channel.send(content=member.mention, embed=embed, file=file)
