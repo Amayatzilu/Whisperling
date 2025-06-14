@@ -1428,7 +1428,7 @@ async def adminhelp(interaction: discord.Interaction):
     embed.set_footer(text=footer)
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
-@bot.command(aliases=["toggleflavor", "togglechatter", "togglewhispers"])
+@bot.command(aliases=["toggleflavor", "togglechatter"])
 @commands.has_permissions(administrator=True)
 async def togglewhispers(ctx):
     guild_id = str(ctx.guild.id)
