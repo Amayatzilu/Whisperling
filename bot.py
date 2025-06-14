@@ -1080,35 +1080,39 @@ async def grove_heartbeat(bot):
             mode = guild_modes.get(guild_id, "dayform")
             activity_level = get_activity_level(guild_id)
 
-            # 🍵 Flavor drops with adjusted activity weighting
-            base_flavor_chance = 0.10
-            weighted_chance = base_flavor_chance + (activity_level / 200)
-            flavor_chance = min(weighted_chance, 0.3)
+            # Pull guild config (for whispers toggle)
+            guild_config = all_languages["guilds"].get(guild_id, {})
+            whispers_enabled = guild_config.get("whispers_enabled", True)
 
-            if random.random() < flavor_chance:
-                flavor = get_flavor_text(mode)
-                channel = (
-                    guild.system_channel
-                    or next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
-                )
+            # 🍵 Flavor drops (only if whispers are enabled)
+            if whispers_enabled:
+                base_flavor_chance = 0.05 
+                weighted_chance = base_flavor_chance + (activity_level / 300)
+                flavor_chance = min(weighted_chance, 0.15)
 
-                if channel and flavor:
-                    guild_config = all_languages["guilds"].get(guild_id, {})
-                    lang_map = guild_config.get("languages", {})
+                if random.random() < flavor_chance:
+                    flavor = get_flavor_text(mode)
+                    channel = (
+                        guild.system_channel
+                        or next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None)
+                    )
 
-                    if lang_map and random.random() < 0.5:  # flat 50% chance
-                        possible_langs = list(lang_map.keys())
-                        chosen_lang = random.choice(possible_langs)
-                        try:
-                            translated = translator.translate(flavor, dest=chosen_lang).text
-                            flavor_to_send = f"{translated} ({chosen_lang})"
-                        except Exception as e:
-                            print(f"🌐 Translation failed: {e}")
+                    if channel and flavor:
+                        lang_map = guild_config.get("languages", {})
+
+                        if lang_map and random.random() < 0.5:  # flat 50% chance to translate
+                            possible_langs = list(lang_map.keys())
+                            chosen_lang = random.choice(possible_langs)
+                            try:
+                                translated = translator.translate(flavor, dest=chosen_lang).text
+                                flavor_to_send = f"{translated} ({chosen_lang})"
+                            except Exception as e:
+                                print(f"🌐 Translation failed: {e}")
+                                flavor_to_send = flavor
+                        else:
                             flavor_to_send = flavor
-                    else:
-                        flavor_to_send = flavor
 
-                    await channel.send(flavor_to_send)
+                        await channel.send(flavor_to_send)
 
             # 🌿 Mood drift still checks after long idle
             if mode in STANDARD_MODES:
@@ -1416,9 +1420,25 @@ async def adminhelp(interaction: discord.Interaction):
         ),
         inline=False
     )
-
+    embed.add_field(
+       name="🌬️ Whisperling’s Chatter",
+        value="`!togglewhispers` – Enable or disable her random sighs, whispers, and future collectible drops.",
+        inline=False
+    )
     embed.set_footer(text=footer)
     await interaction.response.send_message(embed=embed, ephemeral=True)
+
+@bot.command(aliases=["toggleflavor", "togglechatter", "togglewhispers"])
+@commands.has_permissions(administrator=True)
+async def togglewhispers(ctx):
+    guild_id = str(ctx.guild.id)
+    config = all_languages["guilds"].setdefault(guild_id, {})
+    current = config.get("whispers_enabled", True)
+    config["whispers_enabled"] = not current
+    save_languages()
+
+    status = "enabled" if config["whispers_enabled"] else "disabled"
+    await ctx.send(f"🌸 Whisperling's soft whispers are now **{status}**.")
 
 @bot.command(aliases=["formwechsel", "modedeforme", "cambiodemodo"])
 @commands.has_permissions(administrator=True)

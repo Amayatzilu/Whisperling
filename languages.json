@@ -100,6 +100,74 @@
         "938539765739978813": "de",
         "474049414755778561": "en"
       }
+    },
+    "1249379265674477610": {
+      "languages": {
+        "en": {
+          "name": "English",
+          "welcome": "🌿 Welcome to Serenity! 🌿\nYou’ve stepped into a place where stories unfold, kinfolk gather, and sparks light the path ahead. ✨\nWhether you're here to adventure, create, or simply relax with fellow dreamers — you’ve found your guild. 🌌\nSettle in, traveler. Your journey starts here. 💖"
+        },
+        "de": {
+          "name": "Deutsch",
+          "welcome": "🌿 Willkommen in Serenity! 🌿\nDu bist an einem Ort angekommen, wo Geschichten entstehen, Kinfolk sich versammeln und Funken den Weg erleuchten. ✨\nOb du Abenteuer suchst, kreativ werden willst oder einfach mit anderen Träumern entspannen möchtest — du hast deine Gilde gefunden. 🌌\nMach es dir bequem, Reisender. Deine Reise beginnt hier. 💖"
+        }
+      },
+      "users": {
+        "1021444045924479006": "de",
+        "810158790460571671": "en"
+      },
+      "rules": {
+        "en": "🌸 Be kind.\nWe’re all here to relax, share, and enjoy. Respect each other.\n\n🌙 Keep it cozy.\nThis is a chill space — drama belongs outside the grove.\n\n✨ Have fun.\nWhether you're gaming, worldbuilding, or just hanging out — enjoy the magic.",
+        "de": "🌸 Sei freundlich.\nWir sind hier, um zu entspannen, zu teilen und Spaß zu haben. Respektiere einander.\n\n🌙 Halte es gemütlich.\nDies ist ein entspannter Ort — Drama bleibt bitte außerhalb des Hains.\n\n✨ Hab Spaß.\nOb beim Spielen, Weltenbauen oder einfach nur beim Plaudern — genieße die Magie."
+      },
+      "welcome_channel_id": 1249379265674477613,
+      "cosmetic_role_options": {
+        "1373272005205430272": {
+          "emoji": "<:verdleap:1381487839438442616>",
+          "label": "Bright Green"
+        },
+        "1373271034773635202": {
+          "emoji": "<:sunfracture:1383083707946111056>",
+          "label": "Yellow"
+        },
+        "1373287751792722011": {
+          "emoji": "<:downwarddraconic:1381463416279142571>",
+          "label": "Orange"
+        },
+        "1373272394696884375": {
+          "emoji": "<:emberfang:1381480681074331658>",
+          "label": "Red"
+        },
+        "1373271264969494619": {
+          "emoji": "<:auroraform:1383110764746772621>",
+          "label": "Purple"
+        },
+        "1373283013089165375": {
+          "emoji": "<:flutterkin:1376778849613905931>",
+          "label": "Pink"
+        },
+        "1373287175713722398": {
+          "emoji": "<:forestform:1376778851388096612>",
+          "label": "Forest Green"
+        },
+        "1373272090052137111": {
+          "emoji": "<:inferno:1381482619329450044>",
+          "label": "Blue"
+        },
+        "1373285067228708924": {
+          "emoji": "<:frostyzen:1381464585239789648>",
+          "label": "Teal"
+        },
+        "1373287358438441051": {
+          "emoji": "<:yuleshard:1383083763344478279>",
+          "label": "White"
+        }
+      }
+    },
+    "1383263489891635221": {
+      "languages": {},
+      "users": {},
+      "welcome_channel_id": 1383263490562588775
     }
   }
 }
