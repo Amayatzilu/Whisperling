@@ -268,11 +268,11 @@ class MainMenuView(View):
 
     async def seasonal_callback(self, interaction):
         await interaction.response.defer()
-        await send_form_list(self.ctx, SEASONAL_MODES, "Seasonal Forms 🌸")
+        await send_form_list(self.ctx, SEASONAL_MODES, "Seasonal Shifts 🌸")
 
     async def glitched_callback(self, interaction):
         await interaction.response.defer()
-        await send_form_list(self.ctx, GLITCHED_MODES, "Glitched Forms 🌀")
+        await send_form_list(self.ctx, GLITCHED_MODES, "Glitched Modes 🌀")
 
 
 async def send_form_list(ctx, mode_list, title):

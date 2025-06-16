@@ -17,7 +17,7 @@ MODE_DESCRIPTIONS = {
     "dayform": "🌞 Radiant and nurturing",
     "nightform": "🌙 Calm and moonlit",
     "cosmosform": "🌌 Ethereal and star-bound",
-    "seaform": "🌊 Graceful, ocean-deep",
+    "seaform": "🌊 Graceful and ocean-deep",
     "hadesform": "🔥 Mischievous with glowing heat",
     "forestform": "🍃 Grounded and natural",
     "auroraform": "❄️ Dreamlike and glimmering",
