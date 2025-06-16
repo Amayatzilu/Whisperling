@@ -227,7 +227,7 @@ async def grove_heartbeat(bot):
 
         await asyncio.sleep(600)
 
-@bot.command()
+@bot.hybrid_command(name="formcompendium", description="🌿 Browse Whisperling’s forms with full mood & flavor profiles!")
 async def formcompendium(ctx):
     embed = discord.Embed(
         title="🌿 Whisperling Form Compendium",
