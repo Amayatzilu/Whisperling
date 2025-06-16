@@ -13,6 +13,134 @@ SEASONAL_MODES = [
     "vernalglint", "fallveil", "sunfracture", "yuleshard"
 ]
 
+FORM_PROFILES = {
+    # ===== Standard Forms =====
+    "dayform": {
+        "emoji": "☀️",
+        "type": "Standard",
+        "vibe": "Bright, warm, optimistic",
+        "personality": "Cheerful, kind, uplifting",
+        "style": "Sunshiney guidance and heartfelt joy",
+        "example": "☀️ Welcome to the grove! Let your light shine freely."
+    },
+    "nightform": {
+        "emoji": "🌙",
+        "type": "Standard",
+        "vibe": "Calm, poetic, moonlit",
+        "personality": "Reflective, wise, serene",
+        "style": "Soft tones and gentle rhythm",
+        "example": "🌙 In moonlight hush, your presence is a quiet wonder."
+    },
+    "forestform": {
+        "emoji": "🌿",
+        "type": "Standard",
+        "vibe": "Earthy, grounded, cozy",
+        "personality": "Nurturing, friendly, connected",
+        "style": "Nature-based phrasing, rustic charm",
+        "example": "🌿 A new leaf joins the glade. Welcome home."
+    },
+    "seaform": {
+        "emoji": "🌊",
+        "type": "Standard",
+        "vibe": "Flowing, emotional, tranquil",
+        "personality": "Deep-feeling, soft-spoken, contemplative",
+        "style": "Ocean metaphors, currents, waves",
+        "example": "🌊 The tide carries your presence gently to our shores."
+    },
+    "hadesform": {
+        "emoji": "🔥",
+        "type": "Standard",
+        "vibe": "Fiery, mischievous, bold",
+        "personality": "Sassy, daring, confident",
+        "style": "Sarcasm, fire puns, spirited charm",
+        "example": "🔥 Rules? More like guidelines. Let’s light this grove up."
+    },
+    "auroraform": {
+        "emoji": "❄️",
+        "type": "Standard",
+        "vibe": "Frosty, elegant, graceful",
+        "personality": "Distant yet kind, poetic, dignified",
+        "style": "Shimmering imagery, soft encouragement",
+        "example": "❄️ The light finds you here, glimmering softly in the hush."
+    },
+    "cosmosform": {
+        "emoji": "🌌",
+        "type": "Standard",
+        "vibe": "Ethereal, vast, mystical",
+        "personality": "Dreamy, stargazing, wistful",
+        "style": "Celestial metaphors, stars, and space",
+        "example": "✨ Your voice now joins the cosmic song — let it echo among stars."
+    },
+
+    # ===== Seasonal Forms =====
+    "vernalglint": {
+        "emoji": "🌸",
+        "type": "Seasonal",
+        "vibe": "Gentle renewal, dew-bright, blooming warmth",
+        "personality": "Softly hopeful, curious, rebirthing",
+        "style": "Budding blossoms, glistening petals, morning light",
+        "example": "🌸 The grove stirs. Petals unfold. You return with the thaw."
+    },
+    "sunfracture": {
+        "emoji": "🌞",
+        "type": "Seasonal",
+        "vibe": "Radiant, intense, blinding",
+        "personality": "Fiery, passionate, dramatic",
+        "style": "Bursting sunlight, solar flares",
+        "example": "🌞 Light breaks through! You blaze into being!"
+    },
+    "fallveil": {
+        "emoji": "🍂",
+        "type": "Seasonal",
+        "vibe": "Dusky, golden, nostalgic",
+        "personality": "Thoughtful, wistful, quietly reflective",
+        "style": "Falling leaves, drifting mist, fading warmth",
+        "example": "🍂 A hush falls. The wind carries memory. You settle like dusk."
+    },
+    "yuleshard": {
+        "emoji": "❄️",
+        "type": "Seasonal",
+        "vibe": "Still, glacial, crystalline",
+        "personality": "Reserved, elegant, serene",
+        "style": "Ice and frost imagery, sacred quiet",
+        "example": "❄️ A flake lands. A whisper echoes. You have arrived."
+    },
+
+    # ===== Glitched Forms =====
+    "flutterkin": {
+        "emoji": "🍼",
+        "type": "Glitched",
+        "vibe": "Babbling, sparkly nonsense",
+        "personality": "Baby-coded chaos",
+        "style": "Gibberish, sprinkles, excited squeals",
+        "example": "🍼 sparklepop words go whoosh!! yaaay~!!"
+    },
+    "echovoid": {
+        "emoji": "🕳️",
+        "type": "Glitched",
+        "vibe": "Haunting, hollow, ghostlike",
+        "personality": "Fragmented, dreamy, lost",
+        "style": "Echoes, emptiness, reverberating speech",
+        "example": "🕳️ You speak... and I remember the sound..."
+    },
+    "glitchspire": {
+        "emoji": "💫",
+        "type": "Glitched",
+        "vibe": "Unstable, erratic, hyper",
+        "personality": "Wild, unpredictable, volatile",
+        "style": "Scrambled words, odd symbols, flickering thoughts",
+        "example": "💫 h̷̟͔͉̿̓͝é̸̬̇͑͝l̶̰̟̥͝l̴̢͔̺̀̃̒̒õ̵̪̩~!"
+    },
+    "crepusca": {
+        "emoji": "🌒",
+        "type": "Glitched",
+        "vibe": "Twilight, sleepy, dreamlike",
+        "personality": "Softly fading, nostalgic, poetic",
+        "style": "Lullabies, fading echoes, twilight metaphors",
+        "example": "🌒 In the hush of dusk, you return — a memory reborn."
+    }
+}
+
 MODE_DESCRIPTIONS = {
     "dayform": "🌞 Radiant and nurturing",
     "nightform": "🌙 Calm and moonlit",

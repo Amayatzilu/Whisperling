@@ -12,7 +12,7 @@ from googletrans import Translator
 
 from moodcookies import (
     STANDARD_MODES, GLITCHED_MODES, SEASONAL_MODES,
-    MODE_DESCRIPTIONS, MODE_COLORS, MODE_FOOTERS,
+    MODE_DESCRIPTIONS, MODE_COLORS, MODE_FOOTERS, FORM_PROFILES,
     FORM_EMOJIS, MODE_TEXTS_ENGLISH, MODE_TONE, FLAVOR_TEXTS
 )
 
@@ -229,87 +229,58 @@ async def grove_heartbeat(bot):
 
 @bot.command()
 async def formcompendium(ctx):
-    view = MainMenuView(ctx)
     embed = discord.Embed(
         title="🌿 Whisperling Form Compendium",
-        description="Choose a category to browse Whisperling's many forms.",
+        description="Gently select a form to explore its mood & flavor:",
         color=discord.Color.blurple()
     )
     avatar_url = bot.user.avatar.url if bot.user.avatar else None
     if avatar_url:
         embed.set_thumbnail(url=avatar_url)
+
+    view = FormCompendiumDropdown(ctx)
     await ctx.send(embed=embed, view=view)
 
 
-class MainMenuView(View):
+class FormCompendiumDropdown(View):
     def __init__(self, ctx):
         super().__init__(timeout=60)
         self.ctx = ctx
 
-        # Create buttons and bind callbacks:
-        standard_button = Button(label="Standard Forms 🌿", style=discord.ButtonStyle.primary)
-        standard_button.callback = self.standard_callback
-        self.add_item(standard_button)
+        # Build dropdown options dynamically from profiles
+        options = []
+        for key, data in FORM_PROFILES.items():
+            label = f"{data['emoji']} {key.title()} ({data['type']})"
+            options.append(discord.SelectOption(label=label, value=key))
 
-        seasonal_button = Button(label="Seasonal Forms 🌸", style=discord.ButtonStyle.success)
-        seasonal_button.callback = self.seasonal_callback
-        self.add_item(seasonal_button)
-
-        glitched_button = Button(label="Glitched Forms 🌀", style=discord.ButtonStyle.danger)
-        glitched_button.callback = self.glitched_callback
-        self.add_item(glitched_button)
-
-    async def interaction_check(self, interaction):
-        return interaction.user == self.ctx.author
-
-    async def standard_callback(self, interaction):
-        await interaction.response.defer()
-        await send_form_list(self.ctx, STANDARD_MODES, "Standard Forms 🌿")
-
-    async def seasonal_callback(self, interaction):
-        await interaction.response.defer()
-        await send_form_list(self.ctx, SEASONAL_MODES, "Seasonal Shifts 🌸")
-
-    async def glitched_callback(self, interaction):
-        await interaction.response.defer()
-        await send_form_list(self.ctx, GLITCHED_MODES, "Glitched Modes 🌀")
+        self.add_item(FormSelect(options, ctx))
 
 
-async def send_form_list(ctx, mode_list, title):
-    embed = discord.Embed(
-        title=title,
-        description="Here are my forms in this category:",
-        color=discord.Color.blurple()
-    )
-
-    for mode in mode_list:
-        emoji_url = FORM_EMOJIS.get(mode)
-        flavor = MODE_TEXTS_ENGLISH.get(mode, {}).get("language_intro_title", "(no flavor text)")
-        embed.add_field(name=mode, value=flavor, inline=False)
-
-    first_mode = mode_list[0]
-    if FORM_EMOJIS.get(first_mode):
-        embed.set_thumbnail(url=FORM_EMOJIS[first_mode])
-
-    view = ReturnMenuView(ctx)
-    await ctx.send(embed=embed, view=view)
-
-
-class ReturnMenuView(View):
-    def __init__(self, ctx):
-        super().__init__(timeout=60)
+class FormSelect(Select):
+    def __init__(self, options, ctx):
+        super().__init__(
+            placeholder="Choose a form...",
+            min_values=1,
+            max_values=1,
+            options=options
+        )
         self.ctx = ctx
 
-        return_button = Button(label="⬅ Return to Menu", style=discord.ButtonStyle.secondary)
-        return_button.callback = self.return_menu
-        self.add_item(return_button)
+    async def callback(self, interaction: discord.Interaction):
+        selected_key = self.values[0]
+        profile = FORM_PROFILES.get(selected_key)
 
-    async def interaction_check(self, interaction):
-        return interaction.user == self.ctx.author
+        embed = discord.Embed(
+            title=f"{profile['emoji']} {selected_key.title()} — {profile['type']} Form",
+            color=discord.Color.blurple()
+        )
 
-    async def return_menu(self, interaction):
-        await interaction.response.defer()
-        await formcompendium(self.ctx)
+        embed.add_field(name="Vibe", value=profile['vibe'], inline=False)
+        embed.add_field(name="Personality", value=profile['personality'], inline=False)
+        embed.add_field(name="Style", value=profile['style'], inline=False)
+        embed.add_field(name="Example", value=profile['example'], inline=False)
+
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 # ================= UTIL FUNCTION =================
 def style_text(guild_id, text):
