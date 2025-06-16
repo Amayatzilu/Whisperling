@@ -157,6 +157,24 @@ MODE_DESCRIPTIONS = {
     "crepusca": "💫 Dimmed stars and silent dusk"
 }
 
+FORM_EMOJIS = {
+    "dayform": "https://cdn.discordapp.com/emojis/1376778845734043769.webp?size=128",
+    "nightform": "https://cdn.discordapp.com/emojis/1376778856656273408.webp?size=128",
+    "forestform": "https://cdn.discordapp.com/emojis/1376778851388096612.webp?size=128",
+    "seaform": "https://cdn.discordapp.com/emojis/1376778858753294346.webp?size=128",
+    "hadesform": "https://cdn.discordapp.com/emojis/1376778854735151154.webp?size=128",
+    "auroraform": "https://cdn.discordapp.com/emojis/1383110764746772621.webp?size=128",
+    "cosmosform": "https://cdn.discordapp.com/emojis/1376778841971757096.webp?size=128",
+    "vernalglint": "https://cdn.discordapp.com/emojis/1383083741743943721.webp?size=128",
+    "sunfracture": "https://cdn.discordapp.com/emojis/1383083707946111056.webp?size=128",
+    "fallveil": "https://cdn.discordapp.com/emojis/1383083667257032735.webp?size=128",
+    "yuleshard": "https://cdn.discordapp.com/emojis/1383083763344478279.webp?size=128",
+    "echovoid": "https://cdn.discordapp.com/emojis/1376778847579537429.webp?size=128",
+    "glitchspire": "https://cdn.discordapp.com/emojis/1376778853015355442.webp?size=128",
+    "flutterkin": "https://cdn.discordapp.com/emojis/1376778849613905931.webp?size=128",
+    "crepusca": "https://cdn.discordapp.com/emojis/1376778844068909056.webp?size=128"
+}
+
 # Per-guild mode tracking
 guild_modes = defaultdict(lambda: "dayform")
 last_interaction_by_guild = defaultdict(lambda: datetime.now(timezone.utc))
@@ -1159,6 +1177,102 @@ async def grove_heartbeat(bot):
                     await apply_mode_change(guild, new_mode)
 
         await asyncio.sleep(600)
+
+@bot.command()
+async def formcompendium(ctx):
+    view = MainMenuView(ctx)
+    embed = discord.Embed(
+        title="🌿 Whisperling Form Compendium",
+        description="Choose a category to browse Whisperling's many forms.",
+        color=discord.Color.blurple()
+    )
+    avatar_url = bot.user.avatar.url if bot.user.avatar else None
+    if avatar_url:
+        embed.set_thumbnail(url=avatar_url)
+    await ctx.send(embed=embed, view=view)
+
+
+### The Views:
+
+class MainMenuView(View):
+    def __init__(self, ctx):
+        super().__init__(timeout=60)
+        self.ctx = ctx
+
+        self.add_item(Button(label="Standard Forms 🌿", style=discord.ButtonStyle.primary, custom_id="standard"))
+        self.add_item(Button(label="Seasonal Forms 🌸", style=discord.ButtonStyle.success, custom_id="seasonal"))
+        self.add_item(Button(label="Glitched Forms 🌀", style=discord.ButtonStyle.danger, custom_id="glitched"))
+
+    async def interaction_check(self, interaction):
+        return interaction.user == self.ctx.author
+
+    async def on_timeout(self):
+        await self.ctx.send("⏳ Whisperling's Compendium faded for now...")
+
+    async def on_button_click(self, interaction, category):
+        await interaction.response.defer()
+        if category == "standard":
+            await send_form_list(self.ctx, STANDARD_MODES, "Standard Forms 🌿")
+        elif category == "seasonal":
+            await send_form_list(self.ctx, SEASONAL_MODES, "Seasonal Forms 🌸")
+        elif category == "glitched":
+            await send_form_list(self.ctx, GLITCHED_MODES, "Glitched Forms 🌀")
+
+    async def interaction_check(self, interaction):
+        return interaction.user == self.ctx.author
+
+    async def on_button_interaction(self, interaction):
+        button_id = interaction.data["custom_id"]
+        await self.on_button_click(interaction, button_id)
+
+    def interaction_check(self, interaction):
+        for item in self.children:
+            item.callback = self.on_button_interaction
+        return interaction.user == self.ctx.author
+
+
+### Form List Generator:
+
+async def send_form_list(ctx, mode_list, title):
+    embed = discord.Embed(
+        title=title,
+        description="Here are my forms in this category:",
+        color=discord.Color.blurple()
+    )
+
+    for mode in mode_list:
+        emoji_url = FORM_EMOJIS.get(mode)
+        flavor = MODE_TEXTS_ENGLISH.get(mode, {}).get("language_intro_title", "(no flavor text)")
+        embed.add_field(name=mode, value=flavor, inline=False)
+
+    first_mode = mode_list[0]
+    if FORM_EMOJIS.get(first_mode):
+        embed.set_thumbnail(url=FORM_EMOJIS[first_mode])
+
+    view = ReturnMenuView(ctx)
+    await ctx.send(embed=embed, view=view)
+
+
+class ReturnMenuView(View):
+    def __init__(self, ctx):
+        super().__init__(timeout=60)
+        self.ctx = ctx
+        self.add_item(Button(label="⬅ Return to Menu", style=discord.ButtonStyle.secondary, custom_id="return"))
+
+    async def interaction_check(self, interaction):
+        return interaction.user == self.ctx.author
+
+    async def on_timeout(self):
+        await self.ctx.send("⏳ Whisperling's Compendium closed.")
+
+    async def interaction_check(self, interaction):
+        for item in self.children:
+            item.callback = self.return_menu
+        return interaction.user == self.ctx.author
+
+    async def return_menu(self, interaction):
+        await interaction.response.defer()
+        await formcompendium(self.ctx)
 
 # ================= UTIL FUNCTION =================
 def style_text(guild_id, text):
@@ -2554,23 +2668,24 @@ async def whisper(ctx):
 
 # ========== GENERAL COMMANDS ==========
 
-@tree.command(name="help", description="📖 See the magical things Whisperling can do (for all users).")
-async def help(interaction: discord.Interaction):
-    guild_id = str(interaction.guild_id)
-    guild = interaction.guild  # ⬅ you need this for mode switching!
+async def build_help_embed(interaction_or_ctx):
+    guild = interaction_or_ctx.guild
+    guild_id = str(guild.id)
 
-    # 🌒 Handle potential glitch trigger
-    maybe_glitch = maybe_trigger_glitch(guild_id)
-    current_mode = guild_modes.get(guild_id, "dayform")
+    # 🌒 Handle glitch logic if needed (only once, when first called)
+    if isinstance(interaction_or_ctx, discord.Interaction):
+        maybe_glitch = maybe_trigger_glitch(guild_id)
+        current_mode = guild_modes.get(guild_id, "dayform")
 
-    if maybe_glitch and current_mode in STANDARD_MODES:
-        await apply_mode_change(guild, maybe_glitch)
-        current_mode = maybe_glitch  # Refresh current mode after glitch switch
+        if maybe_glitch and current_mode in STANDARD_MODES:
+            await apply_mode_change(guild, maybe_glitch)
+            current_mode = maybe_glitch
 
-    # 🕰️ Update interaction timestamp
-    last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
+        last_interaction_by_guild[guild_id] = datetime.now(timezone.utc)
+    else:
+        # For non-interaction context (regular !help), skip glitch checks
+        current_mode = guild_modes.get(guild_id, "dayform")
 
-    # ✨ Embed theming
     embed_color = MODE_COLORS.get(current_mode, discord.Color.blurple())
     description = MODE_DESCRIPTIONS.get(current_mode, "Whisperling shimmers softly in the grove.")
     footer = MODE_FOOTERS.get(current_mode, "Whisperling watches the grove gently...")
@@ -2587,12 +2702,13 @@ async def help(interaction: discord.Interaction):
             "`!translate` – Translate a replied message into your chosen language (auto-deletes)\n"
             "`?` – React with ❓ to translate a message to your DMs\n"
             "`!chooselanguage` – Pick or change your preferred language\n"
+            "`!setmode` – Shift Whisperling into a different form\n"
+            "`!formcompendium` – Browse Whisperling’s available forms\n"
             "`!... there is a hidden command ...` – If the winds allow, Flutterkin may awaken 🍼✨"
         ),
         inline=False
     )
 
-    # 🌍 Show which languages are available in this server
     lang_map = all_languages["guilds"].get(guild_id, {}).get("languages", {})
     if lang_map:
         langs = [f"{data['name']}" for code, data in lang_map.items()]
@@ -2603,7 +2719,17 @@ async def help(interaction: discord.Interaction):
         )
 
     embed.set_footer(text=footer)
+    return embed
+
+@tree.command(name="help", description="📖 See the magical things Whisperling can do (for all users).")
+async def help(interaction: discord.Interaction):
+    embed = await build_help_embed(interaction)
     await interaction.response.send_message(embed=embed, ephemeral=True)
+
+@bot.command(name="help")
+async def help_command(ctx):
+    embed = await build_help_embed(ctx)
+    await ctx.send(embed=embed)
 
 @bot.event
 async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
