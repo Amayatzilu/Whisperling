@@ -241,46 +241,39 @@ async def formcompendium(ctx):
     await ctx.send(embed=embed, view=view)
 
 
-### The Views:
-
 class MainMenuView(View):
     def __init__(self, ctx):
         super().__init__(timeout=60)
         self.ctx = ctx
 
-        self.add_item(Button(label="Standard Forms 🌿", style=discord.ButtonStyle.primary, custom_id="standard"))
-        self.add_item(Button(label="Seasonal Forms 🌸", style=discord.ButtonStyle.success, custom_id="seasonal"))
-        self.add_item(Button(label="Glitched Forms 🌀", style=discord.ButtonStyle.danger, custom_id="glitched"))
+        # Create buttons and bind callbacks:
+        standard_button = Button(label="Standard Forms 🌿", style=discord.ButtonStyle.primary)
+        standard_button.callback = self.standard_callback
+        self.add_item(standard_button)
+
+        seasonal_button = Button(label="Seasonal Forms 🌸", style=discord.ButtonStyle.success)
+        seasonal_button.callback = self.seasonal_callback
+        self.add_item(seasonal_button)
+
+        glitched_button = Button(label="Glitched Forms 🌀", style=discord.ButtonStyle.danger)
+        glitched_button.callback = self.glitched_callback
+        self.add_item(glitched_button)
 
     async def interaction_check(self, interaction):
         return interaction.user == self.ctx.author
 
-    async def on_timeout(self):
-        await self.ctx.send("⏳ Whisperling's Compendium faded for now...")
-
-    async def on_button_click(self, interaction, category):
+    async def standard_callback(self, interaction):
         await interaction.response.defer()
-        if category == "standard":
-            await send_form_list(self.ctx, STANDARD_MODES, "Standard Forms 🌿")
-        elif category == "seasonal":
-            await send_form_list(self.ctx, SEASONAL_MODES, "Seasonal Forms 🌸")
-        elif category == "glitched":
-            await send_form_list(self.ctx, GLITCHED_MODES, "Glitched Forms 🌀")
+        await send_form_list(self.ctx, STANDARD_MODES, "Standard Forms 🌿")
 
-    async def interaction_check(self, interaction):
-        return interaction.user == self.ctx.author
+    async def seasonal_callback(self, interaction):
+        await interaction.response.defer()
+        await send_form_list(self.ctx, SEASONAL_MODES, "Seasonal Forms 🌸")
 
-    async def on_button_interaction(self, interaction):
-        button_id = interaction.data["custom_id"]
-        await self.on_button_click(interaction, button_id)
+    async def glitched_callback(self, interaction):
+        await interaction.response.defer()
+        await send_form_list(self.ctx, GLITCHED_MODES, "Glitched Forms 🌀")
 
-    def interaction_check(self, interaction):
-        for item in self.children:
-            item.callback = self.on_button_interaction
-        return interaction.user == self.ctx.author
-
-
-### Form List Generator:
 
 async def send_form_list(ctx, mode_list, title):
     embed = discord.Embed(
@@ -306,17 +299,12 @@ class ReturnMenuView(View):
     def __init__(self, ctx):
         super().__init__(timeout=60)
         self.ctx = ctx
-        self.add_item(Button(label="⬅ Return to Menu", style=discord.ButtonStyle.secondary, custom_id="return"))
+
+        return_button = Button(label="⬅ Return to Menu", style=discord.ButtonStyle.secondary)
+        return_button.callback = self.return_menu
+        self.add_item(return_button)
 
     async def interaction_check(self, interaction):
-        return interaction.user == self.ctx.author
-
-    async def on_timeout(self):
-        await self.ctx.send("⏳ Whisperling's Compendium closed.")
-
-    async def interaction_check(self, interaction):
-        for item in self.children:
-            item.callback = self.return_menu
         return interaction.user == self.ctx.author
 
     async def return_menu(self, interaction):
