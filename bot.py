@@ -1083,6 +1083,8 @@ FLAVOR_TEXTS = {
 def get_flavor_text(mode):
     return random.choice(FLAVOR_TEXTS[mode])
 
+from datetime import datetime, timezone
+
 async def grove_heartbeat(bot):
     await bot.wait_until_ready()
 
@@ -1097,10 +1099,20 @@ async def grove_heartbeat(bot):
             guild_config = all_languages["guilds"].get(guild_id, {})
             whispers_enabled = guild_config.get("whispers_enabled", True)
 
-            # 🍵 Flavor drops (only if whispers are enabled)
             if whispers_enabled:
-                time_since_last = (now - last_flavor_sent[guild_id]).total_seconds()
-                cooldown_seconds = 2 * 60 * 60  # 2 hours
+                # 💡 Safely retrieve last flavor time, defaulting to "now minus cooldown" if missing
+                last_sent = last_flavor_sent.get(guild_id)
+                
+                if last_sent is None:
+                    # If no record, treat as if cooldown expired
+                    last_sent = now - timedelta(hours=3)
+
+                # 💡 Convert to timezone-aware if somehow naive
+                if last_sent.tzinfo is None:
+                    last_sent = last_sent.replace(tzinfo=timezone.utc)
+
+                time_since_last = (now - last_sent).total_seconds()
+                cooldown_seconds = 2 * 60 * 60
 
                 if time_since_last >= cooldown_seconds:
                     base_flavor_chance = 0.03
@@ -1130,11 +1142,14 @@ async def grove_heartbeat(bot):
                                 flavor_to_send = flavor
 
                             await channel.send(flavor_to_send)
-                            last_flavor_sent[guild_id] = now  # <-- record the last time she spoke
+                            last_flavor_sent[guild_id] = now
 
-            # 🌿 Mood drift still checks after long idle
             if mode in STANDARD_MODES:
                 last_seen = last_interaction_by_guild.get(guild_id, now)
+                
+                if last_seen.tzinfo is None:
+                    last_seen = last_seen.replace(tzinfo=timezone.utc)
+
                 days_idle = (now - last_seen).days
 
                 if days_idle >= 30 and random.random() < 0.25:
@@ -1143,7 +1158,7 @@ async def grove_heartbeat(bot):
                     print(f"🌿 Mood drift for {guild.name} -> {new_mode}")
                     await apply_mode_change(guild, new_mode)
 
-        await asyncio.sleep(600)  # 10 min loop still fine
+        await asyncio.sleep(600)
 
 # ================= UTIL FUNCTION =================
 def style_text(guild_id, text):
