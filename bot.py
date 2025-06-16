@@ -282,6 +282,7 @@ MODE_TEXTS_ENGLISH["dayform"] = {
     # 📜 Rules confirmation
     "rules_confirm_title": "🌿 The grove welcomes you.",
     "rules_confirm_desc": "You’ve accepted the path of peace and light. Let harmony guide your steps.",
+    "rules_none": "🌿 The grove whispers no laws... your steps are guided by kindness, {user}.",
 
     # 🌼 Role selection
     "role_intro_title": "🌼 Choose Your Role",
@@ -316,11 +317,13 @@ MODE_TEXTS_ENGLISH["nightform"] = {
     # 📜 Rules confirmation
     "rules_confirm_title": "🌿 The grove watches in stillness.",
     "rules_confirm_desc": "You’ve accepted the quiet pact. Walk kindly beneath the stars.",
+    "rules_none": "🌙 Beneath the moon’s hush, no rules are written... only the stars quietly watch, {user}.",
 
     # 🌼 Role selection
     "role_intro_title": "🌾 Choose Your Role",
     "role_intro_desc": "Select a role to carry with you beneath the moon’s gaze.",
     "role_granted": "🌙 The role of **{role}** rests upon your shoulders, light as starlight.",
+
 
     # ✨ Cosmetic Role Selection
     "cosmetic_intro_title": "🌙 Add a Moonlit Sparkle?",
@@ -350,6 +353,7 @@ MODE_TEXTS_ENGLISH["forestform"] = {
     # 📜 Rules confirmation
     "rules_confirm_title": "🌿 The grove welcomes with stillness.",
     "rules_confirm_desc": "The leaves accept your pact. Let your steps tread gently.",
+    "rules_none": "🍃 The deep woods offer no decree... trust the rhythm of the leaves, {user}.",
 
     # ✨ Cosmetic Role Selection
     "cosmetic_intro_title": "🍂 Add a Woodland Sparkle?",
@@ -383,6 +387,7 @@ MODE_TEXTS_ENGLISH["seaform"] = {
     # 📜 Rules confirmation
     "rules_confirm_title": "🌊 The sea accepts your presence.",
     "rules_confirm_desc": "The tide has taken your vow — let your journey flow gently.",
+    "rules_none": "🌊 The waves write no rules upon the shore... may your heart be steady as the tides, {user}.",
 
     # 🌼 Role selection
     "role_intro_title": "🌾 Choose Your Role",
@@ -416,6 +421,7 @@ MODE_TEXTS_ENGLISH["hadesform"] = {
     # 📜 Rules confirmation
     "rules_confirm_title": "🔥 The grove watches through smoke and flame.",
     "rules_confirm_desc": "You’ve accepted the terms — but rules were made to *simmer*, weren’t they?",
+    "rules_none": "🔥 No rules burn here... but don’t set the place on fire, okay {user}? 🔥",
 
     # 🌼 Role selection
     "role_intro_title": "🔥 Choose Your Role (before it chooses you)",
@@ -449,6 +455,7 @@ MODE_TEXTS_ENGLISH["auroraform"] = {
     # 📜 Rules confirmation
     "rules_confirm_title": "❄️ The stillness welcomes you.",
     "rules_confirm_desc": "You’ve accepted the path of gentle light — one that dances just above silence.",
+    "rules_none": "❄️ The aurora glides silently... no rules interrupt its shimmer. Breathe easy, {user}.",
 
     # 🌼 Role selection
     "role_intro_title": "💫 Choose Your Role",
@@ -482,6 +489,7 @@ MODE_TEXTS_ENGLISH["cosmosform"] = {
     # 📜 Rules confirmation
     "rules_confirm_title": "🌠 The grove glimmers in acceptance.",
     "rules_confirm_desc": "You’ve embraced the harmony of stardust — let your orbit be kind and wild.",
+    "rules_none": "✨ The stars hold no laws in their endless dance... float freely among the constellations, {user}.",
 
     # 🌼 Role selection
     "role_intro_title": "💫 Choose Your Role Among the Stars",
@@ -515,6 +523,7 @@ MODE_TEXTS_ENGLISH["vernalglint"] = {
     # 📜 Rules confirmation
     "rules_confirm_title": "🌼 The Grove Has Standards",
     "rules_confirm_desc": "You've agreed to play nice. That’s the spirit! Now water your manners and let’s go.",
+    "rules_none": "🌸 No rules bloom here... the petals simply dance, as shall you, {user}.",
 
     # 🌿 Role selection
     "role_intro_title": "🌷 Pick Your Petal-sona",
@@ -549,6 +558,7 @@ MODE_TEXTS_ENGLISH["sunfracture"] = {
     # 📜 Rules confirmation
     "rules_confirm_title": "☀️ THE GROVE SHINES BRIGHT!",
     "rules_confirm_desc": "You’ve embraced the path — the grove glows brighter with your presence. Let the joy bloom like morning light!",
+    "rules_none": "🌞 The fractured light casts no laws... step carefully between the shards, {user}.",
 
     # 🌼 Role selection
     "role_intro_title": "🔥 CHOOSE YOUR ROLE!",
@@ -585,6 +595,7 @@ MODE_TEXTS_ENGLISH["fallveil"] = {
     # 📜 Rules confirmation
     "rules_confirm_title": "🌒 The Pact of Rest is Made",
     "rules_confirm_desc": "You agreed to stay kind. That includes being kind to *yourself.* The grove approves. And has tea ready.",
+    "rules_none": "🍂 The autumn hush carries no rules... only soft whispers ride the wind, {user}.",
 
     # 🍂 Role selection
     "role_intro_title": "🧣 Choose Your Identity — Shed the Old Skin",
@@ -619,6 +630,7 @@ MODE_TEXTS_ENGLISH["yuleshard"] = {
     # 📜 Rules confirmation
     "rules_confirm_title": "❄️ The grove rests beneath the frost.",
     "rules_confirm_desc": "You’ve accepted the pact, written like ice crystals — delicate, enduring, beautiful beneath the quiet sky.",
+    "rules_none": "❄️ In this frozen stillness, no rules remain... but warmth may yet find you, {user}.",
 
     # 🌼 Role selection
     "role_intro_title": "🧊 Choose your role...",
@@ -656,6 +668,7 @@ MODE_TEXTS_ENGLISH["echovoid"] = {
     # 📜 Rules confirmation
     "rules_confirm_title": "…the grove listens…",
     "rules_confirm_desc": "You’ve accepted… the silence… the shape of the rules… rules… rules…",
+    "rules_none": "🎶 The echoes hold no commands... only the hollow chords hum softly for you, {user}.",
 
     # 🌼 Role selection
     "role_intro_title": "…choose your… role…",
@@ -691,11 +704,11 @@ MODE_TEXTS_ENGLISH["glitchspire"] = {
     # 📜 Rules confirmation
     "rules_confirm_title": "📂 GROVE.PROTOCOL_ACCEPTED",
     "rules_confirm_desc": "Rules.upload = COMPLETE\n(…some fragments missing… parsing okay… continue anyway…)",
+    "rules_none": "🌀 {user}... ru..les…? ::undefined:: none.. detected... proceed, probably…",
 
     # 🌼 Role selection
     "role_intro_title": "💾 SELECT: ROLE_MODULE",
     "role_intro_desc": "SCANNING AVATAR TRAITS…\nOPTIONS LOADED… please assign identity-tag.",
-
     "role_granted": "🧬 Role assigned: **{role}**\n{user}.unit // configuration updated.",
 
     # ✨ Cosmetic Role Selection
@@ -719,20 +732,20 @@ MODE_TEXTS_ENGLISH["flutterkin"] = {
     "flutterkin_activation": "✨ {user} a gentle shimmer surrounds you... the flutterkin hears your wish. yay~ ✨",
 
     # 🤫 Language selection
-    "language_intro_title": "🌈 pick ur whisper tongue!!",
+    "language_intro_title": "🌈 pick your whisper tongue!!",
     "language_intro_desc": "{user} hi hi!! ✨ um um can u pick a voice please? it go pretty~!!!",
 
     "language_confirm_title": "✨ yaaay!!",
-    "language_confirm_desc": "your voice is all sparkle-sparkle now!!! 💖 the grove is goin WHEEEE~!",
+    "language_confirm_desc": "your voice is all sparkle-sparkle now!!! 💖 the grove is going WHEEEE~!",
 
     # 📜 Rules confirmation
     "rules_confirm_title": "🧸 okay sooo…",
-    "rules_confirm_desc": "you said yes to the rules!! 🥹 u so good. grove say thankyuu 💕",
+    "rules_confirm_desc": "you said yes to the rules!! 🥹 You so good. grove say thankyuu 💕",
+    "rules_none": "🦋 No rules! 🎉 Just flutters and sparkles and… oh! Shiny! Hi {user}!",
 
     # 🌼 Role selection
     "role_intro_title": "🐾 pick a role!!",
     "role_intro_desc": "this the fun part!!! pick the sparkly hat you wanna wear!! (it's not a hat but SHHH!)",
-
     "role_granted": "💫 yaaaaayyy!! you is now the **{role}**!! that’s the bestest!!! i’m clapping with my wings!!",
 
     # ✨ Cosmetic Role Selection
@@ -747,7 +760,7 @@ MODE_TEXTS_ENGLISH["flutterkin"] = {
 
     # ⏳ Timeout Text
     "timeout_language": "⏳ {user} ummm you didn’t pick the thing?? that’s ok!! we can try again later yayyy 💖✨",
-    "timeout_rules": "⏳ {user} oh nooo rules went bye bye!! 😢 the grove still loves you though!! maybe come back and tap the button??",
+    "timeout_rules": "⏳ {user} oh no rules went bye bye!! 😢 the grove still loves you though!! maybe come back and tap the button??",
     "timeout_role": "⏳ {user} oh!!! wait!! you didn’t pick a sparkly hat!! 🌟 next time next time!!",
     "timeout_cosmetic": "⏳ {user} no sparkle?! 😱 its okay!! you still squishy!!! 🐛✨💕"
 }
@@ -763,6 +776,7 @@ MODE_TEXTS_ENGLISH["crepusca"] = {
     # 📜 Rules confirmation
     "rules_confirm_title": "🌘 …etched in dreamlight…",
     "rules_confirm_desc": "you’ve whispered your vow… and the grove… listens through sleep…",
+    "rules_none": "🌒 …no laws… only the drifting mists… the grove trusts you, {user}…",
 
     # 🌼 Role selection
     "role_intro_title": "🌫️ choose… gently…",
@@ -1286,9 +1300,9 @@ def get_activity_level(guild_id: str) -> int:
 
 # ================= ADMIN CONTROLS =================
 
-@bot.command(aliases=["backup", "dumpjson"])
-@commands.has_permissions(administrator=True)
-async def backup_json(ctx):
+@bot.command(aliases=["backupwhisp"])
+@commands.is_owner()
+async def backupwhisperling(ctx):
     """📦 Sends the current languages.json as a backup."""
     try:
         file_path = "languages.json"
@@ -1446,7 +1460,6 @@ async def togglewhispers(ctx):
     await ctx.send(f"🌸 Whisperling's soft whispers are now **{status}**.")
 
 @bot.command(aliases=["formwechsel", "modedeforme", "cambiodemodo"])
-@commands.has_permissions(administrator=True)
 async def setmode(ctx, mode: str):
     mode = mode.lower()
     guild = ctx.guild
@@ -2160,11 +2173,19 @@ async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.teal())
 
+    # Pull rules text if configured, else fallback flavored message
+    rules_text = guild_config.get("rules", {}).get(lang_code)
+    if not rules_text:
+        rules_text = get_translated_mode_text(
+            guild_id, user_id, mode, "rules_none",
+            fallback="📜 No rules have been set for this grove. Whisperling trusts your good heart, {user}."
+        )
+
     class AcceptRulesView(View):
         def __init__(self):
             super().__init__(timeout=90)
             button = Button(
-                label="✅ I Accept the Rules",
+                label="✅ I Accept",
                 style=discord.ButtonStyle.success,
                 custom_id="accept_rules"
             )
@@ -2201,15 +2222,13 @@ async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
         await send_role_selector(member, channel, guild_config)
 
     view = AcceptRulesView()
-
-    # Assign callback outside of init to avoid nested class/function spaghetti
     for item in view.children:
         if isinstance(item, Button):
             item.callback = handle_accept
 
     embed = discord.Embed(
-        title="📜 Grove Guidelines",
-        description=guild_config.get("rules", {}).get(lang_code, "📜 No rules are set in your language."),
+        title=get_translated_mode_text(guild_id, user_id, mode, "rules_intro_title", fallback="📜 Grove Guidelines"),
+        description=rules_text,
         color=embed_color
     )
 
@@ -2217,14 +2236,35 @@ async def send_rules_embed(member, channel, lang_code, lang_map, guild_config):
 
 async def send_role_selector(member, channel, guild_config):
     role_options = guild_config.get("role_options", {})
-    if not role_options:
-        return
 
     guild_id = str(member.guild.id)
     user_id = str(member.id)
     mode = guild_modes.get(guild_id, "dayform")
     embed_color = MODE_COLORS.get(mode, discord.Color.gold())
 
+    # 🌿 If no role options are configured, send graceful fallback
+    if not role_options:
+        fallback_desc = get_translated_mode_text(
+            guild_id, user_id, mode, "role_none",
+            fallback="✨ No roles have been configured for you to pick."
+        )
+        embed = discord.Embed(
+            title="🎭 Roles",
+            description=fallback_desc,
+            color=embed_color
+        )
+        await channel.send(content=member.mention, embed=embed)
+        await asyncio.sleep(1)
+
+        # 🌸 Continue onward to cosmetics
+        cosmetic_shown = await send_cosmetic_selector(member, channel, guild_config)
+        if not cosmetic_shown:
+            lang_code = all_languages["guilds"][guild_id]["users"].get(user_id, "en")
+            lang_map = all_languages["guilds"][guild_id]["languages"]
+            await send_final_welcome(member, channel, lang_code, lang_map)
+        return
+
+    # 🖐️ If roles exist, build the selector normally
     class RoleSelectView(View):
         def __init__(self):
             super().__init__(timeout=60)
@@ -2302,8 +2342,21 @@ async def send_cosmetic_selector(member, channel, guild_config):
     cosmetic_options = guild_config.get("cosmetic_role_options", {})
     embed_color = MODE_COLORS.get(mode, discord.Color.blurple())
 
+    # 🌿 Graceful fallback if no cosmetic options configured
     if not cosmetic_options:
-        return False  # ⛔ Skip if no options
+        fallback_desc = get_translated_mode_text(
+            guild_id, user_id, mode, "cosmetic_none",
+            fallback="💎 No cosmetics have been configured. You shine just fine!"
+        )
+        embed = discord.Embed(
+            title="💎 Cosmetic Sparkles",
+            description=fallback_desc,
+            color=embed_color
+        )
+        await channel.send(content=member.mention, embed=embed)
+        await asyncio.sleep(1)
+        await send_final_welcome(member, channel, lang_code, lang_map)
+        return False  # Still return False for consistent flow handling
 
     class CosmeticRoleView(View):
         def __init__(self):
@@ -2335,6 +2388,8 @@ async def send_cosmetic_selector(member, channel, guild_config):
                     user=member.mention
                 )
                 await channel.send(timeout_msg)
+                await asyncio.sleep(1)
+                await send_final_welcome(member, channel, lang_code, lang_map)
             except Exception as e:
                 print("⚠️ Timeout error (cosmetic selector):", e)
 
@@ -2364,7 +2419,6 @@ async def send_cosmetic_selector(member, channel, guild_config):
         await asyncio.sleep(1)
         await send_final_welcome(member, channel, lang_code, lang_map)
 
-    # Instantiate view & safely assign callbacks after init:
     view = CosmeticRoleView()
     for item in view.children:
         if isinstance(item, Button):

@@ -165,7 +165,17 @@
           "label": "White"
         }
       },
-      "whispers_enabled": true
+      "whispers_enabled": true,
+      "role_options": {
+        "1378488908446175322": {
+          "emoji": "✨",
+          "label": "Stardew"
+        },
+        "1383512617611694131": {
+          "emoji": "<:echo4:1383471288500097065>",
+          "label": "Unbroken Light"
+        }
+      }
     },
     "1383263489891635221": {
       "languages": {
