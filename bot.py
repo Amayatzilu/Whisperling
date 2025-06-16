@@ -269,6 +269,7 @@ class FormSelect(Select):
     async def callback(self, interaction: discord.Interaction):
         selected_key = self.values[0]
         profile = FORM_PROFILES.get(selected_key)
+        emoji_url = FORM_EMOJIS.get(selected_key)
 
         embed = discord.Embed(
             title=f"{profile['emoji']} {selected_key.title()} — {profile['type']} Form",
@@ -279,6 +280,9 @@ class FormSelect(Select):
         embed.add_field(name="Personality", value=profile['personality'], inline=False)
         embed.add_field(name="Style", value=profile['style'], inline=False)
         embed.add_field(name="Example", value=profile['example'], inline=False)
+
+        if emoji_url:
+            embed.set_thumbnail(url=emoji_url)
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
