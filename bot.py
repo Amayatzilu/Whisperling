@@ -1117,7 +1117,7 @@ async def softly_remove_member(member, action="kick", interaction=None):
             "kick": f"🌌 You’ve drifted too far from **{guild.name}**.",
             "ban": f"🌌 You are lost beyond the furthest stars. **{guild.name}** will not call you back."
         },
-        "seaform": {
+        "selkintide": {
             "kick": f"🌊 You’ve been swept from **{guild.name}** to calmer tides.",
             "ban": f"🌊 The depths close. **{guild.name}** will not see you resurface."
         },
@@ -1125,7 +1125,7 @@ async def softly_remove_member(member, action="kick", interaction=None):
             "kick": f"🔥 You have been *politely yeeted* from **{guild.name}**.",
             "ban": f"🔥 The flames consume your path. **{guild.name}** is no longer yours to enter."
         },
-        "forestform": {
+        "sylvabloom": {
             "kick": f"🍃 The Grove gently closes its branches around **{guild.name}**.",
             "ban": f"🍃 The roots reject you fully. You shall not return to **{guild.name}**."
         },
@@ -1171,9 +1171,9 @@ async def softly_remove_member(member, action="kick", interaction=None):
         "dayform": f"☀️ {member.mention} has been escorted gently from the Grove.",
         "nightform": f"🌙 A hush falls. {member.mention} is no longer among us.",
         "cosmosform": f"🌌 {member.mention} drifts into the distant void.",
-        "seaform": f"🌊 {member.mention} has been swept beyond the Grove's tides.",
+        "selkintide": f"🌊 {member.mention} has been swept beyond the Grove's tides.",
         "hadesform": f"🔥 The embers flash — {member.mention} is gone.",
-        "forestform": f"🍃 The Grove closes around {member.mention}.",
+        "sylvabloom": f"🍃 The Grove closes around {member.mention}.",
         "auroraform": f"❄️ The lights dim for {member.mention}.",
         "vernalglint": f"🌸 {member.mention} has been shooed away from the Grove.",
         "fallveil": f"🍁 {member.mention} now rests far beyond the Grove's reach.",

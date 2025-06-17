@@ -1,8 +1,8 @@
 import discord
 
 STANDARD_MODES = [
-    "dayform", "nightform", "cosmosform", "seaform",
-    "hadesform", "forestform", "auroraform",
+    "dayform", "nightform", "cosmosform", "selkintide",
+    "hadesform", "sylvabloom", "auroraform",
 ]
 
 GLITCHED_MODES = [
@@ -31,7 +31,7 @@ FORM_PROFILES = {
         "style": "Soft tones and gentle rhythm",
         "example": "🌙 In moonlight hush, your presence is a quiet wonder."
     },
-    "forestform": {
+    "sylvabloom": {
         "emoji": "🌿",
         "type": "Standard",
         "vibe": "Earthy, grounded, cozy",
@@ -39,7 +39,7 @@ FORM_PROFILES = {
         "style": "Nature-based phrasing, rustic charm",
         "example": "🌿 A new leaf joins the glade. Welcome home."
     },
-    "seaform": {
+    "selkintide": {
         "emoji": "🌊",
         "type": "Standard",
         "vibe": "Flowing, emotional, tranquil",
@@ -145,9 +145,9 @@ MODE_DESCRIPTIONS = {
     "dayform": "🌞 Radiant and nurturing",
     "nightform": "🌙 Calm and moonlit",
     "cosmosform": "🌌 Ethereal and star-bound",
-    "seaform": "🌊 Graceful and ocean-deep",
+    "selkintide": "🌊 Graceful and ocean-deep",
     "hadesform": "🔥 Mischievous with glowing heat",
-    "forestform": "🍃 Grounded and natural",
+    "sylvabloom": "🍃 Grounded and natural",
     "auroraform": "❄️ Dreamlike and glimmering",
 
     "vernalglint": "🌸 Aggressively nurturing; a pastel gale of joy",
@@ -164,8 +164,8 @@ MODE_DESCRIPTIONS = {
 FORM_EMOJIS = {
     "dayform": "https://cdn.discordapp.com/emojis/1376778845734043769.webp?size=128",
     "nightform": "https://cdn.discordapp.com/emojis/1376778856656273408.webp?size=128",
-    "forestform": "https://cdn.discordapp.com/emojis/1376778851388096612.webp?size=128",
-    "seaform": "https://cdn.discordapp.com/emojis/1376778858753294346.webp?size=128",
+    "sylvabloom": "https://cdn.discordapp.com/emojis/1376778851388096612.webp?size=128",
+    "selkintide": "https://cdn.discordapp.com/emojis/1376778858753294346.webp?size=128",
     "hadesform": "https://cdn.discordapp.com/emojis/1376778854735151154.webp?size=128",
     "auroraform": "https://cdn.discordapp.com/emojis/1383110764746772621.webp?size=128",
     "cosmosform": "https://cdn.discordapp.com/emojis/1376778841971757096.webp?size=128",
@@ -211,9 +211,9 @@ MODE_TONE = {
     "dayform": lambda text: f"🌞 {text}",
     "nightform": lambda text: f"🌙 *{text}*",
     "cosmosform": lambda text: f"✨ {text} ✨",
-    "seaform": lambda text: f"🌊 {text}...",
+    "selkintide": lambda text: f"🌊 {text}...",
     "hadesform": lambda text: f"🔥 {text}!",
-    "forestform": lambda text: f"🍃 {text}",
+    "sylvabloom": lambda text: f"🍃 {text}",
     "auroraform": lambda text: f"❄️ {text}",
 
     "sunfracture": sunfracture_style,
@@ -232,9 +232,9 @@ MODE_COLORS = {
     "dayform": discord.Color.gold(),                    # 🌞 Radiant golden glow
     "nightform": discord.Color.dark_blue(),             # 🌙 Deep moonlit blue
     "cosmosform": discord.Color.fuchsia(),              # 🌌 Cosmic magenta-pink
-    "seaform": discord.Color.teal(),                    # 🌊 Oceanic teal
+    "selkintide": discord.Color.teal(),                    # 🌊 Oceanic teal
     "hadesform": discord.Color.red(),                   # 🔥 Fiery bold red
-    "forestform": discord.Color.green(),                # 🍃 Natural leafy green
+    "sylvabloom": discord.Color.green(),                # 🍃 Natural leafy green
     "auroraform": discord.Color.blurple(),              # ❄️ Magical aurora violet-blue
 
     # SEASONAL FORMS
@@ -254,9 +254,9 @@ MODE_FOOTERS = {
     "dayform": "☀️ The grove shines bright in kindness.",
     "nightform": "🌙 The moonlight hums a soothing spell.",
     "cosmosform": "✨ Stars whisper secrets between worlds.",
-    "seaform": "🌊 Tides of thought drift through the cove.",
+    "selkintide": "🌊 Tides of thought drift through the cove.",
     "hadesform": "🔥 Mischief smolders beneath the roots.",
-    "forestform": "🍃 The trees murmur in leafy language.",
+    "sylvabloom": "🍃 The trees murmur in leafy language.",
     "auroraform": "❄️ Glistening lights ripple with wonder.",
 
     "vernalglint": "🌸 Blossoms burst with unstoppable joy.",
@@ -344,7 +344,7 @@ MODE_TEXTS_ENGLISH["nightform"] = {
 }
 
 
-MODE_TEXTS_ENGLISH["forestform"] = {
+MODE_TEXTS_ENGLISH["sylvabloom"] = {
     # 🌿 Language selection
     "language_intro_title": "🍃 Choose Your Whispering Tongue",
     "language_intro_desc": "{user}, the forest stirs with your presence.\nChoose the voice you’ll carry among the roots.",
@@ -378,7 +378,7 @@ MODE_TEXTS_ENGLISH["forestform"] = {
     "timeout_cosmetic": "⏳ {user}, no charm was picked — yet the grove still knows your presence among its roots."
 }
 
-MODE_TEXTS_ENGLISH["seaform"] = {
+MODE_TEXTS_ENGLISH["selkintide"] = {
     # 🌊 Language selection
     "language_intro_title": "🌊 Choose Your Whispering Tongue",
     "language_intro_desc": "{user}, the tide calls softly.\nChoose the language that drifts upon your waves.",
@@ -853,7 +853,7 @@ FLAVOR_TEXTS = {
         "🕊️ Cool air carries forgotten lullabies.",
         "🌿 'Even in silence, there is song.'"
     ],
-    "forestform": [
+    "sylvabloom": [
         "🍃 The trees murmur ancient songs in the wind.",
         "🌿 Moss blankets the roots like a patient embrace.",
         "🦌 A quiet rustle reveals shy creatures watching from the brush.",
@@ -870,7 +870,7 @@ FLAVOR_TEXTS = {
         "🌳 'All paths here are watched by quiet eyes.'",
         "🦊 A tiny fox peeks out from its den, tail flicking curiously."
     ],
-    "seaform": [
+    "selkintide": [
         "🌊 The waves hum in endless rhythm.",
         "🐚 Shells glisten beneath shallow pools of light.",
         "🪸 Whisperling listens to secrets carried deep beneath the surface.",
