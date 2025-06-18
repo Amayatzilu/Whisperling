@@ -20,10 +20,8 @@
         "timeout_rules": "⏳ {user}, the grove waited for your promise, but the sun dipped a little lower. You can return anytime.",
         "timeout_role": "⏳ {user}, no role was chosen — the petals closed gently. Come find your bloom again soon.",
         "timeout_cosmetic": "⏳ {user}, no sparkle was chosen, but the grove still glows with your presence."
-    }
-},
+    },
 
-{
   "nightform": {
     "language_intro_title": "🌙 Choose Your Whispering Tongue",
     "language_intro_desc": "{user}, drift softly into the grove.\nChoose the voice that guides your quiet steps.",
@@ -45,10 +43,8 @@
     "timeout_rules": "⏳ {user}, the night listened… but your vow was never spoken. Come back when the hush feels right.",
     "timeout_role": "⏳ {user}, beneath the moon’s gaze, no path was chosen. The grove sleeps on — your journey can begin later.",
     "timeout_cosmetic": "⏳ {user}, no shimmer adorned you, but the dark welcomes you just the same."
-  }
-},
+  },
 
-{
   "sylvabloom": {
     "language_intro_title": "🍃 Choose Your Whispering Tongue",
     "language_intro_desc": "{user}, the forest stirs with your presence.\nChoose the voice you’ll carry among the roots.",
@@ -70,10 +66,8 @@
     "timeout_rules": "⏳ {user}, the trees waited for your vow, but only wind passed through. The path remains, should you wish to walk it.",
     "timeout_role": "⏳ {user}, no trail was chosen — the leaves curled softly. Return when your steps are sure.",
     "timeout_cosmetic": "⏳ {user}, no charm was picked — yet the grove still knows your presence among its roots."
-  }
-},
+  },
 
-{
   "selkintide": {
     "language_intro_title": "🌊 Choose Your Whispering Tongue",
     "language_intro_desc": "{user}, the tide calls softly.\nChoose the language that drifts upon your waves.",
@@ -95,10 +89,8 @@
     "timeout_rules": "⏳ {user}, the sea listened for your vow… but only silence returned. The current will welcome you when you’re ready.",
     "timeout_role": "⏳ {user}, no current carried your choice ashore. Drift back when the pull of purpose finds you.",
     "timeout_cosmetic": "⏳ {user}, no shimmer joined your tide, but the ocean still holds you gently."
-  }
-},
+  },
 
-{
   "hadesform": {
     "language_intro_title": "🔥 Choose Your Whispering Tongue",
     "language_intro_desc": "{user}, the flames flicker in anticipation.\nWhich tongue will you stoke into brilliance?",
@@ -120,10 +112,8 @@
     "timeout_rules": "⏳ {user}, no vow? No problem. The grove’s rules are still smoldering — come back when you're ready to stir the coals.",
     "timeout_role": "⏳ {user}, no role chosen? Bold move. Just vibing in the firelight, huh?",
     "timeout_cosmetic": "⏳ {user}, no sizzle today — guess you're already hot enough. 🔥"
-  }
-},
+  },
 
-{
   "auroraform": {
     "language_intro_title": "❄️ Choose Your Whispering Tongue",
     "language_intro_desc": "{user}, beneath the shimmer of frozen skies,\nselect the voice that will drift beside you.",
@@ -145,11 +135,8 @@
     "timeout_rules": "⏳ {user}, no vow was whispered… only the hush of frost remains. The grove waits in stillness.",
     "timeout_role": "⏳ {user}, no path was chosen — the light dimmed quietly. Drift back when the skies stir once more.",
     "timeout_cosmetic": "⏳ {user}, no sparkle joined your glow, but even the quietest star still shines."
-  }
-},
+  },
 
-
-{
   "vernalglint": {
     "language_intro_title": "🌸 Pick Your Bloom-Speak",
     "language_intro_desc": "{user}, the grove is awake and caffeinated.\nChoose the voice that'll cheer you on (whether you like it or not).",
@@ -171,10 +158,8 @@
     "timeout_rules": "⏳ {user}, the grove sat politely, but your oath got stuck in the roots. Water it and try again later.",
     "timeout_role": "⏳ {user}, you stared at the garden path too long and now a squirrel has taken your spot. Try again soon!",
     "timeout_cosmetic": "⏳ {user}, no sparkle today. But that’s okay. Some petals take longer to open. 🌱"
-  }
-},
+  },
 
-{
   "sunfracture": {
     "language_intro_title": "☀️ CHOOSE YOUR TONGUE!",
     "language_intro_desc": "{user}, the grove shimmers beneath golden skies! Choose the voice that warms your spark and joins the light!",
@@ -196,10 +181,8 @@
     "timeout_rules": "⏳ {user}, the pages turned softly in the breeze — but you missed your chance. The grove remains here for you. 🌞📜",
     "timeout_role": "⏳ {user}, no role chosen — but the grove still shines. Your moment will come again! 🌟💫",
     "timeout_cosmetic": "⏳ {user}, no extra sparkle today — and yet, your light remains bright. ✨🌿"
-  }
-},
+  },
 
-{
   "fallveil": {
     "language_intro_title": "🍁 Pick Your Language — Then Exhale",
     "language_intro_desc": "{user}, hush. Let the leaves fall. Choose the voice that won’t rush you, but won’t let you flee, either.",
@@ -221,10 +204,8 @@
     "timeout_rules": "⏳ {user}, you didn’t make the vow. Maybe you forgot. Or maybe you were scared. The grove is patient. Try again when you’re brave enough to rest.",
     "timeout_role": "⏳ {user}, no path chosen. Maybe today wasn’t a path day. That’s alright. The leaves will still fall without your permission.",
     "timeout_cosmetic": "⏳ {user}, no sparkle today. No mask. Just you — and that's never been a lesser thing. 🍂"
-  }
-},
+  },
 
-{
   "yuleshard": {
     "language_intro_title": "❄️ Choose your whispering tongue...",
     "language_intro_desc": "{user}... the grove lies quiet beneath the snow. Choose your voice — let it drift gently into the stillness...",
@@ -246,10 +227,8 @@
     "timeout_rules": "⏳ {user}... the pact was left unwritten... snow falls, covering empty ground...",
     "timeout_role": "⏳ {user}... the choice faded like breath in winter air... the grove waits beneath the frost...",
     "timeout_cosmetic": "⏳ {user}... no shimmer chosen... the snow falls in quiet layers, undisturbed..."
-  }
-},
+  },
 
-{
   "echovoid": {
     "language_intro_title": "🕳️ …choose… your whispering tongue…",
     "language_intro_desc": "{user}… {user}… the grove… has been quiet… so quiet…\nA voice… any voice… choose it… echo it…",
@@ -271,10 +250,8 @@
     "timeout_rules": "⏳ {user}… the rules waited… (or did they?) …they echo now… in the quiet…",
     "timeout_role": "⏳ {user}… no role… no name… (no identity?) …just echoes where a choice could have been…",
     "timeout_cosmetic": "⏳ {user}… no sparkle chosen… (or maybe you did…) …it’s hard to remember now…"
-  }
-},
+  },
 
-{
   "glitchspire": {
     "language_intro_title": "🧬 ▓Choose▓ your ▒whispering▒ tongue…",
     "language_intro_desc": "{user} = DETECTED\n>LOADING_LINGUAL_OPTIONS…\nSELECT //voice.signal.stable",
@@ -296,10 +273,8 @@
     "timeout_rules": "⏳ {user}… RULE.CONFIRMATION.MISSED… frost.byte()… protocol.standby…",
     "timeout_role": "⏳ {user}… ROLE_UNASSIGNED… identity packet corrupted… awaiting input retry…",
     "timeout_cosmetic": "⏳ {user}… COSMETIC.FLARE=VOID… no sparkle attached… system stability: ⬇️ 81%…"
-  }
-},
+  },
 
-{
   "crepusca": {
     "language_intro_title": "🌒 …a voice… half-remembered…",
     "language_intro_desc": "{user}… the grove has fallen into a hush…\nchoose your voice… before the dream fades…",
@@ -321,10 +296,8 @@
     "timeout_rules": "⏳ {user}… your vow… was almost spoken… then lost… like smoke in the dusk…",
     "timeout_role": "⏳ {user}… the grove waited… but no path was chosen… only mist remains…",
     "timeout_cosmetic": "⏳ {user}… the glimmer passed you by… but you still glow in the dreaming dark…"
-  }
-},
+  },
 
-{
   "flutterkin": {
     "flutterkin_activation": "✨ {user} a gentle shimmer surrounds you... the flutterkin hears your wish. yay~ ✨",
     "language_intro_title": "🌈 pick your whisper tongue!!",
