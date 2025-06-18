@@ -10,11 +10,19 @@ import os
 import asyncio
 from googletrans import Translator
 
-from moodcookies import (
-    STANDARD_MODES, GLITCHED_MODES, SEASONAL_MODES,
-    MODE_DESCRIPTIONS, MODE_COLORS, MODE_FOOTERS, FORM_PROFILES,
-    FORM_EMOJIS, MODE_TEXTS_ENGLISH, MODE_TONE, FLAVOR_TEXTS
-)
+def load_json_file(path):
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+# Load all the mode data from files
+MODE_TEXTS = load_json_file("MODE_TEXTS.json")
+MODE_FOOTERS = load_json_file("MODE_FOOTERS.json")
+MODE_COLORS = load_json_file("MODE_COLORS.json")
+MODE_DESCRIPTIONS = load_json_file("MODE_DESCRIPTIONS.json")
+FORM_CATEGORIES = load_json_file("FORM_CATEGORIES.json")
+FORM_EMOJIS = load_json_file("FORM_EMOJIS.json")
+FORM_PROFILES = load_json_file("FORM_PROFILES.json")
+FLAVOR_TEXTS = load_json_file("FLAVOR_TEXTS.json")
 
 # ========== CONFIG ==========
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -47,6 +55,56 @@ def get_user_language(guild_id: str, user_id: str):
         return all_languages["guilds"][guild_id]["users"][user_id]
     except KeyError:
         return None
+
+# ========== MOOD COOKIES ==========
+
+def flutter_baby_speak(text):
+    return f"✨ {text} yay~ ✨"
+
+def echo_void_style(text):
+    return f"...{text}... ({text})..."
+
+def vernalglint_style(text):
+    return f"🌸 {text}! 🌱"
+
+def fallveil_style(text):
+    return f"🍁 {text}. 🕯️"
+
+def sunfracture_style(text):
+    words = text.split()
+    for i in range(0, len(words), 2):
+        words[i] = words[i].upper()
+    return f"☀️ {' '.join(words)} ✨"
+
+def yuleshard_style(text):
+    return f"❄️ {text.replace('.', '...')} ❄️"
+
+def glitchspire_style(text):
+    return f"{text} [DATA FRAGMENT: ❖]"
+
+def crepusca_style(text):
+    softened = text.lower().replace('.', '...').replace('!', '...').replace('?', '...')
+    return f"🌒 {softened} as if from a dream..."
+
+MODE_TONE = {
+    "dayform": lambda text: f"🌞 {text}",
+    "nightform": lambda text: f"🌙 *{text}*",
+    "cosmosform": lambda text: f"✨ {text} ✨",
+    "selkintide": lambda text: f"🌊 {text}...",
+    "hadesform": lambda text: f"🔥 {text}!",
+    "sylvabloom": lambda text: f"🍃 {text}",
+    "auroraform": lambda text: f"❄️ {text}",
+
+    "sunfracture": sunfracture_style,
+    "yuleshard": yuleshard_style,
+    "vernalglint": vernalglint_style,
+    "fallveil": fallveil_style,
+
+    "echovoid": echo_void_style,
+    "glitchspire": glitchspire_style,
+    "flutterkin": flutter_baby_speak,
+    "crepusca": crepusca_style,
+}
 
 # ========== EVENTS ==========
 
@@ -135,6 +193,20 @@ last_interaction_by_guild = defaultdict(lambda: datetime.now(timezone.utc))
 previous_standard_mode_by_guild = defaultdict(lambda: "dayform")
 glitch_timestamps_by_guild = defaultdict(lambda: None)
 flutterkin_usage_count_by_guild = {}
+
+def get_translated_mode_text(guild_id, user_id, mode, key, fallback="", **kwargs):
+    lang = get_user_language(guild_id, user_id)
+    base_text = MODE_TEXTS.get(mode, {}).get(key, fallback)
+    formatted = base_text.format(**kwargs)
+
+    if not lang or lang == "en":
+        return formatted
+
+    try:
+        translated = translator.translate(formatted, dest=lang).text
+        return translated
+    except Exception:
+        return formatted
 
 def maybe_trigger_glitch(guild_id: str):
     """
@@ -1916,7 +1988,7 @@ async def chooselanguage(ctx):
         return await ctx.send("❗ No languages are configured yet.")
 
     embed_color = MODE_COLORS.get(current_mode, discord.Color.purple())
-    voice = MODE_TEXTS_ENGLISH.get(current_mode, {})
+    voice = MODE_TEXTS.get(current_mode, {})
 
     embed = discord.Embed(
         title=voice.get("language_intro_title", "🧚 Choose Your Whispering Tongue"),

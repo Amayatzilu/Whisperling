@@ -1,0 +1,21 @@
+{
+  "MODE_COLORS": {
+    "dayform": "#FFD700",
+    "nightform": "#00008B",
+    "cosmosform": "#FF00FF",
+    "selkintide": "#008080",
+    "hadesform": "#FF0000",
+    "sylvabloom": "#008000",
+    "auroraform": "#7289DA",
+
+    "vernalglint": "#FFB6C1",
+    "fallveil": "#D2691E",
+    "sunfracture": "#FFFF00",
+    "yuleshard": "#A8C4D9",
+
+    "echovoid": "#A9A9A9",
+    "glitchspire": "#00FFFF",
+    "flutterkin": "#FFB6E1",
+    "crepusca": "#4B4453"
+  }
+}

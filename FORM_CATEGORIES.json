@@ -1,0 +1,12 @@
+{
+  "STANDARD_MODES": [
+    "dayform", "nightform", "cosmosform", "selkintide",
+    "hadesform", "sylvabloom", "auroraform"
+  ],
+  "GLITCHED_MODES": [
+    "echovoid", "glitchspire", "flutterkin", "crepusca"
+  ],
+  "SEASONAL_MODES": [
+    "vernalglint", "fallveil", "sunfracture", "yuleshard"
+  ]
+}

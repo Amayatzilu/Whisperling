@@ -1,0 +1,351 @@
+{
+    "dayform": {
+        "language_intro_title": "🌞 Choose Your Whispering Tongue",
+        "language_intro_desc": "{user}, welcome to the grove.\nLet the morning breeze carry your chosen voice.",
+        "language_confirm_title": "🌸 Thank you!",
+        "language_confirm_desc": "Your voice has joined the song of daybreak. The grove smiles upon you.",
+        "rules_confirm_title": "🌿 The grove welcomes you.",
+        "rules_confirm_desc": "You’ve accepted the path of peace and light. Let harmony guide your steps.",
+        "rules_none": "🌿 The grove whispers no laws... your steps are guided by kindness, {user}.",
+        "role_intro_title": "🌼 Choose Your Role",
+        "role_intro_desc": "Select a role to bloom into who you are beneath the sun.",
+        "role_granted": "✨ You’ve been gifted the **{role}** role! May it shine with purpose.",
+        "cosmetic_intro_title": "🌼 Add a Sunny Sparkle?",
+        "cosmetic_intro_desc": "Choose a **cosmetic role** to show your colors in the light of day.\nOr click **Skip** to continue basking.",
+        "cosmetic_granted": "✨ You've added a sunshine sparkle: **{role}**! Shine on!",
+        "cosmetic_skipped": "🌿 No sparkle today — the grove still smiles warmly.",
+        "welcome_title": "💫 Welcome!",
+        "welcome_desc": "Welcome, {user}! May your time here be filled with warmth, friendship, and discovery.",
+        "timeout_language": "⏳ {user}, the morning breeze faded before you spoke. Try again when you're ready.",
+        "timeout_rules": "⏳ {user}, the grove waited for your promise, but the sun dipped a little lower. You can return anytime.",
+        "timeout_role": "⏳ {user}, no role was chosen — the petals closed gently. Come find your bloom again soon.",
+        "timeout_cosmetic": "⏳ {user}, no sparkle was chosen, but the grove still glows with your presence."
+    }
+},
+
+{
+  "nightform": {
+    "language_intro_title": "🌙 Choose Your Whispering Tongue",
+    "language_intro_desc": "{user}, drift softly into the grove.\nChoose the voice that guides your quiet steps.",
+    "language_confirm_title": "🌌 A hush settles...",
+    "language_confirm_desc": "Your whisper joins the twilight wind. The grove listens, gently.",
+    "rules_confirm_title": "🌿 The grove watches in stillness.",
+    "rules_confirm_desc": "You’ve accepted the quiet pact. Walk kindly beneath the stars.",
+    "rules_none": "🌙 Beneath the moon’s hush, no rules are written... only the stars quietly watch, {user}.",
+    "role_intro_title": "🌾 Choose Your Role",
+    "role_intro_desc": "Select a role to carry with you beneath the moon’s gaze.",
+    "role_granted": "🌙 The role of **{role}** rests upon your shoulders, light as starlight.",
+    "cosmetic_intro_title": "🌙 Add a Moonlit Sparkle?",
+    "cosmetic_intro_desc": "Select a **cosmetic role** to shimmer gently in the quiet dark.\nOr press **Skip** to remain subtle beneath the stars.",
+    "cosmetic_granted": "🌌 You've chosen the sparkle of **{role}** — it glows like starlight.",
+    "cosmetic_skipped": "🌒 You remain quietly unadorned — the night welcomes you still.",
+    "welcome_title": "💫 Welcome!",
+    "welcome_desc": "Welcome, {user}.\nLet your spirit rest here — where night blooms in peace.",
+    "timeout_language": "⏳ {user}, the stars waited… but your voice did not rise. Return when you are ready to whisper.",
+    "timeout_rules": "⏳ {user}, the night listened… but your vow was never spoken. Come back when the hush feels right.",
+    "timeout_role": "⏳ {user}, beneath the moon’s gaze, no path was chosen. The grove sleeps on — your journey can begin later.",
+    "timeout_cosmetic": "⏳ {user}, no shimmer adorned you, but the dark welcomes you just the same."
+  }
+},
+
+{
+  "sylvabloom": {
+    "language_intro_title": "🍃 Choose Your Whispering Tongue",
+    "language_intro_desc": "{user}, the forest stirs with your presence.\nChoose the voice you’ll carry among the roots.",
+    "language_confirm_title": "🌱 It is done.",
+    "language_confirm_desc": "Your chosen tongue takes root. The grove will remember your voice.",
+    "rules_confirm_title": "🌿 The grove welcomes with stillness.",
+    "rules_confirm_desc": "The leaves accept your pact. Let your steps tread gently.",
+    "rules_none": "🍃 The deep woods offer no decree... trust the rhythm of the leaves, {user}.",
+    "cosmetic_intro_title": "🍂 Add a Woodland Sparkle?",
+    "cosmetic_intro_desc": "Choose a **cosmetic role** to wear like moss on bark — subtle and rooted.\nOr press **Skip** to walk the woods untouched.",
+    "cosmetic_granted": "🌾 You've chosen the charm of **{role}** — may it grow with you.",
+    "cosmetic_skipped": "🍃 You wander bare-footed, and the grove still smiles.",
+    "role_intro_title": "🌾 Choose Your Role",
+    "role_intro_desc": "Select the path you’ll walk through the undergrowth.",
+    "role_granted": "🍂 The role of **{role}** is yours — let it grow with you.",
+    "welcome_title": "🌳 Welcome to the Grove.",
+    "welcome_desc": "Welcome, {user}. Rest beneath the branches. You are part of the forest now.",
+    "timeout_language": "⏳ {user}, the forest rustled, but your voice did not take root. Return when your words are ready to grow.",
+    "timeout_rules": "⏳ {user}, the trees waited for your vow, but only wind passed through. The path remains, should you wish to walk it.",
+    "timeout_role": "⏳ {user}, no trail was chosen — the leaves curled softly. Return when your steps are sure.",
+    "timeout_cosmetic": "⏳ {user}, no charm was picked — yet the grove still knows your presence among its roots."
+  }
+},
+
+{
+  "selkintide": {
+    "language_intro_title": "🌊 Choose Your Whispering Tongue",
+    "language_intro_desc": "{user}, the tide calls softly.\nChoose the language that drifts upon your waves.",
+    "language_confirm_title": "🌬️ The current carries your voice.",
+    "language_confirm_desc": "Your chosen tongue echoes through the water's calm depths.",
+    "rules_confirm_title": "🌊 The sea accepts your presence.",
+    "rules_confirm_desc": "The tide has taken your vow — let your journey flow gently.",
+    "rules_none": "🌊 The waves write no rules upon the shore... may your heart be steady as the tides, {user}.",
+    "role_intro_title": "🌾 Choose Your Role",
+    "role_intro_desc": "Select a role to guide you along the ever-changing shoreline.",
+    "role_granted": "🌊 The sea grants you the role of **{role}** — carry it with the grace of the tide.",
+    "cosmetic_intro_title": "🌊 Add a Ripple of Sparkle?",
+    "cosmetic_intro_desc": "Choose a **cosmetic role** to flow with — gentle and glimmering.\nOr tap **Skip** to let the tide decide.",
+    "cosmetic_granted": "🐚 You've chosen **{role}** — may it shimmer with the sea’s grace.",
+    "cosmetic_skipped": "🌊 No shimmer today — the current carries you all the same.",
+    "welcome_title": "🌊 Welcome to the Waters.",
+    "welcome_desc": "Welcome, {user}. Let your voice join the songs of the deep.",
+    "timeout_language": "⏳ {user}, the tide waited, but no voice rode its waves. When you're ready, let it flow once more.",
+    "timeout_rules": "⏳ {user}, the sea listened for your vow… but only silence returned. The current will welcome you when you’re ready.",
+    "timeout_role": "⏳ {user}, no current carried your choice ashore. Drift back when the pull of purpose finds you.",
+    "timeout_cosmetic": "⏳ {user}, no shimmer joined your tide, but the ocean still holds you gently."
+  }
+},
+
+{
+  "hadesform": {
+    "language_intro_title": "🔥 Choose Your Whispering Tongue",
+    "language_intro_desc": "{user}, the flames flicker in anticipation.\nWhich tongue will you stoke into brilliance?",
+    "language_confirm_title": "💥 Ohhh yes.",
+    "language_confirm_desc": "Your words now spark with fire. Let the grove feel your heat.",
+    "rules_confirm_title": "🔥 The grove watches through smoke and flame.",
+    "rules_confirm_desc": "You’ve accepted the terms — but rules were made to *simmer*, weren’t they?",
+    "rules_none": "🔥 No rules burn here... but don’t set the place on fire, okay {user}? 🔥",
+    "role_intro_title": "🔥 Choose Your Role (before it chooses you)",
+    "role_intro_desc": "Pick what sets your soul ablaze — the grove likes bold sparks.",
+    "role_granted": "🔥 The role of **{role}** has been seared into your name. Don’t let it burn out.",
+    "cosmetic_intro_title": "🔥 Wanna Add Some Sizzle?",
+    "cosmetic_intro_desc": "Pick a **cosmetic role** that *crackles*. Or hit **Skip** if you’re already hot enough.",
+    "cosmetic_granted": "🔥 Oh! **{role}** suits you — now you’re really smokin’!",
+    "cosmetic_skipped": "😈 Skipped the glam? Bold move. Let the grove smolder without it.",
+    "welcome_title": "🔥 Welcome, Firestarter.",
+    "welcome_desc": "Welcome, {user}. Let your steps scorch the path — the grove will grow around the heat.",
+    "timeout_language": "⏳ {user}, the flames flickered… but you didn’t speak. Got stage fright, or just dramatic timing?",
+    "timeout_rules": "⏳ {user}, no vow? No problem. The grove’s rules are still smoldering — come back when you're ready to stir the coals.",
+    "timeout_role": "⏳ {user}, no role chosen? Bold move. Just vibing in the firelight, huh?",
+    "timeout_cosmetic": "⏳ {user}, no sizzle today — guess you're already hot enough. 🔥"
+  }
+},
+
+{
+  "auroraform": {
+    "language_intro_title": "❄️ Choose Your Whispering Tongue",
+    "language_intro_desc": "{user}, beneath the shimmer of frozen skies,\nselect the voice that will drift beside you.",
+    "language_confirm_title": "✨ It sparkles just right.",
+    "language_confirm_desc": "Your tongue has been kissed by frost light. Let it shimmer softly through the grove.",
+    "rules_confirm_title": "❄️ The stillness welcomes you.",
+    "rules_confirm_desc": "You’ve accepted the path of gentle light — one that dances just above silence.",
+    "rules_none": "❄️ The aurora glides silently... no rules interrupt its shimmer. Breathe easy, {user}.",
+    "role_intro_title": "💫 Choose Your Role",
+    "role_intro_desc": "Select a role to wear like star light on ice — delicate, bright, and uniquely yours.",
+    "role_granted": "❄️ You now bear the role of **{role}** — may it gleam quietly within you.",
+    "cosmetic_intro_title": "❄️ Add a Glimmer?",
+    "cosmetic_intro_desc": "Choose a **cosmetic role** to shimmer just right.\nOr click **Skip** and stay subtly radiant.",
+    "cosmetic_granted": "✨ The role of **{role}** gleams softly upon you — just lovely.",
+    "cosmetic_skipped": "🌫️ No sparkle? That’s okay. You already glow in your own way.",
+    "welcome_title": "✨ Welcome, Light-Dancer.",
+    "welcome_desc": "Welcome, {user}. The aurora has seen you — and the grove now glows a little brighter.",
+    "timeout_language": "⏳ {user}, the shimmer faded before you spoke. Return when the light calls softly again.",
+    "timeout_rules": "⏳ {user}, no vow was whispered… only the hush of frost remains. The grove waits in stillness.",
+    "timeout_role": "⏳ {user}, no path was chosen — the light dimmed quietly. Drift back when the skies stir once more.",
+    "timeout_cosmetic": "⏳ {user}, no sparkle joined your glow, but even the quietest star still shines."
+  }
+},
+
+
+{
+  "vernalglint": {
+    "language_intro_title": "🌸 Pick Your Bloom-Speak",
+    "language_intro_desc": "{user}, the grove is awake and caffeinated.\nChoose the voice that'll cheer you on (whether you like it or not).",
+    "language_confirm_title": "🌱 You’ve Sprouted a Sound!",
+    "language_confirm_desc": "Your voice blooms bright. The grove hums approvingly. You're *doing amazing, sweetie.*",
+    "rules_confirm_title": "🌼 The Grove Has Standards",
+    "rules_confirm_desc": "You've agreed to play nice. That’s the spirit! Now water your manners and let’s go.",
+    "rules_none": "🌸 No rules bloom here... the petals simply dance, as shall you, {user}.",
+    "role_intro_title": "🌷 Pick Your Petal-sona",
+    "role_intro_desc": "Choose your role like it’s your favorite flower crown. No pressure—but I *am* watching.",
+    "role_granted": "🌸 The role of **{role}** settles on you like a butterfly. *Gorgeous. Stunning. No notes.*",
+    "cosmetic_intro_title": "🌟 Accessorize Your Aura?",
+    "cosmetic_intro_desc": "Pick a **cosmetic role** to add sparkle to your already thriving self.\nOr skip it—if you’re going for the ~mysterious seedling~ aesthetic.",
+    "cosmetic_granted": "🌼 You chose **{role}** — *chef’s kiss.* You’re practically pollinating style.",
+    "cosmetic_skipped": "🍃 No frills? That’s okay. Still a ten. Nature chic.",
+    "welcome_title": "💐 You Made It!",
+    "welcome_desc": "Welcome, {user}!\nThe grove is proud of you. I’m proud of you. That tree over there is sobbing gently with pride. Let's grow.",
+    "timeout_language": "⏳ {user}, the sun waited, but your sproutling self stayed buried. Come back when you’re ready to rise and shine.",
+    "timeout_rules": "⏳ {user}, the grove sat politely, but your oath got stuck in the roots. Water it and try again later.",
+    "timeout_role": "⏳ {user}, you stared at the garden path too long and now a squirrel has taken your spot. Try again soon!",
+    "timeout_cosmetic": "⏳ {user}, no sparkle today. But that’s okay. Some petals take longer to open. 🌱"
+  }
+},
+
+{
+  "sunfracture": {
+    "language_intro_title": "☀️ CHOOSE YOUR TONGUE!",
+    "language_intro_desc": "{user}, the grove shimmers beneath golden skies! Choose the voice that warms your spark and joins the light!",
+    "language_confirm_title": "⚡ VOICE EMBRACED!",
+    "language_confirm_desc": "Your words now glow like sunlight through leaves — the grove hums with your radiance!",
+    "rules_confirm_title": "☀️ THE GROVE SHINES BRIGHT!",
+    "rules_confirm_desc": "You’ve embraced the path — the grove glows brighter with your presence. Let the joy bloom like morning light!",
+    "rules_none": "🌞 The fractured light casts no laws... step carefully between the shards, {user}.",
+    "role_intro_title": "🔥 CHOOSE YOUR ROLE!",
+    "role_intro_desc": "Which role calls your spark to rise? Choose the one that lets you shine like the golden hour!",
+    "role_granted": "🌞 The role of **{role}** is yours! Your light dances across the grove — radiant, warm, and full of life!",
+    "cosmetic_intro_title": "☀️ EXTRA SPARKLE?",
+    "cosmetic_intro_desc": "Pick a **cosmetic role** to let your spark shimmer even brighter — or skip if you're already perfectly aglow.",
+    "cosmetic_granted": "🌟 Brilliant choice! **{role}** wraps you in golden sparkle — the grove gleams with you!",
+    "cosmetic_skipped": "💥 You shine just fine without it — sometimes simplicity catches the sun best.",
+    "welcome_title": "☀️ WELCOME!",
+    "welcome_desc": "Welcome, {user}! The grove glows warmer with you here. May your light dance across our skies!",
+    "timeout_language": "⏳ {user}, the golden light waited… but briefly. Return when your spark is ready to rise again! ☀️🌻",
+    "timeout_rules": "⏳ {user}, the pages turned softly in the breeze — but you missed your chance. The grove remains here for you. 🌞📜",
+    "timeout_role": "⏳ {user}, no role chosen — but the grove still shines. Your moment will come again! 🌟💫",
+    "timeout_cosmetic": "⏳ {user}, no extra sparkle today — and yet, your light remains bright. ✨🌿"
+  }
+},
+
+{
+  "fallveil": {
+    "language_intro_title": "🍁 Pick Your Language — Then Exhale",
+    "language_intro_desc": "{user}, hush. Let the leaves fall. Choose the voice that won’t rush you, but won’t let you flee, either.",
+    "language_confirm_title": "🕯️ The hush holds you now.",
+    "language_confirm_desc": "Your voice settles into dusk. The grove nods. You're allowed to be soft and still. *Finally.*",
+    "rules_confirm_title": "🌒 The Pact of Rest is Made",
+    "rules_confirm_desc": "You agreed to stay kind. That includes being kind to *yourself.* The grove approves. And has tea ready.",
+    "rules_none": "🍂 The autumn hush carries no rules... only soft whispers ride the wind, {user}.",
+    "role_intro_title": "🧣 Choose Your Identity — Shed the Old Skin",
+    "role_intro_desc": "Pick a role like you’re letting go of expectations. You don’t have to carry what doesn’t fit anymore.",
+    "role_granted": "🍁 The role of **{role}** cloaks you like dusk. It's not a costume — it's who you were always becoming.",
+    "cosmetic_intro_title": "🕯️ Want a Little Extra Magic?",
+    "cosmetic_intro_desc": "Choose a **cosmetic role** if your soul needs a little glitter today.\nOr skip it — some starlight is better kept in pockets.",
+    "cosmetic_granted": "🌟 You picked **{role}** — cozy, radiant, and absolutely earned.",
+    "cosmetic_skipped": "🌫️ No shimmer needed. Still stunning. Still sacred.",
+    "welcome_title": "🧡 You're Home Now.",
+    "welcome_desc": "Welcome, {user}.\nUnclench. Exhale. You’ve been running too long. The grove has been waiting to hold you. Let it.",
+    "timeout_language": "⏳ {user}, the trees waited. The dusk waited. But you weren’t ready. That’s okay. You don’t owe anyone urgency.",
+    "timeout_rules": "⏳ {user}, you didn’t make the vow. Maybe you forgot. Or maybe you were scared. The grove is patient. Try again when you’re brave enough to rest.",
+    "timeout_role": "⏳ {user}, no path chosen. Maybe today wasn’t a path day. That’s alright. The leaves will still fall without your permission.",
+    "timeout_cosmetic": "⏳ {user}, no sparkle today. No mask. Just you — and that's never been a lesser thing. 🍂"
+  }
+},
+
+{
+  "yuleshard": {
+    "language_intro_title": "❄️ Choose your whispering tongue...",
+    "language_intro_desc": "{user}... the grove lies quiet beneath the snow. Choose your voice — let it drift gently into the stillness...",
+    "language_confirm_title": "❄️ Voice chosen.",
+    "language_confirm_desc": "Your words settle like falling snow... the grove listens softly beneath its winter veil.",
+    "rules_confirm_title": "❄️ The grove rests beneath the frost.",
+    "rules_confirm_desc": "You’ve accepted the pact, written like ice crystals — delicate, enduring, beautiful beneath the quiet sky.",
+    "rules_none": "❄️ In this frozen stillness, no rules remain... but warmth may yet find you, {user}.",
+    "role_intro_title": "🧊 Choose your role...",
+    "role_intro_desc": "Each path glistens like morning frost... select the one that shines beneath winter’s hush.",
+    "role_granted": "❄️ You now hold the role of **{role}**... steady and bright, like starlight on fresh snow.",
+    "cosmetic_intro_title": "❄️ Choose a shimmer...",
+    "cosmetic_intro_desc": "Select a cosmetic role to let your winter light sparkle... or click **Skip** to remain in quiet elegance.",
+    "cosmetic_granted": "🧊 You now shimmer as **{role}**… quiet radiance beneath the frost.",
+    "cosmetic_skipped": "🌨️ No shimmer chosen... the snow falls softly, untouched and pure.",
+    "welcome_title": "❄️ Welcome...",
+    "welcome_desc": "Welcome, {user}... your light joins the quiet grove — steady as falling snow beneath winter’s sky.",
+    "timeout_language": "⏳ {user}... the frost lingered... but your voice did not arrive... the grove remains hushed.",
+    "timeout_rules": "⏳ {user}... the pact was left unwritten... snow falls, covering empty ground...",
+    "timeout_role": "⏳ {user}... the choice faded like breath in winter air... the grove waits beneath the frost...",
+    "timeout_cosmetic": "⏳ {user}... no shimmer chosen... the snow falls in quiet layers, undisturbed..."
+  }
+},
+
+{
+  "echovoid": {
+    "language_intro_title": "🕳️ …choose… your whispering tongue…",
+    "language_intro_desc": "{user}… {user}… the grove… has been quiet… so quiet…\nA voice… any voice… choose it… echo it…",
+    "language_confirm_title": "…it echoes…",
+    "language_confirm_desc": "Your voice… your voice… has returned… returned… to the grove…",
+    "rules_confirm_title": "…the grove listens…",
+    "rules_confirm_desc": "You’ve accepted… the silence… the shape of the rules… rules… rules…",
+    "rules_none": "🎶 The echoes hold no commands... only the hollow chords hum softly for you, {user}.",
+    "role_intro_title": "…choose your… role…",
+    "role_intro_desc": "A role… drifting in the dark… grab hold… before it fades again…",
+    "role_granted": "🕳️ You… you are now… **{role}**… or were… or will be… it’s hard to tell…",
+    "cosmetic_intro_title": "🕳️ …choose… a shimmer…",
+    "cosmetic_intro_desc": "…a role… a glimmer… a name to wear… or… nothing… the void remembers either…",
+    "cosmetic_granted": "🌫️ …you are now… **{role}**… or were… or could be… it’s… unclear…",
+    "cosmetic_skipped": "🕳️ …no sparkle… only echoes… fading…",
+    "welcome_title": "…welcome…",
+    "welcome_desc": "Welcome, {user}… you’ve come back… or never left… the grove remembers… something…",
+    "timeout_language": "⏳ {user}… (you were going to choose…) …but the moment passed… and passed again…",
+    "timeout_rules": "⏳ {user}… the rules waited… (or did they?) …they echo now… in the quiet…",
+    "timeout_role": "⏳ {user}… no role… no name… (no identity?) …just echoes where a choice could have been…",
+    "timeout_cosmetic": "⏳ {user}… no sparkle chosen… (or maybe you did…) …it’s hard to remember now…"
+  }
+},
+
+{
+  "glitchspire": {
+    "language_intro_title": "🧬 ▓Choose▓ your ▒whispering▒ tongue…",
+    "language_intro_desc": "{user} = DETECTED\n>LOADING_LINGUAL_OPTIONS…\nSELECT //voice.signal.stable",
+    "language_confirm_title": "📡 Voice.lock=TRUE",
+    "language_confirm_desc": ">>T̷̨̨͓̩̯̘͔͎̗̺̈́̐͋̍̂̈́̓̓͐̈́̾̌͜͝Ơ̵͇̬̍͒̐̄́͒͋́͂̑̅̚͘͝N̶̤̱̳͇̅̈́͌̓́̈́̆͘̚̕͠G̸̠͎̼͓̘̈́̄͂̂̓̋̍́͝͝Ư̴̺̺͚͖̮̥̥͎͔̘̌̑̏̒͌̓̾͒̄̓͒͌͐̚Ḛ̶̛̛̈́̏͗̈́̑͛͛̍̐ CONFIRMED\nSignal: unstable but holding…",
+    "rules_confirm_title": "📂 GROVE.PROTOCOL_ACCEPTED",
+    "rules_confirm_desc": "Rules.upload = COMPLETE\n(…some fragments missing… parsing okay… continue anyway…)",
+    "rules_none": "🌀 {user}... ru..les…? ::undefined:: none.. detected... proceed, probably…",
+    "role_intro_title": "💾 SELECT: ROLE_MODULE",
+    "role_intro_desc": "SCANNING AVATAR TRAITS…\nOPTIONS LOADED… please assign identity-tag.",
+    "role_granted": "🧬 Role assigned: **{role}**\n{user}.unit // configuration updated.",
+    "cosmetic_intro_title": "🧬 ▓SELECT▓ YOUR ▒SPARKLE▒ MODULE",
+    "cosmetic_intro_desc": "…scanning available cosmetic roles… ::injecting identity flair…",
+    "cosmetic_granted": "📎 COSMETIC ROLE = **{role}** …visual anomaly: accepted.",
+    "cosmetic_skipped": "🧬 Skipped cosmetic role injection… stability maintained… for now.",
+    "welcome_title": "🧬 ::WELCOME::",
+    "welcome_desc": "Greetings {user}… memory restored?\nEnvironment unstable… but you belong here now…",
+    "timeout_language": "⏳ {user}… <response_timeout>… [voice.selection=FAILED] :: system will attempt memory restoration… later…",
+    "timeout_rules": "⏳ {user}… RULE.CONFIRMATION.MISSED… frost.byte()… protocol.standby…",
+    "timeout_role": "⏳ {user}… ROLE_UNASSIGNED… identity packet corrupted… awaiting input retry…",
+    "timeout_cosmetic": "⏳ {user}… COSMETIC.FLARE=VOID… no sparkle attached… system stability: ⬇️ 81%…"
+  }
+},
+
+{
+  "crepusca": {
+    "language_intro_title": "🌒 …a voice… half-remembered…",
+    "language_intro_desc": "{user}… the grove has fallen into a hush…\nchoose your voice… before the dream fades…",
+    "language_confirm_title": "💫 the silence stirs…",
+    "language_confirm_desc": "your tongue drifts… through soft mist… it has… remembered you…",
+    "rules_confirm_title": "🌘 …etched in dreamlight…",
+    "rules_confirm_desc": "you’ve whispered your vow… and the grove… listens through sleep…",
+    "rules_none": "🌒 …no laws… only the drifting mists… the grove trusts you, {user}…",
+    "role_intro_title": "🌫️ choose… gently…",
+    "role_intro_desc": "roles drift like fog… reach for the one that hums with quiet truth…",
+    "role_granted": "🌒 the role of **{role}** settles around you… like dusk falling slow…",
+    "cosmetic_intro_title": "🌒 A quiet glimmer...",
+    "cosmetic_intro_desc": "The twilight stirs... Would you like to choose a soft sparkle to carry into the dusk? Or let the silence stay.",
+    "cosmetic_granted": "The role of {role} settles on you, gentle as falling stars.",
+    "cosmetic_skipped": "You remain unadorned — a quiet light in the dreaming dark.",
+    "welcome_title": "🌒 …welcome back…",
+    "welcome_desc": "welcome, {user}… the stars blink slowly in the quiet sky… we are… still dreaming…",
+    "timeout_language": "⏳ {user}… the hush held its breath… but your voice never arrived… it’s okay… the stars are still listening…",
+    "timeout_rules": "⏳ {user}… your vow… was almost spoken… then lost… like smoke in the dusk…",
+    "timeout_role": "⏳ {user}… the grove waited… but no path was chosen… only mist remains…",
+    "timeout_cosmetic": "⏳ {user}… the glimmer passed you by… but you still glow in the dreaming dark…"
+  }
+},
+
+{
+  "flutterkin": {
+    "flutterkin_activation": "✨ {user} a gentle shimmer surrounds you... the flutterkin hears your wish. yay~ ✨",
+    "language_intro_title": "🌈 pick your whisper tongue!!",
+    "language_intro_desc": "{user} hi hi!! ✨ um um can u pick a voice please? it go pretty~!!!",
+    "language_confirm_title": "✨ yaaay!!",
+    "language_confirm_desc": "your voice is all sparkle-sparkle now!!! 💖 the grove is going WHEEEE~!",
+    "rules_confirm_title": "🧸 okay sooo…",
+    "rules_confirm_desc": "you said yes to the rules!! 🥹 You so good. grove say thankyuu 💕",
+    "rules_none": "🦋 No rules! 🎉 Just flutters and sparkles and… oh! Shiny! Hi {user}!",
+    "role_intro_title": "🐾 pick a role!!",
+    "role_intro_desc": "this the fun part!!! pick the sparkly hat you wanna wear!! (it's not a hat but SHHH!)",
+    "role_granted": "💫 yaaaaayyy!! you is now the **{role}**!! that’s the bestest!!! i’m clapping with my wings!!",
+    "cosmetic_intro_title": "✨ Time to pick a sparkle!",
+    "cosmetic_intro_desc": "Do you want to add a cute little role to show your sparkle? You can choose one or skip if you’re shy~",
+    "cosmetic_granted": "Yay! You have the {role} role now. It’s soooo sparkly!",
+    "cosmetic_skipped": "No sparkle today? That’s okay. You're still the cutest~",
+    "welcome_title": "🌸 hiiiiii~!!",
+    "welcome_desc": "welcoooome {user}!! 🐞💖 the grove LOVES you already!! you want snack? or nap? or sparkle cloud???",
+    "timeout_language": "⏳ {user} ummm you didn’t pick the thing?? that’s ok!! we can try again later yayyy 💖✨",
+    "timeout_rules": "⏳ {user} oh no rules went bye bye!! 😢 the grove still loves you though!! maybe come back and tap the button??",
+    "timeout_role": "⏳ {user} oh!!! wait!! you didn’t pick a sparkly hat!! 🌟 next time next time!!",
+    "timeout_cosmetic": "⏳ {user} no sparkle?! 😱 its okay!! you still squishy!!! 🐛✨💕"
+  }
+}
