@@ -19,10 +19,14 @@ MODE_TEXTS = load_json_file("MODE_TEXTS.json")
 MODE_FOOTERS = load_json_file("MODE_FOOTERS.json")
 MODE_COLORS = load_json_file("MODE_COLORS.json")
 MODE_DESCRIPTIONS = load_json_file("MODE_DESCRIPTIONS.json")
-FORM_CATEGORIES = load_json_file("FORM_CATEGORIES.json")
 FORM_EMOJIS = load_json_file("FORM_EMOJIS.json")
 FORM_PROFILES = load_json_file("FORM_PROFILES.json")
 FLAVOR_TEXTS = load_json_file("FLAVOR_TEXTS.json")
+FORM_CATEGORIES = load_json_file("FORM_CATEGORIES.json")
+
+STANDARD_MODES = FORM_CATEGORIES.get("STANDARD_MODES", [])
+GLITCHED_MODES = FORM_CATEGORIES.get("GLITCHED_MODES", [])
+SEASONAL_MODES = FORM_CATEGORIES.get("SEASONAL_MODES", [])
 
 # ========== CONFIG ==========
 TOKEN = os.getenv("DISCORD_TOKEN")
