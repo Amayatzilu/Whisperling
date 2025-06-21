@@ -117,13 +117,43 @@ async def on_ready():
     except Exception as e:
         print(f"❗ Failed to sync spells: {e}")
 
+    await seasonal_check_once()  # 🌟 immediate seasonal mode check
+
     bot.loop.create_task(glitch_reversion_loop())
     bot.loop.create_task(decay_activity_loop())
     bot.loop.create_task(grove_heartbeat(bot))
-    bot.loop.create_task(seasonal_check_loop())  # 👈 Add this line
+    bot.loop.create_task(seasonal_check_loop())
 
+async def seasonal_check_once():
+    now = datetime.now(timezone.utc)
+    for guild in bot.guilds:
+        guild_id = str(guild.id)
+        current_mode = guild_modes.get(guild_id, "dayform")
 
-# Seasonal mode & avatar trigger
+        if is_summer_solstice():
+            seasonal_mode = "sunfracture"
+        elif is_winter_solstice():
+            seasonal_mode = "yuleshard"
+        elif is_spring_equinox():
+            seasonal_mode = "vernalglint"
+        elif is_autumn_equinox():
+            seasonal_mode = "fallveil"
+        else:
+            seasonal_mode = None
+
+        if seasonal_mode:
+            if current_mode != seasonal_mode:
+                previous_standard_mode_by_guild[guild_id] = current_mode
+                print(f"🌸 (Startup) Switching {guild_id} to seasonal mode: {seasonal_mode}")
+                await apply_mode_change(guild, seasonal_mode)
+                await update_avatar_for_mode(seasonal_mode)
+        else:
+            if current_mode in SEASONAL_MODES:
+                previous = previous_standard_mode_by_guild.get(guild_id, "basic")
+                print(f"🍂 (Startup) Reverting {guild_id} from seasonal mode {current_mode} to {previous}")
+                await apply_mode_change(guild, previous)
+                await update_avatar_for_mode(previous)
+
 async def seasonal_check_loop():
     await bot.wait_until_ready()
     while not bot.is_closed():
@@ -409,23 +439,6 @@ async def update_avatar_for_mode(mode: str):
         print(f"⚠️ No avatar found for mode: {avatar_key}")
 
 from discord.ext import tasks
-
-@tasks.loop(hours=24)
-async def seasonal_mode_check():
-    now = datetime.now(timezone.utc)
-    for guild in bot.guilds:
-        if is_summer_solstice():
-            await apply_mode_change(guild, "sunfracture")
-            await update_avatar_for_mode("sunfracture")
-        elif is_winter_solstice():
-            await apply_mode_change(guild, "yuleshard")
-            await update_avatar_for_mode("yuleshard")
-        elif is_spring_equinox():
-            await apply_mode_change(guild, "vernalglint")
-            await update_avatar_for_mode("vernalglint")
-        elif is_autumn_equinox():
-            await apply_mode_change(guild, "fallveil")
-            await update_avatar_for_mode("fallveil")
 
 # --- Apply mode change safely ---
 
