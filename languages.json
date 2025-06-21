@@ -100,6 +100,24 @@
         "938539765739978813": "de",
         "474049414755778561": "en"
       }
+    },
+    "1249379265674477610": {
+      "languages": {
+        "en": {
+          "name": "English",
+          "welcome": "🌿 Welcome to Serenity! 🌿\\nYou’ve stepped into a place where stories unfold, kinfolk gather, and sparks light the path ahead. ✨\\nWhether you're here to adventure, create, or simply relax with fellow dreamers — you’ve found your guild. 🌌\\nSettle in, traveler. Your journey starts here. 💖"
+        },
+        "de": {
+          "name": "Deutsch",
+          "welcome": "🌿 Willkommen in Serenity! 🌿\\nDu bist an einem Ort angekommen, wo Geschichten entstehen, Kinfolk sich versammeln und Funken den Weg erleuchten. ✨\\nOb du Abenteuer suchst, kreativ werden willst oder einfach mit anderen Träumern entspannen möchtest — du hast deine Gilde gefunden. 🌌\\nMach es dir bequem, Reisender. Deine Reise beginnt hier. 💖"
+        }
+      },
+      "users": {},
+      "welcome_channel_id": 1249379265674477613,
+      "rules": {
+        "en": "🌸 Be kind.\\nWe’re all here to relax, share, and enjoy. Respect each other.\\n\\n🌙 Keep it cozy.\\nThis is a chill space — drama belongs outside the grove.\\n\\n✨ Have fun.\\nWhether you're gaming, worldbuilding, or just hanging out — enjoy the magic.",
+        "de": "🌸 Sei freundlich.\\nWir sind hier, um zu entspannen, zu teilen und Spaß zu haben. Respektiere einander.\\n\\n🌙 Halte es gemütlich.\\nDies ist ein entspannter Ort — Drama bleibt bitte außerhalb des Hains.\\n\\n✨ Hab Spaß.\\nOb beim Spielen, Weltenbauen oder einfach nur beim Plaudern — genieße die Magie."
+      }
     }
   }
 }

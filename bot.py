@@ -120,41 +120,46 @@ async def on_ready():
     bot.loop.create_task(glitch_reversion_loop())
     bot.loop.create_task(decay_activity_loop())
     bot.loop.create_task(grove_heartbeat(bot))
+    bot.loop.create_task(seasonal_check_loop())  # 👈 Add this line
 
-async def glitch_reversion_loop():
+
+# Seasonal mode & avatar trigger
+async def seasonal_check_loop():
     await bot.wait_until_ready()
     while not bot.is_closed():
         now = datetime.now(timezone.utc)
+        for guild in bot.guilds:
+            guild_id = str(guild.id)
+            current_mode = guild_modes.get(guild_id, "dayform")
 
-        for guild_id, timestamp in list(glitch_timestamps_by_guild.items()):
-            mode = guild_modes[guild_id]
-            guild = bot.get_guild(int(guild_id))
+            # Determine current seasonal mode (if any)
+            if is_summer_solstice():
+                seasonal_mode = "sunfracture"
+            elif is_winter_solstice():
+                seasonal_mode = "yuleshard"
+            elif is_spring_equinox():
+                seasonal_mode = "vernalglint"
+            elif is_autumn_equinox():
+                seasonal_mode = "fallveil"
+            else:
+                seasonal_mode = None
 
-            if mode not in GLITCHED_MODES + SEASONAL_MODES:
-                continue
+            if seasonal_mode:
+                # Enter seasonal mode if not already active
+                if current_mode != seasonal_mode:
+                    previous_standard_mode_by_guild[guild_id] = current_mode
+                    print(f"🌸 Switching {guild_id} to seasonal mode: {seasonal_mode}")
+                    await apply_mode_change(guild, seasonal_mode)
+                    await update_avatar_for_mode(seasonal_mode)
+            else:
+                # Revert seasonal mode if the date is no longer in-season
+                if current_mode in SEASONAL_MODES:
+                    previous = previous_standard_mode_by_guild.get(guild_id, "basic")
+                    print(f"🍂 Reverting {guild_id} from seasonal mode {current_mode} to {previous}")
+                    await apply_mode_change(guild, previous)
+                    await update_avatar_for_mode(previous)
 
-            # Flutterkin expiry
-            if mode == "flutterkin" and timestamp and (now - timestamp > timedelta(minutes=30)):
-                previous = previous_standard_mode_by_guild[guild_id]
-                print(f"🍼 Flutterkin nap time for {guild_id}. Reverting to {previous}.")
-                await apply_mode_change(guild, previous)
-                glitch_timestamps_by_guild[guild_id] = None
-
-            # Other glitched modes expiry
-            elif mode in ["echovoid", "glitchspire", "crepusca"] and timestamp and (now - timestamp > timedelta(minutes=30)):
-                previous = previous_standard_mode_by_guild[guild_id]
-                print(f"⏳ Glitch expired for {guild_id}. Reverting to {previous}.")
-                await apply_mode_change(guild, previous)
-                glitch_timestamps_by_guild[guild_id] = None
-
-            # Seasonal mode expired out-of-season
-            elif mode in SEASONAL_MODES and not is_current_season_mode(mode):
-                previous = previous_standard_mode_by_guild[guild_id]
-                print(f"🗓️ {mode} expired for {guild_id}. Reverting to {previous}.")
-                await apply_mode_change(guild, previous)
-                glitch_timestamps_by_guild[guild_id] = None
-
-        await asyncio.sleep(60)
+        await asyncio.sleep(3600)  # Run once per hour
 
 @bot.event
 async def on_message(message):
@@ -363,8 +368,6 @@ def style_text(guild_id, text):
     mode = guild_modes[str(guild_id)]
     return MODE_TONE.get(mode, lambda t: t)(text)
 
-# --- (Season triggers — keep if still used!) ---
-
 def is_spring_equinox():
     today = datetime.now(timezone.utc)
     return today.month == 3 and 17 <= today.day <= 23
@@ -405,6 +408,25 @@ async def update_avatar_for_mode(mode: str):
     else:
         print(f"⚠️ No avatar found for mode: {avatar_key}")
 
+from discord.ext import tasks
+
+@tasks.loop(hours=24)
+async def seasonal_mode_check():
+    now = datetime.now(timezone.utc)
+    for guild in bot.guilds:
+        if is_summer_solstice():
+            await apply_mode_change(guild, "sunfracture")
+            await update_avatar_for_mode("sunfracture")
+        elif is_winter_solstice():
+            await apply_mode_change(guild, "yuleshard")
+            await update_avatar_for_mode("yuleshard")
+        elif is_spring_equinox():
+            await apply_mode_change(guild, "vernalglint")
+            await update_avatar_for_mode("vernalglint")
+        elif is_autumn_equinox():
+            await apply_mode_change(guild, "fallveil")
+            await update_avatar_for_mode("fallveil")
+
 # --- Apply mode change safely ---
 
 async def apply_mode_change(guild, mode):
@@ -426,9 +448,8 @@ async def apply_mode_change(guild, mode):
 # --- Build embed correctly ---
 
 def build_whisperling_embed(guild_id, title: str, description: str):
-    mode = guild_modes.get(str(guild_id), "dayform")  # Pull mode cleanly
+    mode = guild_modes.get(str(guild_id), "dayform")
 
-    # Build path directly — because you *do* have every file
     avatar_path = f"avatars/{mode}.png"
 
     embed = discord.Embed(
