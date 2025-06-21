@@ -404,19 +404,19 @@ def style_text(guild_id, text):
 
 def is_spring_equinox():
     today = datetime.now(timezone.utc)
-    return today.month == 3 and 17 <= today.day <= 23
+    return today.month == 3 and 20 <= today.day <= 27
 
 def is_autumn_equinox():
     today = datetime.now(timezone.utc)
-    return today.month == 9 and 19 <= today.day <= 25
+    return today.month == 9 and 22 <= today.day <= 29
 
 def is_summer_solstice():
     today = datetime.now(timezone.utc)
-    return today.month == 6 and 18 <= today.day <= 24
+    return today.month == 6 and 21 <= today.day <= 28
 
 def is_winter_solstice():
     today = datetime.now(timezone.utc)
-    return today.month == 12 and 18 <= today.day <= 24
+    return today.month == 12 and 21 <= today.day <= 28
 
 # --- Avatar updates ---
 
